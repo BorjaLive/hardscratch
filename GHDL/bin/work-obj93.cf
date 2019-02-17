@@ -1,0 +1,4 @@
+v 4
+file / "C:\Users\Arlin-T2\Desktop\hello.vhd" "4b83d01b41316c529a29a4f5918e04b90f4e8936" "20190131174637.704":
+  entity heartbeat at 1( 0) + 0 on 17;
+  architecture behaviour of heartbeat at 9( 138) + 0 on 18;

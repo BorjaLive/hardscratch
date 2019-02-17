@@ -67,6 +67,15 @@ public abstract class Element extends ElementBase{
     }
     
     public final boolean colide(int x, int y){
+        for(int i = 0; i < boxen.size(); i++){
+            TextBox box = boxen.get(i);
+            if(x > box.getX() && x < box.getX()+box.getWidth()
+            && y > box.getY() && y < box.getY()+box.getHeight()){
+                boxSelected = i;
+                return true;
+            }
+        }
+        
         //TODO: remplazar con un while
         for(int[] boundingBox : boundingBoxes){
             if( x-position.getCordX() > boundingBox[0] && x-position.getCordX() < boundingBox[1] &&
@@ -76,16 +85,7 @@ public abstract class Element extends ElementBase{
                 else
                     action(boundingBox[4]);
         }
-        if(boxSelected != -1)
-            return false;
-        for(int i = 0; i < boxen.size(); i++){
-            TextBox box = boxen.get(i);
-            if(x > box.getX() && x < box.getX()+box.getWidth()
-            && y > box.getY() && y < box.getY()+box.getHeight()){
-                boxSelected = i;
-                return true;
-            }
-        }
+        
         return false;
     }
     

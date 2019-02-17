@@ -1,0 +1,6 @@
+GHDL es perfecto.
+La simulacion debe acerse con salidas por consola, esas se controlan y se dibujan en pantalla.
+
+-a para procesar
+-e para comprobar
+-r para ejecutar
