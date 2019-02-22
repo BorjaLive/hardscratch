@@ -1,24 +1,23 @@
 package hardscratch.base;
 
-import org.lwjgl.glfw.GLFW;
-
 public class SyncTimer {
      
-    private int mode;
-    private double timeThen;
+    private static double timeThen;
+    private static int targetFPS;
  
-    public SyncTimer(){
-        timeThen = System.nanoTime();
+    public static void initer(int fps){
+        SyncTimer.timeThen = System.nanoTime();
+        SyncTimer.targetFPS = fps;
     }
      
-    public void sync(double fps) throws Exception {
+    public static void sync() throws Exception {
         double resolution = 1000000000.0D;
         double timeNow =  System.nanoTime();
          
-        double gapTo = resolution / fps + timeThen;
+        double gapTo = resolution / targetFPS + timeThen;
 
         while (gapTo < timeNow) 
-            gapTo = resolution / fps + gapTo;
+            gapTo = resolution / targetFPS + gapTo;
         
         while (gapTo > timeNow) {
             Thread.sleep(1);

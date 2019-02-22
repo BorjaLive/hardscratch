@@ -9,14 +9,16 @@ public class TextLabel extends ElementBase{
     private Font font;
     private String text;
     private char[] letters;
-    private int[] color;
+    private float[] color;
+    boolean align;
     
-    public TextLabel(int x, int y, int depth, float scale, Font font, int[] color, String text) {
+    public TextLabel(int x, int y, int depth, float scale, Font font, float[] color, String text, boolean align) {
         super(x, y, depth, scale);
         
         this.font = font;
         this.text = text;
         this.color = color;
+        this.align = align; //Center align
         generateLetters();
     }
     
@@ -24,10 +26,10 @@ public class TextLabel extends ElementBase{
     public void setFont(Font f){
         font = f;
     }
-    public int[] getColor(){
+    public float[] getColor(){
         return color;
     }
-    public void setColor(int[] c){
+    public void setColor(float[] c){
         color = c;
     }
     public String getText(){
@@ -45,9 +47,8 @@ public class TextLabel extends ElementBase{
         if(text.length() > 0){
             text = text.substring(0, text.length()-1);
             generateLetters();
-            return true;
         }
-        return false;
+        return text.length() > 0;
     }
     
     private void generateLetters(){
@@ -58,8 +59,11 @@ public class TextLabel extends ElementBase{
         return text.length() - text.replace("\n", "").length();
     }
     public int getCharsLastLine(){
+        return getCharsLine(getLines());
+    }
+    public int getCharsLine(int n){
         String lines[] = text.split("\n");
-        return lines[lines.length-1].length();
+        return n>=lines.length?0:lines[n].length();
     }
     
     
@@ -67,7 +71,9 @@ public class TextLabel extends ElementBase{
         Texture letter;
         int line = 0, count = 0;
         float   width = scale*Dot.relativeSizeX(font.getWidth()),
-                height = scale*Dot.relativeSizeY(font.getHeight());
+                height = scale*Dot.relativeSizeY(font.getHeight()),
+                spacingW = scale*Dot.relativeSizeX(font.getLetterSpace()),
+                spacingH = scale*Dot.relativeSizeX(font.getLinesPace());
         
         glColor3f(color[0], color[1], color[2]);
         
@@ -76,13 +82,15 @@ public class TextLabel extends ElementBase{
                 line++;
                 count = 0;
             }else{
+                float paddingW, paddingH = (spacingH*(getLines()+1.5f))/2;
                 letter = font.getCharacter((int)letters[i]);
                 letter.bind();
                 glBegin(GL_QUADS);
                 for(int j = 0; j < Global.SHAPE_TEXTURE.length; j++){
+                    paddingW = (spacingW*getCharsLine(line))/2;
                     glTexCoord2f(Global.SHAPE_TEXTURE[j][0], Global.SHAPE_TEXTURE[j][1]);
-                    glVertex2f( position.getRelX()+(Global.SHAPE_TEXTURE[j][0]*width) +(Dot.relativeSizeX(font.getLetterSpace()*count)),
-                                position.getRelY()+(Global.SHAPE_TEXTURE[j][1]*height)+(Dot.relativeSizeY(font.getLinesPace()*line)));
+                    glVertex2f( position.getRelX()+(Global.SHAPE_TEXTURE[j][0]*width) +(spacingW*count) - paddingW,
+                                position.getRelY()+(Global.SHAPE_TEXTURE[j][1]*height)-(spacingH*line)  + paddingH);
                 }
                 glEnd();
                 Global.unBind();

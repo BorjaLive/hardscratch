@@ -4,18 +4,18 @@ import hardscratch.base.ElementBase;
 
 public class Shape extends ElementBase{
     
-    protected int color[];
+    protected float color[];
     
-    public Shape(int x, int y, int[] color, float scale, int depth) {
+    public Shape(int x, int y, float[] color, float scale, int depth) {
         super(x, y, depth, scale);
         
         this.color = color;
     }
     
-    public void setColor(int c[]){
+    public void setColor(float c[]){
         color = c;
     }
-    public int[] getColor(){
+    public float[] getColor(){
         return color;
     }
     

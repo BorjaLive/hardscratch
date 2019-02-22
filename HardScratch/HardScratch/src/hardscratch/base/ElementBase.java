@@ -43,10 +43,10 @@ public class ElementBase {
     public float getScale(){
         return scale;
     }
-    public float getX(){
+    public int getX(){
         return position.getCordX();
     }
-    public float getY(){
+    public int getY(){
         return position.getCordY();
     }
 }

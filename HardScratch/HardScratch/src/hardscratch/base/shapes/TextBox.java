@@ -1,5 +1,6 @@
 package hardscratch.base.shapes;
 
+import hardscratch.Controller;
 import hardscratch.base.*;
 import hardscratch.inputs.Keyboard;
 
@@ -11,11 +12,15 @@ public class TextBox extends ElementBase{
     Shape_Square box1, box2;
     int maxW, maxH, weight, height, border;
     //boolean selected;
-    boolean empty;
-    int[] color_selected, color_notSelected, color_text, color_placeholder;
+    boolean empty, tight;
+    int alignW,alignH;
+    float[] color_selected, color_notSelected, color_text, color_placeholder;
+    private final int ID;
     
-    public TextBox(int x, int y, int depth, float scale, Font font, String placeholder, int[] color_text, int[] color_placeholder, int[] color_back, int[] color_border_1, int[] color_border_2, int width, int height, int border) {
+    public TextBox(int x, int y, int depth, float scale, Font font, String placeholder, float[] color_text, float[] color_placeholder, float[] color_back, float[] color_border_1, float[] color_border_2, int width, int height, int border, boolean sizeMode, boolean tight, boolean align) {
         super(x, y, depth, scale);
+        
+        ID = Controller.generateID();
         
         this.color_notSelected = color_border_1;
         this.color_selected = color_border_2;
@@ -23,15 +28,26 @@ public class TextBox extends ElementBase{
         this.color_placeholder = color_placeholder;
         this.font = font;
         this.placeholder = placeholder;
+        if(sizeMode){
+            maxW = width;
+            maxH = height-1;
+            width *= (int) (scale*font.getLetterSpace());
+            height *= (int) (scale*font.getLinesPace());
+            width += border*(tight?1:2); height += border*(tight?1:2);
+        }else{
+            maxW = (int) ((width-border*(tight?1:2))/(scale*font.getLetterSpace()));
+            maxH = (int) ((height-border*(tight?1:2))/(scale*font.getLinesPace()))-1;
+        }
         this.weight = width;
         this.height = height;
         this.border = border;
+        this.tight = tight;
+        this.alignW = (align?(weight/2)-(tight?border/2:0):0)+(tight?border/2:border);
+        this.alignH = (align?(height/2)-(tight?border/2:0):0)+(tight?border/2:border);
         
-        label = new TextLabel(x+border,y+border,0,scale,font,color_placeholder,placeholder);
-        box1 = new Shape_Square(x+border/2,y+border/2,color_back,scale,1,width-border,height-border);
-        box2 = new Shape_Square(x,y,color_border_1,scale,2,width,height);
-        maxW = (int) (width-border*2)/font.getLetterSpace();
-        maxH = (int) ((height-border*2)/font.getLinesPace())-1;
+        label = new TextLabel(x+alignW,y+alignH,0,scale,font,color_placeholder,placeholder, align);
+        box1 = new Shape_Square(x+border/2,y+border/2,color_back,1,1,width-border,height-border);
+        box2 = new Shape_Square(x,y,color_border_1,1,2,width,height);
         //this.selected = false;
         empty = true;
     }
@@ -41,7 +57,7 @@ public class TextBox extends ElementBase{
         position.setCords(x, y);
         box1.moveAbsolute(x+border/2,y+border/2);
         box2.moveAbsolute(x, y);
-        label.moveAbsolute(x+border,y+border);
+        label.moveAbsolute(x+alignW,y+alignH);
     }
     
     public int getWidth(){
@@ -74,6 +90,10 @@ public class TextBox extends ElementBase{
                     empty = true;
                 }
             break;
+            case '£':
+                empty = true;
+                label.setText("");
+            break;
             default:
                 if(empty){
                     empty = false;
@@ -82,7 +102,7 @@ public class TextBox extends ElementBase{
                 }
                 if(label.getCharsLastLine() < maxW)
                     label.concatText(c+"");
-                else if(label.getLines() < maxH)
+                else if(label.getLines() < maxH && c != ' ')
                     label.concatText("\n"+c);
         }
         if(empty){
@@ -96,6 +116,10 @@ public class TextBox extends ElementBase{
         box2.draw();
         box1.draw();
         label.draw();
+    }
+
+    public int getID() {
+        return ID;
     }
     
 }

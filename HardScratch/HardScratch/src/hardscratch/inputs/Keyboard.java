@@ -21,7 +21,7 @@ public class Keyboard extends GLFWKeyCallback{
         keys_down[key] = action != GLFW_RELEASE;
     }
     
-    public static boolean getClick(int keycode) {
+    public static boolean getClick(int keycode) {//Delete es GLFW_KEY_DELETE
         boolean ret = keys_click[keycode];
         keys_click[keycode] = false;
         return ret;
@@ -55,6 +55,9 @@ public class Keyboard extends GLFWKeyCallback{
         }else if(keys_click[GLFW_KEY_BACKSPACE]){
             keys_click[GLFW_KEY_BACKSPACE] = false;
             return '~';
+        }else if(keys_click[GLFW_KEY_DELETE]){
+            keys_click[GLFW_KEY_BACKSPACE] = false;
+            return '£';
         }
         
         return 0;

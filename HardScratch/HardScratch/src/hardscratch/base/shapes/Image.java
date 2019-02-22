@@ -7,10 +7,10 @@ import static org.lwjgl.opengl.GL11.*;
 public class Image extends ElementBase{
     
     private final Texture texture;
-    private int[] color;
+    private float[] color;
     private int width, height;
     
-    public Image(int x, int y, int depth, Texture texture, float scale, int[] color) {
+    public Image(int x, int y, int depth, Texture texture, float scale, float[] color) {
         super(x, y, depth, scale);
         
         this.texture = texture;
@@ -24,6 +24,9 @@ public class Image extends ElementBase{
     }
     public int getHeight(){
         return height;
+    }
+    public void setColor(float[] c){
+        color = c;
     }
     
     public void draw(){

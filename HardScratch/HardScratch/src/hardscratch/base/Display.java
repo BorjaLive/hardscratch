@@ -3,8 +3,6 @@ package hardscratch.base;
 import hardscratch.Controller;
 import hardscratch.Global;
 import hardscratch.base.shapes.Texture;
-import java.io.File;
-import javax.imageio.ImageIO;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -12,9 +10,6 @@ import org.lwjgl.opengl.GL;
 
 public class Display {
     public long window;
-    
-    SyncTimer timer;
-    Controller controller;
     
     public Display(){
     }
@@ -42,8 +37,8 @@ public class Display {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
-        timer = new SyncTimer();
-        controller = new Controller(window);
+        SyncTimer.initer(Global.FRAME_RATE);
+        Controller.initer(window);
     }
     
     public boolean isRunning() {
@@ -51,12 +46,12 @@ public class Display {
     }
     
     public void update() {
-        controller.loop();
+        Controller.loop();
         
         glfwSwapBuffers(window); 
         glfwPollEvents();
         try{
-            timer.sync(Global.FRAME_RATE); 
+            SyncTimer.sync(); 
         }catch(Exception e){
             System.err.println("SYNC ERROR: \n"+e);
         }

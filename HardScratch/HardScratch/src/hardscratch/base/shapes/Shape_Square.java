@@ -9,11 +9,16 @@ public class Shape_Square extends Shape{
     
     float width, height;
     
-    public Shape_Square(int x, int y, int[] color, float scale, int depth, int width, int height) {
+    public Shape_Square(int x, int y, float[] color, float scale, int depth, int width, int height) {
         super(x, y, color, scale, depth);
         
         this.width = Dot.relativeSizeX(width);
         this.height = Dot.relativeSizeY(height);
+    }
+    
+    public void resize(int x, int y){
+        width = Dot.relativeSizeX(x);
+        height = Dot.relativeSizeY(y);
     }
     
     @Override
