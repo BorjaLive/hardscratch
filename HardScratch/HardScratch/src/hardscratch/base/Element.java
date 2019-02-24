@@ -13,14 +13,13 @@ public abstract class Element extends ElementBase{
     private int maxDepth;
     private int boxSelected, boxSelectedPRE; //Deprecated
     private int focus_item, focus_itemPRE;
-    protected final int ID;
     private boolean drag_forced;
     
-    private ArrayList<Shape> shapes;
-    private ArrayList<Image> images;
-    private ArrayList<TextLabel> labels;
-    private ArrayList<TextBox> boxen;
-    private ArrayList<Shape_Square> bounds;
+    protected ArrayList<Shape> shapes;
+    protected ArrayList<Image> images;
+    protected ArrayList<TextLabel> labels;
+    protected ArrayList<TextBox> boxen;
+    protected ArrayList<Shape_Square> bounds;
     private ArrayList<int[]> boundingBoxes;
     
     public Element(int x, int y, int depth, boolean drawable, boolean dragable, boolean deleteable) {
@@ -74,6 +73,10 @@ public abstract class Element extends ElementBase{
         Shape_Square bound = new Shape_Square(position.getCordX()+x1, position.getCordY()+y1,Global.COLOR_WHITE,1,0,x2-x1,y2-y1);
         bounds.add(bound);
     }
+    public final void whipeBounds(){
+        boundingBoxes.clear();
+        bounds.clear();
+    }
     
     public final  void changeColorShape(int n, float[] color){
         shapes.get(n).setColor(color);
@@ -111,10 +114,6 @@ public abstract class Element extends ElementBase{
         return colideExtra(x, y);
     }
     public abstract Hole getHoleByID(int id);
-    
-    public int getID(){
-        return ID;
-    }
     
     @Override
     public final void move(int x, int y){
@@ -225,4 +224,5 @@ public abstract class Element extends ElementBase{
     public abstract void drag_end();
     public abstract void action(int action);
     public abstract void delete();
+    public abstract Port[] getPorts();
 }

@@ -9,9 +9,9 @@ public class Global {
     
     public static final String RESOURCES = "src/res/";
     
-    public static final int WINDOW_WIDTH = 1024;
-    public static final int WINDOW_HEIGHT = 640;
-    public static final boolean FULLSCREEN = false;
+    public static final int WINDOW_WIDTH = 1920;
+    public static final int WINDOW_HEIGHT = 1080;
+    public static final boolean FULLSCREEN = true;
     
     public static final int LAYOUT_TOP = 70;
     public static int LAYOUT_LEFT = 400;
@@ -68,20 +68,85 @@ public class Global {
     public static final int
             HOLE_VAR = 1,
             HOLE_VAR_INOUT = 2,
-            HOLE_VAR_TYPE = 3
+            HOLE_VAR_TYPE = 3,
+            HOLE_CONSTRUCTOR = 4,   //Para todos los elementos del constructor
+            CONSTRUCTOR_LITERAL_CONST = 5,
+            CONSTRUCTOR_OPERATORS = 6,
+            CONSTRUCTOR_OPERATORS_PLUS = 7,  //agrega el =
+            CONSTRUCTOR_LITERAL_VARS = 8;
             ;
     public static final int
             TIP_VAR_IN = 1,
             TIP_VAR_OUT = 2,
             TIP_VAR_SIGNAL = 3,
-            TIP_VAR_CONST = 4
+            TIP_VAR_CONST = 4,
+            TIP_CONSTRUCTOR_LITERAL_N = 5,  //Number
+            TIP_CONSTRUCTOR_LITERAL_B = 6,  //Bit / char
+            TIP_CONSTRUCTOR_LITERAL_A = 7,  //Array
+            TIP_CONSTRUCTOR_VAR_I = 8,  //Integer
+            TIP_CONSTRUCTOR_VAR_B = 9,  //Bit / char
+            TIP_CONSTRUCTOR_VAR_A = 10, //Array
+            TIP_CONSTRUCTOR_VAR_C = 11,  //Const
+            TIP_CONSTRUCTOR_EQUALITY = 12,
+            TIP_CONSTRUCTOR_CONCAT = 13,
+            TIP_CONSTRUCTOR_ARITH_ADD = 14,
+            TIP_CONSTRUCTOR_ARITH_SUB = 15,
+            TIP_CONSTRUCTOR_ARITH_TIM = 16,
+            TIP_CONSTRUCTOR_ARITH_TAK = 17,
+            TIP_CONSTRUCTOR_LOGIC_AND = 18,
+            TIP_CONSTRUCTOR_LOGIC_OR = 19,
+            TIP_CONSTRUCTOR_LOGIC_XOR = 20,
+            TIP_CONSTRUCTOR_LOGIC_NAND = 21,
+            TIP_CONSTRUCTOR_LOGIC_NOR = 22,
+            TIP_CONSTRUCTOR_LOGIC_XNOR = 23,
+            TIP_CONSTRUCTOR_LOGIC_NOT = 24,
+            TIP_CONSTRUCTOR_OPEN = 25,
+            TIP_CONSTRUCTOR_CLOSE = 26
             ;
     public static final int
             SUMMON_DECLARATRON = 1,
             SUMMON_TIP_IN = 2,
             SUMMON_TIP_OUT = 3,
             SUMMON_TIP_SIGNAL = 4,
-            SUMMON_TIP_CONST = 5
+            SUMMON_TIP_CONST = 5,
+            SUMMON_INICIALIZER = 6,
+            SUMMON_EXTRAVAR = 7,
+            SUMMON_CONSTRUCTOR_LITERAL_N = 8,
+            SUMMON_CONSTRUCTOR_LITERAL_B = 9,
+            SUMMON_CONSTRUCTOR_LITERAL_A = 10,
+            SUMMON_CONSTRUCTOR_VAR_I = 11,
+            SUMMON_CONSTRUCTOR_VAR_B = 12,
+            SUMMON_CONSTRUCTOR_VAR_A = 13,
+            SUMMON_CONSTRUCTOR_VAR_C = 15,
+            SUMMON_CONSTRUCTOR_EQUALITY = 16,
+            SUMMON_CONSTRUCTOR_CONCAT = 17,
+            SUMMON_CONSTRUCTOR_ARITH_ADD = 18,
+            SUMMON_CONSTRUCTOR_ARITH_SUB = 19,
+            SUMMON_CONSTRUCTOR_ARITH_TIM = 20,
+            SUMMON_CONSTRUCTOR_ARITH_TAK = 21,
+            SUMMON_CONSTRUCTOR_LOGIC_AND = 22,
+            SUMMON_CONSTRUCTOR_LOGIC_OR = 23,
+            SUMMON_CONSTRUCTOR_LOGIC_XOR = 24,
+            SUMMON_CONSTRUCTOR_LOGIC_NAND = 25,
+            SUMMON_CONSTRUCTOR_LOGIC_NOR = 26,
+            SUMMON_CONSTRUCTOR_LOGIC_XNOR = 27,
+            SUMMON_CONSTRUCTOR_LOGIC_NOT = 28,
+            SUMMON_CONSTRUCTOR_OPEN = 29,
+            SUMMON_CONSTRUCTOR_CLOSE = 30
+            ;
+    public static final int
+            CREATOR_I = 1,
+            CREATOR_A = 2,
+            CREATOR_E = 3,
+            CREATOR_N = 4
+            ;
+    public static final boolean
+            PORT_FEMALE = true,
+            PORT_MALE = false
+            ;
+    public static final int
+            PORT_INICIALIZER = 2,
+            PORT_EXTRAVAR = 3
             ;
     
     public static float distance(int x1, int y1, int x2, int y2){
@@ -98,7 +163,7 @@ public class Global {
         
         //Color load
         COLOR_TEXT_INPUT = new float[]              {  0/255f,  0/255f,  0/255f};
-        COLOR_TEXT_INPUT_PLACEHOLDER = new float[]  { 25/255f, 25/255f, 25/255f};
+        COLOR_TEXT_INPUT_PLACEHOLDER = new float[]  { 35/255f, 35/255f, 35/255f};
         TEXT_INPUT_BACK = new float[]               { 96/255f,125/255f,139/255f};
         COLOR_BORDER_UNSELECTED = new float[]       {255/255f,255/255f,255/255f};
         COLOR_BORDER_SELECTED = new float[]         {255/255f,213/255f, 79/255f};

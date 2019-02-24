@@ -19,7 +19,11 @@ public class Controller {
     private static int finder;
     private static ArrayList<Summoner>
             BasicElements,  //Iniciadores y partes principales
-            InOutElements  //In, Out, Const, Signal para variables
+            InOutElements,  //In, Out, Const, Signal para variables
+            cLiteralConstElements,   //Dafts tipo I
+            cLiteralVarElements,
+            cOperatorsElements,     //Linkers tipo a
+            cOperatorsPlusElements  //Linker tipo e
             ;  
     private static ArrayList<Summoner> selectedFinder;
     
@@ -45,13 +49,49 @@ public class Controller {
         
         //Create summonersPack
         BasicElements = new ArrayList<>();
-        BasicElements.add(new Summoner(25, 95, 3, 0.5f, Global.SUMMON_DECLARATRON));
+        finderADD(BasicElements, 0.5f, Global.SUMMON_DECLARATRON);
+        finderADD(BasicElements, 0.5f, Global.SUMMON_INICIALIZER);
+        finderADD(BasicElements, 0.5f, Global.SUMMON_EXTRAVAR);
         
         InOutElements = new ArrayList<>();
-        InOutElements.add(new Summoner(25, 95, 3, 1f, Global.SUMMON_TIP_IN));
-        InOutElements.add(new Summoner(25, 150, 3, 1f, Global.SUMMON_TIP_OUT));
-        InOutElements.add(new Summoner(25, 205, 3, 1f, Global.SUMMON_TIP_SIGNAL));
-        InOutElements.add(new Summoner(25, 260, 3, 1f, Global.SUMMON_TIP_CONST));
+        finderADD(InOutElements, 1f, Global.SUMMON_TIP_IN);
+        finderADD(InOutElements, 1f, Global.SUMMON_TIP_OUT);
+        finderADD(InOutElements, 1f, Global.SUMMON_TIP_SIGNAL);
+        finderADD(InOutElements, 1f, Global.SUMMON_TIP_CONST);
+        
+        cLiteralConstElements = new ArrayList<>();
+        finderADD(cLiteralConstElements, 1f, Global.SUMMON_CONSTRUCTOR_OPEN);
+        finderADD(cLiteralConstElements, 1f, Global.SUMMON_CONSTRUCTOR_CLOSE);
+        finderADD(cLiteralConstElements, 1f, Global.SUMMON_CONSTRUCTOR_LITERAL_N);
+        finderADD(cLiteralConstElements, 1f, Global.SUMMON_CONSTRUCTOR_LITERAL_B);
+        finderADD(cLiteralConstElements, 1f, Global.SUMMON_CONSTRUCTOR_LITERAL_A);
+        //cLiteralConstElements.add(new Summoner(25, 260, 3, 1f, Global.SUMMON_CONSTRUCTOR_VAR_C)); //Esto depende de las variables
+        
+        cLiteralVarElements = new ArrayList<>();
+        finderADD(cLiteralConstElements, 1f, Global.SUMMON_CONSTRUCTOR_OPEN);
+        finderADD(cLiteralConstElements, 1f, Global.SUMMON_CONSTRUCTOR_CLOSE);
+        cLiteralVarElements.addAll(cLiteralConstElements);
+        //Depende de las variables
+        
+        cOperatorsElements = new ArrayList<>();
+        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_OPEN);
+        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_CLOSE);
+        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_ARITH_ADD);
+        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_ARITH_SUB);
+        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_ARITH_TIM);
+        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_ARITH_TAK);
+        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_CONCAT);
+        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_LOGIC_AND);
+        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_LOGIC_OR);
+        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_LOGIC_XOR);
+        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_LOGIC_NAND);
+        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_LOGIC_NOR);
+        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_LOGIC_XNOR);
+        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_LOGIC_NOT);
+        
+        cOperatorsPlusElements = new ArrayList<>();
+        cOperatorsPlusElements.addAll(cOperatorsElements);
+        finderADD(cOperatorsPlusElements, 1f, Global.SUMMON_CONSTRUCTOR_EQUALITY);
         
         setFinder(1);
         //Elementos
@@ -61,6 +101,13 @@ public class Controller {
         glfwShowWindow(window); 
     }
     
+    private static void finderADD(ArrayList<Summoner> list, float scale, int type){
+        int height = 95;
+        for(Summoner s:list)
+            height += s.getHeight()+15;
+        list.add(new Summoner(0, height, 3, scale, type));
+        list.get(list.size()-1).move((400-list.get(list.size()-1).getWidth())/2, 0);
+    }
     
     public static void loop(){
         Mouse.read();
@@ -145,7 +192,6 @@ public class Controller {
             Global.DEBUG_MODE = false;
         
         
-        
         //Eliminador
         if(lastFocus >= elements.size())    //Un parque que no ayuda demasiado
             lastFocus = -1;
@@ -154,19 +200,25 @@ public class Controller {
             lastFocus = -1;
             resumeFocus();
         }
+        
+        //Arrastrar todo el tablero
+        if(Mouse.getRightDown()){
+            for(Element e:elements)
+                if(e.getDragable())
+                    e.move(Mouse.getMoveX(), Mouse.getMoveY());
+        }
     }
     
     
     private static boolean inScreen(Element object){
-        if(object.getX() < -Global.DRAWING_RADIUS_LIMIT || object.getX() > Global.WINDOW_WIDTH+Global.DRAWING_RADIUS_LIMIT ||
-           object.getY() < -Global.DRAWING_RADIUS_LIMIT || object.getY() > Global.WINDOW_HEIGHT+Global.DRAWING_RADIUS_LIMIT)
-            return false;
-        else
-            return true;
+        return !(object.getX() < -Global.DRAWING_RADIUS_LIMIT || object.getX() > Global.WINDOW_WIDTH+Global.DRAWING_RADIUS_LIMIT ||
+                object.getY() < -Global.DRAWING_RADIUS_LIMIT || object.getY() > Global.WINDOW_HEIGHT+Global.DRAWING_RADIUS_LIMIT);
     }
     private static void unLink(int n){
-        elements.get(n).delete();
-        elements.remove(n);
+        if(elements.size() > n){
+            elements.get(n).delete();
+            elements.remove(n);
+        }
     }
     
     public static void moveAuto(ElementBase e, int x2, int y2, int tics){
@@ -201,8 +253,36 @@ public class Controller {
             focus_volatile = Rfocus_volatile;
             Rfocus = -1;
         }else{
+            if(focus_volatile && focus != -1 && elements.size()-1 >= focus){     //Mecanismo para hacer docking
+                Port[] Ports1 = elements.get(focus).getPorts();
+                for(Port p1: Ports1){
+                    for(Element e:elements){
+                        Port[] Ports2 = e.getPorts();
+                        for(Port p2: Ports2){
+                            docking(elements.get(focus), e, p1, p2);
+                        }
+                    }
+                }
+            }
             focus = -1;
         }
+    }
+    public static boolean docking(Element e1, Element e2, Port p1, Port p2){
+        if(e1.getID() == e2.getID()) return false;
+        if(!Port.couple(p1, p2)) return false;
+        
+        p1.dock(e2, p2);
+        p2.dock(e1, p1);
+        
+        if(p1.getGender() == Global.PORT_MALE)
+            dockingAlign(e1,p1);
+        else
+            dockingAlign(e2,p2);
+        
+        return true;
+    }
+    public static void dockingAlign(Element e1, Port p1){
+        moveAuto(e1, p1.getConnectedPort().getX1()-p1.getX1()+e1.getX(), p1.getConnectedPort().getY1()-p1.getY1()+e1.getY(), 30);
     }
     
     //Game mechanics
@@ -211,6 +291,10 @@ public class Controller {
         switch(finder){
             case 1: selectedFinder = BasicElements; break;
             case Global.HOLE_VAR_INOUT: selectedFinder = InOutElements; break;
+            case Global.CONSTRUCTOR_LITERAL_CONST: selectedFinder = cLiteralConstElements; break;
+            case Global.CONSTRUCTOR_LITERAL_VARS: selectedFinder = cLiteralVarElements; break;
+            case Global.CONSTRUCTOR_OPERATORS: selectedFinder = cOperatorsElements; break;
+            case Global.CONSTRUCTOR_OPERATORS_PLUS: selectedFinder = cOperatorsPlusElements; break;
         }
     }
 
@@ -240,6 +324,12 @@ public class Controller {
             if(h != null)
                 return h;
         }
+        return null;
+    }
+    public static Element getElementByID(int id){
+        for(Element e:elements)
+            if(e.getID() == id)
+                return e;
         return null;
     }
 }

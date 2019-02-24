@@ -3,6 +3,8 @@ package hardscratch.base;
 import hardscratch.Controller;
 import hardscratch.Global;
 import hardscratch.base.shapes.Texture;
+import java.nio.IntBuffer;
+import org.lwjgl.BufferUtils;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -15,6 +17,7 @@ public class Display {
     }
     
     public void init(){
+        
         if(!glfwInit()) {
             throw new IllegalStateException("Failed to initalize GLFW!");
         }

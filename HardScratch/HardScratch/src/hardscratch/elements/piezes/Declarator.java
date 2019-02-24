@@ -1,40 +1,38 @@
 package hardscratch.elements.piezes;
 
+import hardscratch.Controller;
 import hardscratch.Global;
-import hardscratch.base.Element;
-import hardscratch.base.shapes.Shape_Square;
-import hardscratch.base.shapes.TextBox;
-import hardscratch.base.shapes.TextLabel;
+import hardscratch.base.*;
+import hardscratch.base.shapes.*;
 import hardscratch.elements.subParts.Hole;
 
 public class Declarator extends Element{
     
     private final TextBox identifier_text;
     private final Hole type_hole, inOut_hole;
-    private final Element extra_dock, initer_dock;
-    private final int[] extra_port, initer_port;
     private int selected_ID;
+    
+    private Port extra_port, initer_port;
 
     public Declarator(int x, int y) {
         super(x, y, 5, true, true, true); //El ultimo true es que es borrable
         
         addShape(new Shape_Square(0, 0, Global.COLOR_DECLARATOR, 1, 2, 483, 118), 0, 0);
         addShape(new Shape_Square(0, 0, Global.COLOR_DECLARATOR, 1, 2, 30, 30), 0, 118);
-        addShape(new Shape_Square(0, 0, Global.COLOR_DECLARATOR, 1, 2, 30, 30), 228, 118);
+        addShape(new Shape_Square(0, 0, Global.COLOR_DECLARATOR, 1, 2, 30, 30), 288, 118);
         addShape(new Shape_Square(0, 0, Global.COLOR_DECLARATOR, 1, 2, 30, 30), 483, 0);
         addShape(new Shape_Square(0, 0, Global.COLOR_DECLARATOR, 1, 2, 30, 30), 483, 88);
         addLabel(new TextLabel(0, 0, 1, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_TEXT_INPUT, "Declarator", true), 159, 25);
-        extra_port = new int[]{0,258,118,148};
-        initer_port = new int[]{483,513,0,118};
         
-        extra_dock = null;
-        initer_dock = null;
+        extra_port = new Port(x+0,x+258,y+118,y+148, Global.PORT_FEMALE, Global.PORT_EXTRAVAR);
+        initer_port = new Port(x+483,x+513,y+0,y+118, Global.PORT_FEMALE, Global.PORT_INICIALIZER);
+        
         selected_ID = -1;
         identifier_text = new TextBox(x+10, y+50, 1, 0.5f, Global.FONT_MONOFONTO, "VAR NAME", Global.COLOR_TEXT_INPUT, Global.COLOR_TEXT_INPUT_PLACEHOLDER, Global.TEXT_INPUT_BACK, Global.COLOR_BORDER_UNSELECTED, Global.COLOR_BORDER_SELECTED, 12, 1, 10, true, true, true);
         inOut_hole = new Hole(x+318,y+10,1,Global.HOLE_VAR_INOUT);
         type_hole = new Hole(x+318,y+64,1,Global.HOLE_VAR_TYPE);
         
-        addBoundingBox(x, 483, 0, 118, -1);
+        addBoundingBox(0, 483, 0, 118, -1);
     }
     
     
@@ -52,15 +50,6 @@ public class Declarator extends Element{
         if(x > type_hole.getX() && x < type_hole.getX()+type_hole.getWidth()
         && y > type_hole.getY() && y < type_hole.getY()+type_hole.getHeight())
                 colide = type_hole.getID();
-       
-        /*
-        if(extra_dock != null && x > extra_port[0] && x < extra_port[1]
-                              && y > extra_port[2] && y < extra_port[3])
-                colide = extra_dock.getID();
-        if(initer_dock != null && x > initer_port[0] && x < initer_port[1]
-                              && y > initer_port[2] && y < initer_port[3])
-                colide = initer_dock.getID();
-        */
         
         return colide;
     }
@@ -77,7 +66,6 @@ public class Declarator extends Element{
         }else{
             selected_ID = -1;
         }
-        
     }
 
     @Override
@@ -113,7 +101,10 @@ public class Declarator extends Element{
     }
     @Override
     public void drag_end() {
-        
+        if(extra_port.isOcupied() && Controller.getElementByID(extra_port.getID()) == null)
+            extra_port.undock();
+        if(initer_port.isOcupied() && Controller.getElementByID(initer_port.getID()) == null)
+            initer_port.undock();
     }
     @Override
     public void action(int action) {
@@ -127,20 +118,14 @@ public class Declarator extends Element{
         type_hole.move(x, y);
         inOut_hole.move(x, y);
         identifier_text.move(x, y);
-        if(extra_dock != null)
-            extra_dock.move(x, y);
-        if(initer_dock != null)
-            initer_dock.move(x, y);
+        extra_port.move(x, y);
+        initer_port.move(x, y);
     }
     @Override
     protected void drawExtra() {
         type_hole.draw();
         inOut_hole.draw();
         identifier_text.draw();
-        if(extra_dock != null)
-            extra_dock.draw();
-        if(initer_dock != null)
-            initer_dock.draw();
     }
 
     @Override
@@ -156,5 +141,17 @@ public class Declarator extends Element{
             type_hole.delete();
         if(inOut_hole != null)
             inOut_hole.delete();
+        
+        if(initer_port.isOcupied())
+            Controller.deleteElement(initer_port.getDock().getID());
+        if(extra_port.isOcupied())
+            Controller.deleteElement(extra_port.getDock().getID());
     }
+
+    @Override
+    public Port[] getPorts() {
+        return new Port[]{extra_port,initer_port};
+    }
+
+    
 }

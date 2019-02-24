@@ -1,16 +1,21 @@
 package hardscratch.base;
 
-public class ElementBase {
+import hardscratch.Controller;
+
+public abstract class ElementBase {
     protected Dot position;
     
     protected int depth, rot;
     protected float scale;
+    protected int ID;
     
     public ElementBase(int x, int y, int depth, float scale){
         position = new Dot(x, y);
         this.depth = depth;
         this.scale = scale;
         this.rot = 0;
+        
+        ID = Controller.generateID();
     }
     
     public void move(int x, int y){
@@ -49,4 +54,10 @@ public class ElementBase {
     public int getY(){
         return position.getCordY();
     }
+    
+    public int getID(){
+        return ID;
+    }
+    
+    public abstract void draw();
 }
