@@ -3,7 +3,6 @@ package hardscratch.elements.subParts;
 import hardscratch.Controller;
 import hardscratch.Global;
 import hardscratch.base.Element;
-import hardscratch.base.Port;
 import hardscratch.base.shapes.Shape_Square;
 import hardscratch.base.shapes.TextBox;
 import hardscratch.base.shapes.TextLabel;
@@ -16,7 +15,7 @@ public class Tip extends Element{
     private int selectedI;
     
     public Tip(int x, int y, int value) {
-        super(x, y, 3, true, true, true);
+        super(x, y, true, true, true);
         this.value = value;
         selectedI = -1;
         
@@ -79,12 +78,37 @@ public class Tip extends Element{
                 width = 95; height = 44;
                 addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "AND", true), (width/2), (height/2));
             break;
+            case Global.TIP_VAR_INT:
+                width = 155; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.42f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "INTEGER", true), (width/2), (height/2));
+            break;
+            case Global.TIP_VAR_BIT:
+                width = 155; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "BIT", true), (width/2), (height/2));
+            break;
+            case Global.TIP_VAR_ARRAY:
+                width = 155; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "ARRAY", true), (width/2), (height/2));
+            break;
+            case Global.TIP_EDGE_RISING:
+                width = 202; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.3f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "RISING EDGE", true), (width/2), (height/2));
+                labels.get(labels.size()-1).setScretch(1.6f);
+            break;
+            case Global.TIP_EDGE_LOWERING:
+                width = 202; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.3f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "LOWERING EDGE", true), (width/2), (height/2));
+                labels.get(labels.size()-1).setScretch(1.6f);
+            break;
         }
         switch(value){
             case Global.TIP_VAR_IN:
             case Global.TIP_VAR_OUT:
             case Global.TIP_VAR_SIGNAL:
             case Global.TIP_VAR_CONST:  compativility = Global.HOLE_VAR_INOUT; break;
+            case Global.TIP_VAR_INT:
+            case Global.TIP_VAR_BIT:
+            case Global.TIP_VAR_ARRAY:  compativility = Global.HOLE_VAR_TYPE; break;
             case Global.TIP_CONSTRUCTOR_LITERAL_A:
             case Global.TIP_CONSTRUCTOR_LITERAL_B:
             case Global.TIP_CONSTRUCTOR_LITERAL_N:
@@ -107,6 +131,8 @@ public class Tip extends Element{
             case Global.TIP_CONSTRUCTOR_LOGIC_NOR:
             case Global.TIP_CONSTRUCTOR_LOGIC_XNOR:
             case Global.TIP_CONSTRUCTOR_LOGIC_NOT:      compativility = Global.HOLE_CONSTRUCTOR; break;
+            case Global.TIP_EDGE_RISING:
+            case Global.TIP_EDGE_LOWERING:              compativility = Global.HOLE_EDGE; break;
         }
         
         addShape(new Shape_Square(0, 0, Global.COLOR_BORDER_SELECTED, 1, 3, width, height), 0, 0);
@@ -165,6 +191,7 @@ public class Tip extends Element{
         if(h == null || !h.assign(this))
             Controller.deleteElement(ID);
         setDragable(false);
+        depth = 3;
     }
     public int getCompativility(){
         return compativility;
@@ -187,12 +214,12 @@ public class Tip extends Element{
     public boolean middleSelected(){
         return selectedI != -1;
     }
+
     @Override
-    public void delete() {
+    public void updateEvent(int Identifier, int data1, int data2, String data3) {
     }
 
     @Override
-    public Port[] getPorts() {
-        return new Port[]{};
+    public void latWish() {
     }
 }

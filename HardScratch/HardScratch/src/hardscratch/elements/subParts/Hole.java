@@ -40,7 +40,8 @@ public class Hole extends ElementBase{
     public final void setDefaultSize(){
         switch(hole_type){
             case Global.HOLE_VAR:
-                width = 298;
+            case Global.HOLE_EDGE:
+                width = 202;
                 height = 44;
                 break;
             case Global.HOLE_VAR_INOUT:
@@ -89,6 +90,8 @@ public class Hole extends ElementBase{
     public void draw(){
         border.draw();
         back.draw();
+        if(tip != null)
+            tip.draw();
     }
 
     public int getWidth() {
@@ -137,6 +140,7 @@ public class Hole extends ElementBase{
                 Controller.setFinder(1);
             }
             resizeAbsolute(t.getWidth(),t.getHeight());
+            Controller.deleteElement(tip.getID());
             return true;
         }
         return false;

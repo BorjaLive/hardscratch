@@ -21,4 +21,6 @@ public class Shape extends ElementBase{
     
     public void draw(){
     }
+    
+    public void resize(int x, int y){}
 }

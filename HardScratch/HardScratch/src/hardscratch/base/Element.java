@@ -4,14 +4,12 @@ import hardscratch.Controller;
 import hardscratch.Global;
 import hardscratch.base.shapes.*;
 import hardscratch.elements.subParts.*;
-import hardscratch.inputs.Mouse;
 import java.util.ArrayList;
 
 public abstract class Element extends ElementBase{
     
     private boolean drawable, dragable, deleteable;
     private int maxDepth;
-    private int boxSelected, boxSelectedPRE; //Deprecated
     private int focus_item, focus_itemPRE;
     private boolean drag_forced;
     
@@ -19,11 +17,14 @@ public abstract class Element extends ElementBase{
     protected ArrayList<Image> images;
     protected ArrayList<TextLabel> labels;
     protected ArrayList<TextBox> boxen;
+    protected ArrayList<Hole> holes;            //New
+    protected ArrayList<Constructor> creators;  //New
+    protected ArrayList<Port> ports;            //New
     protected ArrayList<Shape_Square> bounds;
     private ArrayList<int[]> boundingBoxes;
     
-    public Element(int x, int y, int depth, boolean drawable, boolean dragable, boolean deleteable) {
-        super(x, y, depth, 1);
+    public Element(int x, int y, boolean drawable, boolean dragable, boolean deleteable) {
+        super(x, y, 2, 1);
         
         this.ID = Controller.generateID();
         this.drawable = drawable;
@@ -34,10 +35,12 @@ public abstract class Element extends ElementBase{
         bounds = new ArrayList<>();
         labels = new ArrayList<>();
         boxen = new ArrayList<>();
+        holes = new ArrayList<>();
+        ports = new ArrayList<>();
+        creators = new ArrayList<>();
         drag_forced = false;
         boundingBoxes = new ArrayList<>();
         maxDepth = 0;
-        boxSelected = -1; boxSelectedPRE = -1;
         focus_item = -1; focus_itemPRE = -1;
     }
     
@@ -56,6 +59,9 @@ public abstract class Element extends ElementBase{
         if(image.getDepth() > maxDepth)
             maxDepth = image.getDepth();
     }
+    public final void dropImages(){
+        images.clear();
+    }
     public final  void addLabel(TextLabel label, int x, int y){
         label.moveAbsolute(position.getCordX()+x, position.getCordY()+y);
         labels.add(label);
@@ -67,6 +73,22 @@ public abstract class Element extends ElementBase{
         boxen.add(box);
         if(box.getDepth() > maxDepth)
             maxDepth = box.getDepth();
+    }
+    public final void addHole(Hole hole, int x, int y){
+        hole.moveAbsolute(position.getCordX()+x, position.getCordY()+y);
+        holes.add(hole);
+        if(hole.getDepth() > maxDepth)
+            maxDepth = hole.getDepth();
+    }
+    public final void addCreator(Constructor creator, int x, int y){
+        creator.move(position.getCordX()+x, position.getCordY()+y);
+        creators.add(creator);
+        if(creator.getDepth() > maxDepth)
+            maxDepth = creator.getDepth();
+    }
+    public final void addPort(int x1, int x2, int y1, int y2, boolean gender, int type){
+        ports.add(new Port(getX()+x1,getX()+x2,getY()+y1,getY()+y2,gender,type));
+        ports.get(ports.size()-1).setEventCall(this);
     }
     public final  void addBoundingBox(int x1, int x2, int y1, int y2, int action){
         boundingBoxes.add(new int[]{x1,x2,y1,y2,action});
@@ -81,21 +103,19 @@ public abstract class Element extends ElementBase{
     public final  void changeColorShape(int n, float[] color){
         shapes.get(n).setColor(color);
     }
+    public final void boundingBoxMove(int n, int x, int y){
+        if(n >= boundingBoxes.size()) return;
+        boundingBoxes.get(n)[0] += x;
+        boundingBoxes.get(n)[1] += x;
+        boundingBoxes.get(n)[2] += y;
+        boundingBoxes.get(n)[3] += y;
+        bounds.get(n).move(x, y);
+    }
     
     public final boolean colide(int x, int y){
-        
-        focus_itemPRE = colideExtra(x,y);
+        focus_itemPRE = colideID(x, y);
         if(focus_itemPRE != -1)
             return true;
-        
-        for(int i = 0; i < boxen.size(); i++){
-            TextBox box = boxen.get(i);
-            if(x > box.getX() && x < box.getX()+box.getWidth()
-            && y > box.getY() && y < box.getY()+box.getHeight()){
-                boxSelectedPRE = i;
-                return true;
-            }
-        }
         
         //TODO: remplazar con un while
         for(int[] boundingBox : boundingBoxes){
@@ -109,11 +129,44 @@ public abstract class Element extends ElementBase{
         
         return false;
     }
-    protected abstract int colideExtra(int x, int y);
     public int colideID(int x, int y){
-        return colideExtra(x, y);
+        int colide = -1;
+        
+        for(TextBox e: boxen){
+            if(x > e.getX() && x < e.getX()+e.getWidth()
+            && y > e.getY() && y < e.getY()+e.getHeight())
+                    colide = e.getID();
+        }
+        for(Hole e: holes){
+            if(x > e.getX() && x < e.getX()+e.getWidth()
+            && y > e.getY() && y < e.getY()+e.getHeight())
+                    colide = e.getID();
+        }
+        for(Constructor e: creators){
+            if(x > e.getX() && x < e.getX()+e.getWidth()
+            && y > e.getY() && y < e.getY()+e.getHeight())
+                    colide = e.getID();
+        }
+        if(colide != -1)
+            return colide;
+        
+        return colideExtra(x,y);
     }
-    public abstract Hole getHoleByID(int id);
+    protected abstract int colideExtra(int x, int y);
+    
+    public Hole getHoleByID(int id){
+        Hole hole;
+        for(Constructor c:creators){
+            hole = c.getHoleByID(id);
+            if(hole != null)
+                return hole;
+        }
+        
+        for(Hole h:holes){
+            if(h.getID() == id) return h;
+        }
+        return null;
+    }
     
     @Override
     public final void move(int x, int y){
@@ -132,6 +185,15 @@ public abstract class Element extends ElementBase{
         });
         boxen.forEach((box) -> {
             box.move(x, y);
+        });
+        holes.forEach((hole) -> {
+            hole.move(x, y);
+        });
+        creators.forEach((creator) -> {
+            creator.move(x, y);
+        });
+        ports.forEach((port) -> {
+            port.move(x, y);
         });
         moveExtra(x, y);
     }
@@ -154,6 +216,7 @@ public abstract class Element extends ElementBase{
         return deleteable;
     }
     
+    @Override
     public void draw(){
         for(int i = maxDepth; i >= 0; i--){
             for (Shape shape : shapes)
@@ -168,6 +231,12 @@ public abstract class Element extends ElementBase{
             for (TextBox box : boxen)
                 if(box.getDepth() == i)
                     box.draw();
+            for (Hole hole : holes)
+                if(hole.getDepth() == i)
+                    hole.draw();
+            for (Constructor creator : creators)
+                if(creator.getDepth() == i)
+                    creator.draw();
         }
         drawExtra();
         if(Global.DEBUG_MODE)
@@ -178,37 +247,99 @@ public abstract class Element extends ElementBase{
     
     public final void focus_force_drag(){
         drag_forced = true;
-        if(focus_item != -1)
+        if(focus_item != -1){
+            depth = 5;
             select_end();
+        }
         focus_itemPRE = -1;
         focus_item = -1;
+        depth = 2;
+        Controller.putOnTop(ID);
         drag_init();
     }
     public final boolean focus_init(){
         if(focus_itemPRE != -1){
             focus_item = focus_itemPRE;
             focus_itemPRE = -1;
+            
+            for(TextBox box:boxen){
+                if(focus_item == box.getID())
+                    box.on_selected();
+            }
+            for(Hole hole:holes){
+                if(focus_item == hole.getID())
+                    hole.on_selected();
+            }
+            for(Constructor creator:creators){
+                if(focus_item == creator.getID())
+                    creator.on_selected();
+            }
+            
+            depth = 2;
+            Controller.putOnTop(ID);
             select_init(focus_item);
             return false;
         }else{
+            for(Port p:ports)
+                if(p.getGender() == Global.PORT_MALE && p.isOcupied())
+                    p.undock();
+            depth = 4;
             drag_init();
+            Controller.putOnTop(ID);
             return true;
         }
     }
     protected abstract void select_init(int ID);
     public final void focus_end(){
         if(focus_item != -1){
-            select_end();
+            for(TextBox box:boxen){
+                if(focus_item == box.getID())
+                    box.de_select();
+            }
+            for(Hole hole:holes){
+                if(focus_item == hole.getID())
+                    hole.de_select();
+            }
+            for(Constructor creator:creators){
+                if(focus_item == creator.getID())
+                    creator.de_select();
+            }
             focus_item = -1;
+            depth = 5;
+            select_end();
         }else{
+            for(Port port:ports){
+                if(port.isOcupied() && Controller.getElementByID(port.getID()) == null)
+                    port.undock();
+                
+                if(port.isOcupied() && port.getGender()==Global.PORT_MALE && !Port.inBound(port, port.getConnectedPort()))
+                    port.undock();
+        
+                if(port.isOcupied() && port.getGender()==Global.PORT_MALE)
+                    Controller.dockingAlign(this, port);
+            }
+            depth = 5;
             drag_end();
         }
-        if(drag_forced && (Mouse.getX() < Global.LAYOUT_LEFT || Mouse.getY() < Global.LAYOUT_TOP))
-            Controller.deleteElement(ID);
+        //if(drag_forced && (Mouse.getX() < Global.LAYOUT_LEFT || Mouse.getY() < Global.LAYOUT_TOP))
+        //    Controller.deleteElement(ID);
     }
     protected abstract void select_end();
     public final boolean loop(int move_x, int move_y){
         if(focus_item != -1){
+            for(TextBox box:boxen){
+                if(focus_item == box.getID())
+                    box.act();
+            }
+            for(Hole hole:holes){
+                if(focus_item == hole.getID())
+                    hole.act();
+            }
+            for(Constructor creator:creators){
+                if(focus_item == creator.getID())
+                    creator.act();
+            }
+            
             selected_loop();
             return true;
         }else{
@@ -223,6 +354,41 @@ public abstract class Element extends ElementBase{
     public abstract void drag_init();
     public abstract void drag_end();
     public abstract void action(int action);
-    public abstract void delete();
-    public abstract Port[] getPorts();
+    public abstract void updateEvent(int event, int data1, int data2, String data3);
+    public abstract void latWish();
+    
+    public Port[] getPorts(){
+        Port[] ps = new Port[ports.size()];
+        for(int i = 0; i < ps.length; i++){
+            ps[i] = ports.get(i);
+        }
+        return ps;
+    }
+    
+    public void delete(){
+        for(Hole hole:holes){
+            if(hole != null)
+                hole.delete();
+        }
+        for(Port port:ports){
+            if(port != null)
+                port.delete();
+        }
+        for(Constructor creator:creators){
+            if(creator != null)
+                creator.delete();
+        }
+        
+        latWish();
+    }
+    
+    public boolean connectedWith(boolean gender){
+        for(Port p:ports){
+            if(p.getGender() != gender && p.isOcupied())
+                return true;
+        }
+        return false;
+    }
+    
+    public int getHeight(){return -1;}
 }

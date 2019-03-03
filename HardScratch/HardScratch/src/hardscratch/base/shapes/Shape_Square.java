@@ -16,6 +16,7 @@ public class Shape_Square extends Shape{
         this.height = Dot.relativeSizeY(height);
     }
     
+    @Override
     public void resize(int x, int y){
         width = Dot.relativeSizeX(x);
         height = Dot.relativeSizeY(y);

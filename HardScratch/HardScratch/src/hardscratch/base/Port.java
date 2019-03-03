@@ -1,12 +1,16 @@
 package hardscratch.base;
 
+import hardscratch.Controller;
+import hardscratch.Global;
+
 public class Port {
     
     private int x1, x2, y1, y2;
     private final int type;
     private final boolean gender;
-    Element dock;
-    Port port;
+    private Element dock;
+    private Port port;
+    private Element eventCall;
     
     public Port(int x1, int x2, int y1, int y2, boolean gender, int type){
         this.x1 = x1;
@@ -16,22 +20,28 @@ public class Port {
         this.gender = gender;
         this.type = type;
         dock = null; port = null;
+        
+        eventCall = null;
     }
     
-    public boolean isOcupied(){
+    public final void setEventCall(Element e){
+        eventCall = e;
+    }
+    
+    public final boolean isOcupied(){
         return dock != null && port != null;
     }
-    public Element getDock(){
+    public final Element getDock(){
         return dock;
     }
-    public int getX1(){return x1;}
-    public int getX2(){return x2;}
-    public int getY1(){return y1;}
-    public int getY2(){return y2;}
-    public boolean getGender(){
+    public final int getX1(){return x1;}
+    public final int getX2(){return x2;}
+    public final int getY1(){return y1;}
+    public final int getY2(){return y2;}
+    public final boolean getGender(){
         return gender;
     }
-    public int getType(){
+    public final int getType(){
         return type;
     }
     
@@ -43,30 +53,44 @@ public class Port {
         if(getGender() && isOcupied())
             dock.move(x, y);
     }
-    public int getID(){ //La id de lo que esta conectada
+    public void moveAbsolute(int x, int y){
+        x2 = x + x2-x1;
+        x1 = x;
+        y2 = y + y2-y1;
+        y1 = y;
+    }
+    public final int getID(){ //La id de lo que esta conectada
         if(isOcupied())
             return dock.getID();
         else
             return -1;
     }
-    public Port getConnectedPort(){
+    public final Port getConnectedPort(){
         if(isOcupied())
             return port;
         else
             return null;
     }
     
-    public void dock(Element e, Port p){
+    public final void dock(Element e, Port p){
         dock = e;
         port = p;
+        if(eventCall != null) eventCall.updateEvent(Global.EVENT_DOCK, 0, 0, "");
     }
-    public void undock(){
+    public final void undock(){
         dock = null;
         if(port != null && port.isOcupied())
            port.undock();
         port = null;
+        if(eventCall != null) eventCall.updateEvent(Global.EVENT_DOCK, 0, 0, "");
     }
     
+    public final void delete(){
+        if(isOcupied() && gender == Global.PORT_FEMALE)
+            Controller.deleteElement(dock.getID());
+        
+        undock();
+    }
     
     public static boolean couple(Port p1, Port p2){
         return  !(p1.isOcupied() || p2.isOcupied()) &&
@@ -77,6 +101,13 @@ public class Port {
     public static boolean inBound(Port p1, Port p2){
         return p1.getX1() < p2.getX2() && p1.getX2() > p2.getX1() &&
                p1.getY1() < p2.getY2() && p1.getY2() > p2.getY1();
+    }
+    
+    public int getX(){
+        return x1;
+    }
+    public int getY(){
+        return y1;
     }
     
 }

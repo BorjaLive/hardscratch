@@ -9,21 +9,24 @@ import java.util.ArrayList;
 
 public class Constructor extends ElementBase{
     
-    private final int type;
+    private final int type, identifier;
     private int width, height;
     private int selectedID, selectedI;
     private Element father;
     
     private final int BORDER = 5, DAFT_W = 100, DAFT_H = 44, LINKER_W = 50, LINKER_H = 44;
-    Shape_Square border, back;
+    private Shape_Square border, back;
     private ArrayList<Hole> holes;
+    private int iniciate;
     
-    public Constructor(int x, int y, int type, Element father) {
-        super(x, y, 3, 1);
+    public Constructor(int x, int y, int type, Element father, int identifier) {
+        super(x, y, 2, 1);
         this.type = type;
         this.father = father;
         holes = new ArrayList<>();
         selectedID = -1; selectedI = -1;
+        this.identifier = identifier;
+        iniciate = 0;
         
         height = 65; width = BORDER*3;
         border = new Shape_Square(x, y, Global.COLOR_BORDER_UNSELECTED, 1, depth, width, height);
@@ -95,7 +98,6 @@ public class Constructor extends ElementBase{
             if(holes.get(i).isAsigned()) break;
             if(!holes.get(i).isAsigned() && !holes.get(i-1).isAsigned()){
                 deleteHole(i);
-                System.out.println("DELETE HOLE: "+i);
             }
         }
         //Buscar que haya al menos un agujeto libre al final
@@ -116,6 +118,8 @@ public class Constructor extends ElementBase{
                 }
             }
         }
+        
+        father.updateEvent(Global.EVENT_RESIZE,width,identifier,"");
     }
     
     private void changeWidth(int w){
@@ -125,7 +129,13 @@ public class Constructor extends ElementBase{
         width=w;
         border.resize(width, height);
         back.resize(width-BORDER*2, height-BORDER*2);
-        father.action(width);
+    }
+    
+    public boolean isEmpty(){
+        for(Hole h:holes)
+            if(h.isAsigned())
+                return false;
+        return true;
     }
     
     
@@ -139,10 +149,10 @@ public class Constructor extends ElementBase{
     }
     
     
-    public float getWidth() {
+    public int getWidth() {
         return width;
     }
-    public float getHeight() {
+    public int getHeight() {
         return height;
     }
     
@@ -171,6 +181,9 @@ public class Constructor extends ElementBase{
         }
         //Esto es un poco de truco
         return null;
+    }
+    public int getIdentifier(){
+        return identifier;
     }
 
     public void on_selected() {

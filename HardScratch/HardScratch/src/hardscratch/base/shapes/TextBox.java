@@ -1,6 +1,7 @@
 package hardscratch.base.shapes;
 
 import hardscratch.Controller;
+import hardscratch.Global;
 import hardscratch.base.*;
 import hardscratch.inputs.Keyboard;
 
@@ -19,6 +20,14 @@ public class TextBox extends ElementBase{
     
     public TextBox(int x, int y, int depth, float scale, Font font, String placeholder, float[] color_text, float[] color_placeholder, float[] color_back, float[] color_border_1, float[] color_border_2, int width, int height, int border, boolean sizeMode, boolean tight, boolean align) {
         super(x, y, depth, scale);
+        
+        if(font == null)                font = Global.FONT_MONOFONTO;
+        if(color_text == null)          color_text =  Global.COLOR_TEXT_INPUT;
+        if(color_placeholder == null)   color_placeholder = Global.COLOR_TEXT_INPUT_PLACEHOLDER;
+        if(color_back == null)          color_back = Global.TEXT_INPUT_BACK;
+        if(color_border_1 == null)      color_border_1 = Global.COLOR_BORDER_UNSELECTED;
+        if(color_border_2 == null)      color_border_2 = Global.COLOR_BORDER_SELECTED;
+        
         
         ID = Controller.generateID();
         

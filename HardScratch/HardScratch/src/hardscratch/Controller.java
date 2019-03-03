@@ -5,6 +5,7 @@ import hardscratch.elements.*;
 import hardscratch.elements.subParts.*;
 import hardscratch.inputs.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import static org.lwjgl.glfw.GLFW.*;
 import org.lwjgl.glfw.GLFWKeyCallback;
 
@@ -20,10 +21,12 @@ public class Controller {
     private static ArrayList<Summoner>
             BasicElements,  //Iniciadores y partes principales
             InOutElements,  //In, Out, Const, Signal para variables
+            VarTypeElements,    //Integer, bit, bit array
             cLiteralConstElements,   //Dafts tipo I
-            cLiteralVarElements,
+            cLiteralVarElements,    //Variables
             cOperatorsElements,     //Linkers tipo a
-            cOperatorsPlusElements  //Linker tipo e
+            cOperatorsPlusElements, //Linker tipo e
+            EdgeType
             ;  
     private static ArrayList<Summoner> selectedFinder;
     
@@ -31,8 +34,10 @@ public class Controller {
     private static ElementBase movingElement;
     private static int[][] movingPos;
     private static int movingCounter;
+    private static int slidingFinder, finderPos;
     
     private static GLFWKeyCallback keyCallback;
+    private static int layerOnly = -1;
     
     
     public static void initer(long window){
@@ -49,15 +54,31 @@ public class Controller {
         
         //Create summonersPack
         BasicElements = new ArrayList<>();
-        finderADD(BasicElements, 0.5f, Global.SUMMON_DECLARATRON);
-        finderADD(BasicElements, 0.5f, Global.SUMMON_INICIALIZER);
-        finderADD(BasicElements, 0.5f, Global.SUMMON_EXTRAVAR);
+        finderADD(BasicElements, 1f, Global.SUMMON_DECLARATRON);
+        finderADD(BasicElements, 1f, Global.SUMMON_INICIALIZER);
+        finderADD(BasicElements, 1f, Global.SUMMON_EXTRAVAR);
+        finderADD(BasicElements, 1f, Global.SUMMON_CONVERTER);
+        finderADD(BasicElements, 1f, Global.SUMMON_ASIGNATOR);
+        finderADD(BasicElements, 1f, Global.SUMMON_SETIF);
+        finderADD(BasicElements, 1f, Global.SUMMON_SETSWITCH);
+        finderADD(BasicElements, 1f, Global.SUMMON_SEQUENTIAL);
+        finderADD(BasicElements, 1f, Global.SUMMON_ASIGNATOR_SEQ);
+        finderADD(BasicElements, 1f, Global.SUMMON_IFTHEN);
+        finderADD(BasicElements, 1f, Global.SUMMON_SWITCHCASE);
+        finderADD(BasicElements, 1f, Global.SUMMON_WAITFOR);
+        finderADD(BasicElements, 1f, Global.SUMMON_WAITON);
+        finderADD(BasicElements, 1f, Global.SUMMON_FORNEXT);
         
         InOutElements = new ArrayList<>();
         finderADD(InOutElements, 1f, Global.SUMMON_TIP_IN);
         finderADD(InOutElements, 1f, Global.SUMMON_TIP_OUT);
         finderADD(InOutElements, 1f, Global.SUMMON_TIP_SIGNAL);
         finderADD(InOutElements, 1f, Global.SUMMON_TIP_CONST);
+        
+        VarTypeElements = new ArrayList<>();
+        finderADD(VarTypeElements, 1f, Global.SUMMON_TIP_INT);
+        finderADD(VarTypeElements, 1f, Global.SUMMON_TIP_BIT);
+        finderADD(VarTypeElements, 1f, Global.SUMMON_TIP_ARRAY);
         
         cLiteralConstElements = new ArrayList<>();
         finderADD(cLiteralConstElements, 1f, Global.SUMMON_CONSTRUCTOR_OPEN);
@@ -93,10 +114,14 @@ public class Controller {
         cOperatorsPlusElements.addAll(cOperatorsElements);
         finderADD(cOperatorsPlusElements, 1f, Global.SUMMON_CONSTRUCTOR_EQUALITY);
         
-        setFinder(1);
-        //Elementos
-        //elements.add(new Declarator(0,0));
-        //elements.add(new TestElement(0, 0, 0, true, true));
+        EdgeType = new ArrayList<>();
+        finderADD(EdgeType, 1f, Global.SUMMON_TIP_RISSING);
+        finderADD(EdgeType, 1f, Global.SUMMON_TIP_LOWERING);
+        
+        selectedFinder = new ArrayList<>();
+        
+        
+        changeRoom(Global.ROOM_DESIGN);
         
         glfwShowWindow(window); 
     }
@@ -128,13 +153,14 @@ public class Controller {
         
         //Scrool de elementos summoneables
         float scroll = Mouse.getScroll()*Global.MOUSE_SCROLL_SEPED;
-        if( Math.abs(scroll) > 0.000001 && selectedFinder.get(0).getY() + scroll < Global.LAYOUT_TOP+30 &&
+        if(!selectedFinder.isEmpty() && Math.abs(scroll) > 0.000001 && selectedFinder.get(0).getY() + scroll < Global.LAYOUT_TOP+30 &&
             selectedFinder.get(selectedFinder.size()-1).getY() + scroll > Global.WINDOW_HEIGHT-200)
             for(Summoner s: selectedFinder)
                 s.move(0, (int) scroll);
         
         //Seleccionar elementos
-        for (int i = 0; i < elements.size(); i++) {
+        //for (int i = 0; i < elements.size(); i++) {
+        for (int i = elements.size()-1; i >= 0; i--) {
             Element element = elements.get(i);
             if(Mouse.getLeftClick()){
                 if((focus == -1 || !focus_volatile) && element.getDragable() && element.colide(Mouse.getX(), Mouse.getY())){
@@ -144,11 +170,11 @@ public class Controller {
                     focus_volatile = elements.get(focus).focus_init();
                 }else if(focus == i && !focus_volatile){
                     elements.get(focus).focus_end();
-                resumeFocus();
+                    resumeFocus();
                 }
             }
         }
-        
+        System.out.println(focus);
         //Rutina de seleccionados
         if(focus != -1){
             if(Mouse.getLeftDown()){
@@ -165,13 +191,20 @@ public class Controller {
         }
         
         //Rutina de dibujado
-        selectedFinder.forEach((summoner) -> {
-            summoner.draw();
-        });
+        elements.get(0).action(Global.EVENT_DRAW_BACKGROUND);
         for(int dl = 6; dl >= 0; dl--)
-            for(int i = elements.size()-1; i >= 0; i--) //Al reves para que el que agarres sea el primero
+            if(!Global.DEBUG_MODE || layerOnly == -1 || layerOnly == dl)
+            for(int i = 0; i < elements.size(); i++){
+                if(dl == 2){
+                    elements.get(0).action(Global.EVENT_DRAW_FLOD);
+                    selectedFinder.forEach((summoner) -> {
+                        summoner.draw();
+                    });
+                }
                 if(elements.get(i).getDepth() == dl && elements.get(i).getDrawable() && inScreen(elements.get(i)))
                     elements.get(i).draw();
+            }
+        
         
         //Rutina de movimiento auto
         if(movingElement != null){
@@ -183,6 +216,24 @@ public class Controller {
                 Mouse.setBlock(false);
             }
         }
+        if(slidingFinder == 1 || slidingFinder == 2){
+            int move;
+            if(slidingFinder == 1 && finderPos <= 0){
+                move = 0 - finderPos;
+                slidingFinder = 0;
+            }else if(slidingFinder == 2 && finderPos >= 400){
+                move = 400 - finderPos;
+                slidingFinder = 0;
+            }else{
+                move = Math.round(Global.FUNCTION_QR_A + (Global.FUNCTION_QR_B*finderPos) + (Global.FUNCTION_QR_C*finderPos*finderPos));
+                move *= (slidingFinder==1?-1:1);
+            }
+            //System.out.println(Global.FUNCTION_QR_A + (Global.FUNCTION_QR_B*finderPos) + (Global.FUNCTION_QR_C*finderPos*finderPos));
+            finderPos += move;
+            elements.get(0).updateEvent(Global.EVENT_FINDER_MOVE,move,0,"");
+            for(Summoner s:selectedFinder)
+                s.move(move, 0);
+        }
         
         
         //Debug toggle
@@ -190,6 +241,16 @@ public class Controller {
             Global.DEBUG_MODE = true;
         else if(Keyboard.getClick(GLFW_KEY_O))
             Global.DEBUG_MODE = false;
+        if(Global.DEBUG_MODE){
+            if(Keyboard.getClick(GLFW_KEY_1 )) layerOnly = 0;
+            if(Keyboard.getClick(GLFW_KEY_2 )) layerOnly = 1;
+            if(Keyboard.getClick(GLFW_KEY_3 )) layerOnly = 2;
+            if(Keyboard.getClick(GLFW_KEY_4 )) layerOnly = 3;
+            if(Keyboard.getClick(GLFW_KEY_5 )) layerOnly = 4;
+            if(Keyboard.getClick(GLFW_KEY_6 )) layerOnly = 5;
+            if(Keyboard.getClick(GLFW_KEY_7 )) layerOnly = 6;
+            if(Keyboard.getClick(GLFW_KEY_0 )) layerOnly = -1;
+        }
         
         
         //Eliminador
@@ -204,7 +265,7 @@ public class Controller {
         //Arrastrar todo el tablero
         if(Mouse.getRightDown()){
             for(Element e:elements)
-                if(e.getDragable())
+                if(e.getDepth() != 1 && e.getDragable() && !e.connectedWith(Global.PORT_FEMALE))
                     e.move(Mouse.getMoveX(), Mouse.getMoveY());
         }
     }
@@ -291,10 +352,17 @@ public class Controller {
         switch(finder){
             case 1: selectedFinder = BasicElements; break;
             case Global.HOLE_VAR_INOUT: selectedFinder = InOutElements; break;
+            case Global.HOLE_VAR_TYPE: selectedFinder = VarTypeElements; break;
             case Global.CONSTRUCTOR_LITERAL_CONST: selectedFinder = cLiteralConstElements; break;
             case Global.CONSTRUCTOR_LITERAL_VARS: selectedFinder = cLiteralVarElements; break;
             case Global.CONSTRUCTOR_OPERATORS: selectedFinder = cOperatorsElements; break;
             case Global.CONSTRUCTOR_OPERATORS_PLUS: selectedFinder = cOperatorsPlusElements; break;
+            case Global.HOLE_EDGE: selectedFinder = EdgeType; break;
+        }
+        for(Summoner s: selectedFinder)
+            s.move(finderPos-375-s.getX(), 0);
+        if(!(slidingFinder == 0 && finderPos == 400)){
+            finderToggle();
         }
     }
 
@@ -331,5 +399,41 @@ public class Controller {
             if(e.getID() == id)
                 return e;
         return null;
+    }
+    
+    public static void changeRoom(int room){
+        elements.clear();
+        switch(room){
+            case Global.ROOM_MENU: break;
+            case Global.ROOM_CREATE: break;
+            case Global.ROOM_OPEN: break;
+            case Global.ROOM_SETTINGS: break;
+            case Global.ROOM_DESIGN:
+                elements.add(new DesignGUI());
+                slidingFinder = 0;
+                finderPos = 400;
+                setFinder(1);
+                break;
+            case Global.ROOM_IMPLEMENT: break;
+            case Global.ROOM_SIMULATE: break;
+        }
+    }
+    public static void finderToggle(){
+        if(finderPos == 400){
+            slidingFinder = 1;
+        }else if(finderPos == 0){
+            slidingFinder = 2;
+        }
+        elements.get(0).action(Global.EVENT_TOOGLE_TOGGLE);
+    }
+    
+    public static void putOnTop(int id){
+        Element e = getElementByID(id);
+        if(elements.indexOf(e) == focus)
+            focus = elements.size()-1;
+        while(elements.indexOf(e) != elements.size()-1){
+            int i = elements.indexOf(e);
+            Collections.swap(elements, i, i+1);
+        }
     }
 }
