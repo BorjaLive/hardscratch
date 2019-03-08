@@ -7,16 +7,15 @@ import hardscratch.inputs.Keyboard;
 
 public class TextBox extends ElementBase{
     
-    TextLabel label;
-    Font font;
-    String placeholder;
-    Shape_Square box1, box2;
-    int maxW, maxH, weight, height, border;
+    private final TextLabel label;
+    private final Font font;
+    private final String placeholder;
+    private final Shape_Square box1, box2;
+    private final int maxW, maxH, weight, height, border;
     //boolean selected;
-    boolean empty, tight;
-    int alignW,alignH;
-    float[] color_selected, color_notSelected, color_text, color_placeholder;
-    private final int ID;
+    private boolean empty, tight;
+    private int alignW,alignH;
+    private float[] color_selected, color_notSelected, color_text, color_placeholder;
     
     public TextBox(int x, int y, int depth, float scale, Font font, String placeholder, float[] color_text, float[] color_placeholder, float[] color_back, float[] color_border_1, float[] color_border_2, int width, int height, int border, boolean sizeMode, boolean tight, boolean align) {
         super(x, y, depth, scale);
@@ -121,14 +120,25 @@ public class TextBox extends ElementBase{
     }
     
     
+    @Override
     public void draw(){
         box2.draw();
         box1.draw();
         label.draw();
     }
-
-    public int getID() {
-        return ID;
+    
+    public boolean isEmpty(){
+        return empty;
+    }
+    public String getText(){
+        if (empty) return "";
+        return label.getText();
+    }
+    public void setText(String text){
+        if(text != null && !text.isEmpty() && !text.isBlank() &&  !text.equals("-1")){
+            label.setText(text);
+            empty = false;
+        }
     }
     
 }

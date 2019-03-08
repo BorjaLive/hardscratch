@@ -59,7 +59,7 @@ public class Port {
         y2 = y + y2-y1;
         y1 = y;
     }
-    public final int getID(){ //La id de lo que esta conectada
+    public final long getID(){ //La id de lo que esta conectada
         if(isOcupied())
             return dock.getID();
         else

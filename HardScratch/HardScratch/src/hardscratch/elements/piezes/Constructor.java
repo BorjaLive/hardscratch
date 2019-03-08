@@ -1,17 +1,20 @@
-package hardscratch.elements.subParts;
+package hardscratch.elements.piezes;
 
 import hardscratch.Controller;
 import hardscratch.Global;
+import hardscratch.backend.Variable;
 import hardscratch.base.Element;
 import hardscratch.base.ElementBase;
 import hardscratch.base.shapes.Shape_Square;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class Constructor extends ElementBase{
     
     private final int type, identifier;
     private int width, height;
-    private int selectedID, selectedI;
+    private long selectedID;
+    private int selectedI;
     private Element father;
     
     private final int BORDER = 5, DAFT_W = 100, DAFT_H = 44, LINKER_W = 50, LINKER_H = 44;
@@ -44,7 +47,7 @@ public class Constructor extends ElementBase{
     private void insertDaft(){
         int compativility = 0;
         switch(type){
-            case Global.CREATOR_I: compativility=Global.CONSTRUCTOR_LITERAL_CONST; break;
+            case Global.CREATOR_I: compativility=Global.CONSTRUCTOR_LITERAL_VARS; break;
             case Global.CREATOR_A: compativility=Global.CONSTRUCTOR_LITERAL_VARS; break;
             case Global.CREATOR_E: compativility=Global.CONSTRUCTOR_LITERAL_VARS; break;
             case Global.CREATOR_N:  break;
@@ -119,7 +122,8 @@ public class Constructor extends ElementBase{
             }
         }
         
-        father.updateEvent(Global.EVENT_RESIZE,width,identifier,"");
+        if(father != null)
+            father.updateEvent(Global.EVENT_RESIZE,width,identifier,"");
     }
     
     private void changeWidth(int w){
@@ -165,7 +169,7 @@ public class Constructor extends ElementBase{
             hole.draw();
     }
     
-    public int getColideHoleID(){
+    public long getColideHoleID(){
         for(int i = 0; i < holes.size(); i++){
             if(holes.get(i).colide()){
                 return holes.get(i).getID();
@@ -173,7 +177,7 @@ public class Constructor extends ElementBase{
         }
         return -1;
     }
-    public Hole getHoleByID(int id){
+    public Hole getHoleByID(long id){
         for(int i = 0; i < holes.size(); i++){
             if(holes.get(i).colide()){
                 return holes.get(i);
@@ -221,6 +225,89 @@ public class Constructor extends ElementBase{
         for(Hole h:holes){
             h.SetConstructorFedBack(null);
             h.delete();       }
+    }
+    
+    
+    public Hole getHole(int n){
+        if(n < holes.size())
+            return holes.get(n);
+        else return null;
+    }
+    public ArrayList<Hole> getHoles(){return holes;}
+    
+    
+    public void forceSet(String text){
+        if(text.isEmpty() || text.equals("-1")) return;
+        //TODO: Hacerlo
+        
+        Hole h;
+        String[] list = text.replace("\n", "").replace("\r", "").split(Pattern.quote("-"));
+        for(String data:list){
+            h = holes.get(holes.size()-1);
+            //System.out.println("ESTOY LEYENDO: "+data);
+            Tip tip = null;
+            if(data.contains(":")){
+                String[] parts = data.split(Pattern.quote(":"));
+                if(parts[0].equals("LN"))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_LITERAL_N);
+                else if(parts[0].equals("LB"))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_LITERAL_B);
+                else if(parts[0].equals("LA"))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_LITERAL_A);
+                if(tip != null && parts.length > 1)
+                    tip.getBox(0).setText(parts[1]);
+            }else{
+                if(data.equals("="))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_EQUALITY);
+                else if(data.equals("&"))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_CONCAT);
+                else{
+                    Variable var = Controller.getVarByName(data);
+                    if(var != null)
+                        tip = new Tip(h.getX(),h.getY(),Global.TIP_VAR).setVar(var);
+                }
+                
+            }
+            
+            if(tip != null){
+                h.assign(tip);
+                tip.select_end();
+            }
+            checkHoles();
+        }
+        
+    }
+    public String retriveData(){
+        ArrayList<String> data = new ArrayList<>();
+        
+        for(Hole h:holes){
+            if(h.isAsigned()){
+                switch(h.getTipType()){
+                    case Global.TIP_CONSTRUCTOR_LITERAL_N: data.add("LN:"+h.getTip().getBox(0).getText());break;
+                    case Global.TIP_CONSTRUCTOR_LITERAL_B: data.add("LB:"+h.getTip().getBox(0).getText());break;
+                    case Global.TIP_CONSTRUCTOR_LITERAL_A: data.add("LA:"+h.getTip().getBox(0).getText());break;
+                    case Global.TIP_CONSTRUCTOR_EQUALITY: data.add("=");break;
+                    case Global.TIP_CONSTRUCTOR_CONCAT: data.add("&");break;
+                    case Global.TIP_CONSTRUCTOR_CLOSE: data.add(")");break;
+                    case Global.TIP_CONSTRUCTOR_OPEN: data.add("(");break;
+                    case Global.TIP_CONSTRUCTOR_ARITH_ADD: data.add("+");break;
+                    case Global.TIP_CONSTRUCTOR_ARITH_SUB: data.add("_");break;
+                    case Global.TIP_CONSTRUCTOR_ARITH_TIM: data.add("*");break;
+                    case Global.TIP_CONSTRUCTOR_ARITH_TAK: data.add("/");break;
+                    case Global.TIP_CONSTRUCTOR_LOGIC_AND: data.add("AND");break;
+                    case Global.TIP_CONSTRUCTOR_LOGIC_OR: data.add("OR");break;
+                    case Global.TIP_CONSTRUCTOR_LOGIC_XOR: data.add("XOR");break;
+                    case Global.TIP_CONSTRUCTOR_LOGIC_NAND: data.add("NAND");break;
+                    case Global.TIP_CONSTRUCTOR_LOGIC_NOR: data.add("NOR");break;
+                    case Global.TIP_CONSTRUCTOR_LOGIC_XNOR: data.add("XNOR");break;
+                    case Global.TIP_CONSTRUCTOR_LOGIC_NOT: data.add("NOT");break;
+                    case Global.TIP_VAR: data.add(h.getTip().getVar().name);break;
+                }
+            }
+        }
+        
+        if(data.isEmpty()) return "-1";
+        return Global.concatenateWith(data, "-");
     }
     
 }

@@ -1,7 +1,8 @@
-package hardscratch.elements;
+package hardscratch.elements.piezes.GUIs;
 
 import hardscratch.Controller;
 import hardscratch.Global;
+import hardscratch.backend.*;
 import hardscratch.base.Element;
 import hardscratch.base.shapes.*;
 
@@ -11,7 +12,7 @@ public class DesignGUI extends Element{
     private Image toggle;
 
     public DesignGUI() {
-        super(0, 0, true, true, false);
+        super(0, 0, -1, true, true, false);
         depth = 1;
         
         addShape(new Shape_Square(0, 0, Global.COLOR_GUI_2, 1, 4, Global.WINDOW_WIDTH, 70), 0, 0);
@@ -41,7 +42,7 @@ public class DesignGUI extends Element{
     }
 
     @Override
-    protected int colideExtra(int x, int y) {
+    protected long colideExtra(int x, int y) {
         return -1;
     }
 
@@ -54,7 +55,7 @@ public class DesignGUI extends Element{
     }
 
     @Override
-    protected void select_init(int ID) {
+    protected void select_init(long ID) {
     }
 
     @Override
@@ -92,12 +93,15 @@ public class DesignGUI extends Element{
             case Global.EVENT_GO_HOMO:
             break;
             case Global.EVENT_SAVE:
+                BUCKLE.save();
             break;
             case Global.EVENT_GO_DESIGN:
             break;
             case Global.EVENT_GO_IMPLEMENT:
+                Controller.changeRoom(Global.ROOM_IMPLEMENT);
             break;
             case Global.EVENT_GO_SIMULATE:
+                Controller.changeRoom(Global.ROOM_SIMULATE);
             break;
             case Global.EVENT_FINDER_TOGGLE:
                 Controller.finderToggle();

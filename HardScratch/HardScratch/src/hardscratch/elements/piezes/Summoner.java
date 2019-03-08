@@ -1,12 +1,25 @@
-package hardscratch.elements;
+package hardscratch.elements.piezes;
 
+import hardscratch.elements.piezes.Design.SetIf;
+import hardscratch.elements.piezes.Design.Sequential;
+import hardscratch.elements.piezes.Design.WaitOn;
+import hardscratch.elements.piezes.Design.Asignator;
+import hardscratch.elements.piezes.Design.AsignatorSEQ;
+import hardscratch.elements.piezes.Design.SetSwitch;
+import hardscratch.elements.piezes.Design.ForNext;
+import hardscratch.elements.piezes.Design.Inicializer;
+import hardscratch.elements.piezes.Design.Converter;
+import hardscratch.elements.piezes.Design.ExtraVar;
+import hardscratch.elements.piezes.Design.Declarator;
+import hardscratch.elements.piezes.Design.IfThen;
+import hardscratch.elements.piezes.Design.WaitFor;
+import hardscratch.elements.piezes.Design.SwitchCase;
 import hardscratch.Global;
+import hardscratch.backend.Variable;
 import hardscratch.base.Element;
 import hardscratch.base.ElementBase;
 import hardscratch.base.shapes.*;
 import hardscratch.base.shapes.TextLabel;
-import hardscratch.elements.piezes.*;
-import hardscratch.elements.subParts.Tip;
 
 public class Summoner extends ElementBase{
     
@@ -14,6 +27,7 @@ public class Summoner extends ElementBase{
     private TextLabel name;
     private Shape_BorderedBox shape;
     private int[] bounds;
+    private Variable var;
     
     public Summoner(int x, int y, int depth, float scale, int item) {
         super(x, y, depth, scale);
@@ -72,6 +86,18 @@ public class Summoner extends ElementBase{
             case Global.SUMMON_TIP_LOWERING:            name.setText("LOWERING EDGE"); break;
         }
     }
+    public void setVar(Variable v){
+        if(item == Global.SUMMON_VAR && v != null){
+            var = v;
+            name.setText(v.name);
+            switch(v.inout){
+                case Global.TIP_VAR_IN:     shape.setPalete(Global.COLOR_VAR_IN); break;
+                case Global.TIP_VAR_OUT:    shape.setPalete(Global.COLOR_VAR_OUT); break;
+                case Global.TIP_VAR_SIGNAL: shape.setPalete(Global.COLOR_VAR_SIGNAL); break;
+                case Global.TIP_VAR_CONST:  shape.setPalete(Global.COLOR_VAR_CONST); break;
+            }
+        }
+    }
     
     public int getHeight(){
         return bounds[3]-bounds[2];
@@ -85,51 +111,53 @@ public class Summoner extends ElementBase{
     }
     public Element summon(int x, int y){
         switch(item){
-            case Global.SUMMON_DECLARATRON:             return new Declarator(x-192, y-64);
-            case Global.SUMMON_INICIALIZER:             return new Inicializer(x-140, y-59);
-            case Global.SUMMON_EXTRAVAR:                return new ExtraVar(x-159, y-59);
-            case Global.SUMMON_TIP_IN:                  return new Tip(x-77,y-22,Global.TIP_VAR_IN);
-            case Global.SUMMON_TIP_OUT:                 return new Tip(x-77,y-22,Global.TIP_VAR_OUT);
-            case Global.SUMMON_TIP_SIGNAL:              return new Tip(x-77,y-22,Global.TIP_VAR_SIGNAL);
-            case Global.SUMMON_TIP_CONST:               return new Tip(x-77,y-22,Global.TIP_VAR_CONST);
-            case Global.SUMMON_CONSTRUCTOR_LITERAL_N:   return new Tip(x-77,y-22,Global.TIP_CONSTRUCTOR_LITERAL_N);
-            case Global.SUMMON_CONSTRUCTOR_LITERAL_B:   return new Tip(x-25,y-22,Global.TIP_CONSTRUCTOR_LITERAL_B);
-            case Global.SUMMON_CONSTRUCTOR_LITERAL_A:   return new Tip(x-96,y-22,Global.TIP_CONSTRUCTOR_LITERAL_A);
-            case Global.SUMMON_CONSTRUCTOR_VAR_I:       return new Tip(x-77,y-22,Global.TIP_CONSTRUCTOR_VAR_I);
-            case Global.SUMMON_CONSTRUCTOR_VAR_B:       return new Tip(x-77,y-22,Global.TIP_CONSTRUCTOR_VAR_B);
-            case Global.SUMMON_CONSTRUCTOR_VAR_A:       return new Tip(x-77,y-22,Global.TIP_CONSTRUCTOR_VAR_A);
-            case Global.SUMMON_CONSTRUCTOR_VAR_C:       return new Tip(x-77,y-22,Global.TIP_CONSTRUCTOR_VAR_C);
-            case Global.SUMMON_CONSTRUCTOR_EQUALITY:    return new Tip(x-77,y-22,Global.TIP_CONSTRUCTOR_EQUALITY);
-            case Global.SUMMON_CONSTRUCTOR_CONCAT:      return new Tip(x-77,y-22,Global.TIP_CONSTRUCTOR_CONCAT);
-            case Global.SUMMON_CONSTRUCTOR_CLOSE:       return new Tip(x-15,y-22,Global.TIP_CONSTRUCTOR_CLOSE);
-            case Global.SUMMON_CONSTRUCTOR_OPEN:        return new Tip(x-15,y-22,Global.TIP_CONSTRUCTOR_OPEN);
-            case Global.SUMMON_CONSTRUCTOR_ARITH_ADD:   return new Tip(x-20,y-22,Global.TIP_CONSTRUCTOR_ARITH_ADD);
-            case Global.SUMMON_CONSTRUCTOR_ARITH_SUB:   return new Tip(x-77,y-22,Global.TIP_CONSTRUCTOR_ARITH_SUB);
-            case Global.SUMMON_CONSTRUCTOR_ARITH_TIM:   return new Tip(x-77,y-22,Global.TIP_CONSTRUCTOR_ARITH_TIM);
-            case Global.SUMMON_CONSTRUCTOR_ARITH_TAK:   return new Tip(x-77,y-22,Global.TIP_CONSTRUCTOR_ARITH_TAK);
-            case Global.SUMMON_CONSTRUCTOR_LOGIC_AND:   return new Tip(x-47,y-22,Global.TIP_CONSTRUCTOR_LOGIC_AND);
-            case Global.SUMMON_CONSTRUCTOR_LOGIC_OR:    return new Tip(x-77,y-22,Global.TIP_CONSTRUCTOR_LOGIC_OR);
-            case Global.SUMMON_CONSTRUCTOR_LOGIC_XOR:   return new Tip(x-77,y-22,Global.TIP_CONSTRUCTOR_LOGIC_XOR);
-            case Global.SUMMON_CONSTRUCTOR_LOGIC_NAND:  return new Tip(x-77,y-22,Global.TIP_CONSTRUCTOR_LOGIC_NAND);
-            case Global.SUMMON_CONSTRUCTOR_LOGIC_NOR:   return new Tip(x-77,y-22,Global.TIP_CONSTRUCTOR_LOGIC_NOR);
-            case Global.SUMMON_CONSTRUCTOR_LOGIC_XNOR:  return new Tip(x-77,y-22,Global.TIP_CONSTRUCTOR_LOGIC_XNOR);
-            case Global.SUMMON_CONSTRUCTOR_LOGIC_NOT:   return new Tip(x-77,y-22,Global.TIP_CONSTRUCTOR_LOGIC_NOT);
-            case Global.SUMMON_CONVERTER:               return new Converter(x-239, y-48);
-            case Global.SUMMON_ASIGNATOR:               return new Asignator(x-198, y-64);
-            case Global.SUMMON_TIP_INT:                 return new Tip(x-77,y-22,Global.TIP_VAR_INT);
-            case Global.SUMMON_TIP_BIT:                 return new Tip(x-77,y-22,Global.TIP_VAR_BIT);
-            case Global.SUMMON_TIP_ARRAY:               return new Tip(x-77,y-22,Global.TIP_VAR_ARRAY);
-            case Global.SUMMON_SETIF:                   return new SetIf(x-157, y-112);
-            case Global.SUMMON_SETSWITCH:               return new SetSwitch(x-331, y-112);
-            case Global.SUMMON_SEQUENTIAL:              return new Sequential(x-200, y-27);
-            case Global.SUMMON_ASIGNATOR_SEQ:           return new AsignatorSEQ(x-198, y-64);
-            case Global.SUMMON_IFTHEN:                  return new IfThen(x-115, y-85);
-            case Global.SUMMON_SWITCHCASE:              return new SwitchCase(x-181, y-117);
-            case Global.SUMMON_WAITFOR:                 return new WaitFor(x-198, y-42);
-            case Global.SUMMON_WAITON:                  return new WaitOn(x-198, y-42);
-            case Global.SUMMON_FORNEXT:                 return new ForNext(x-198, y-64);
-            case Global.SUMMON_TIP_RISSING:             return new Tip(x-101,y-22,Global.TIP_EDGE_RISING);
-            case Global.SUMMON_TIP_LOWERING:            return new Tip(x-101,y-22,Global.TIP_EDGE_LOWERING);
+            case Global.SUMMON_TIP_IN:                  return new Tip(Global.TIP_VAR_IN);
+            case Global.SUMMON_TIP_OUT:                 return new Tip(Global.TIP_VAR_OUT);
+            case Global.SUMMON_TIP_SIGNAL:              return new Tip(Global.TIP_VAR_SIGNAL);
+            case Global.SUMMON_TIP_CONST:               return new Tip(Global.TIP_VAR_CONST);
+            case Global.SUMMON_CONSTRUCTOR_LITERAL_N:   return new Tip(Global.TIP_CONSTRUCTOR_LITERAL_N);
+            case Global.SUMMON_CONSTRUCTOR_LITERAL_B:   return new Tip(Global.TIP_CONSTRUCTOR_LITERAL_B);
+            case Global.SUMMON_CONSTRUCTOR_LITERAL_A:   return new Tip(Global.TIP_CONSTRUCTOR_LITERAL_A);
+            //case Global.SUMMON_CONSTRUCTOR_VAR_I:       return new Tip(Global.TIP_CONSTRUCTOR_VAR_I);
+            //case Global.SUMMON_CONSTRUCTOR_VAR_B:       return new Tip(Global.TIP_CONSTRUCTOR_VAR_B);
+            //case Global.SUMMON_CONSTRUCTOR_VAR_A:       return new Tip(Global.TIP_CONSTRUCTOR_VAR_A);
+            //case Global.SUMMON_CONSTRUCTOR_VAR_C:       return new Tip(Global.TIP_CONSTRUCTOR_VAR_C);
+            case Global.SUMMON_CONSTRUCTOR_EQUALITY:    return new Tip(Global.TIP_CONSTRUCTOR_EQUALITY);
+            case Global.SUMMON_CONSTRUCTOR_CONCAT:      return new Tip(Global.TIP_CONSTRUCTOR_CONCAT);
+            case Global.SUMMON_CONSTRUCTOR_CLOSE:       return new Tip(Global.TIP_CONSTRUCTOR_CLOSE);
+            case Global.SUMMON_CONSTRUCTOR_OPEN:        return new Tip(Global.TIP_CONSTRUCTOR_OPEN);
+            case Global.SUMMON_CONSTRUCTOR_ARITH_ADD:   return new Tip(Global.TIP_CONSTRUCTOR_ARITH_ADD);
+            case Global.SUMMON_CONSTRUCTOR_ARITH_SUB:   return new Tip(Global.TIP_CONSTRUCTOR_ARITH_SUB);
+            case Global.SUMMON_CONSTRUCTOR_ARITH_TIM:   return new Tip(Global.TIP_CONSTRUCTOR_ARITH_TIM);
+            case Global.SUMMON_CONSTRUCTOR_ARITH_TAK:   return new Tip(Global.TIP_CONSTRUCTOR_ARITH_TAK);
+            case Global.SUMMON_CONSTRUCTOR_LOGIC_AND:   return new Tip(Global.TIP_CONSTRUCTOR_LOGIC_AND);
+            case Global.SUMMON_CONSTRUCTOR_LOGIC_OR:    return new Tip(Global.TIP_CONSTRUCTOR_LOGIC_OR);
+            case Global.SUMMON_CONSTRUCTOR_LOGIC_XOR:   return new Tip(Global.TIP_CONSTRUCTOR_LOGIC_XOR);
+            case Global.SUMMON_CONSTRUCTOR_LOGIC_NAND:  return new Tip(Global.TIP_CONSTRUCTOR_LOGIC_NAND);
+            case Global.SUMMON_CONSTRUCTOR_LOGIC_NOR:   return new Tip(Global.TIP_CONSTRUCTOR_LOGIC_NOR);
+            case Global.SUMMON_CONSTRUCTOR_LOGIC_XNOR:  return new Tip(Global.TIP_CONSTRUCTOR_LOGIC_XNOR);
+            case Global.SUMMON_CONSTRUCTOR_LOGIC_NOT:   return new Tip(Global.TIP_CONSTRUCTOR_LOGIC_NOT);
+            case Global.SUMMON_TIP_INT:                 return new Tip(Global.TIP_VAR_INT);
+            case Global.SUMMON_TIP_BIT:                 return new Tip(Global.TIP_VAR_BIT);
+            case Global.SUMMON_TIP_ARRAY:               return new Tip(Global.TIP_VAR_ARRAY);
+            case Global.SUMMON_TIP_RISSING:             return new Tip(Global.TIP_EDGE_RISING);
+            case Global.SUMMON_TIP_LOWERING:            return new Tip(Global.TIP_EDGE_LOWERING);
+            case Global.SUMMON_VAR:                     return new Tip(Global.TIP_VAR).setVar(var);
+            case Global.SUMMON_DECLARATRON:             return new Declarator();
+            case Global.SUMMON_INICIALIZER:             return new Inicializer();
+            case Global.SUMMON_EXTRAVAR:                return new ExtraVar();
+            case Global.SUMMON_CONVERTER:               return new Converter();
+            case Global.SUMMON_ASIGNATOR:               return new Asignator();
+            case Global.SUMMON_SETIF:                   return new SetIf();
+            case Global.SUMMON_SETSWITCH:               return new SetSwitch();
+            case Global.SUMMON_SEQUENTIAL:              return new Sequential();
+            case Global.SUMMON_ASIGNATOR_SEQ:           return new AsignatorSEQ();
+            case Global.SUMMON_IFTHEN:                  return new IfThen();
+            case Global.SUMMON_SWITCHCASE:              return new SwitchCase();
+            case Global.SUMMON_WAITFOR:                 return new WaitFor();
+            case Global.SUMMON_WAITON:                  return new WaitOn();
+            case Global.SUMMON_FORNEXT:                 return new ForNext();
+            default: System.err.println("\n\n Hast comentado mas de la cuenta.\n\n");
         }
         return null;
     }
@@ -143,9 +171,13 @@ public class Summoner extends ElementBase{
         shape.move(x, y);
     }
     
+    @Override
     public void draw(){
         shape.draw();
         name.draw();
+    }
+    public int getItem(){
+        return item;
     }
     
 }

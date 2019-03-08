@@ -1,8 +1,15 @@
 package hardscratch;
 
+import hardscratch.elements.piezes.Hole;
+import hardscratch.elements.piezes.Tip;
+import hardscratch.elements.piezes.GUIs.ImplementGUI;
+import hardscratch.elements.piezes.GUIs.DesignGUI;
+import hardscratch.elements.piezes.GUIs.SimulateGUI;
+import hardscratch.elements.piezes.Summoner;
+import hardscratch.elements.piezes.Design.Declarator;
+import hardscratch.backend.*;
 import hardscratch.base.*;
-import hardscratch.elements.*;
-import hardscratch.elements.subParts.*;
+import hardscratch.elements.piezes.Implementation.Implementer;
 import hardscratch.inputs.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,19 +20,22 @@ public class Controller {
     
     private static long window;
     private static ArrayList<Element> elements;
-    private static int focus, Rfocus, lastFocus;
+    private static int focus, Rfocus, lastFocus, currentRoom;
     private static boolean focus_volatile, Rfocus_volatile;
-    private static int idCounter = 0;
+    private static long idCounter = 0;
     
     private static int finder;
     private static ArrayList<Summoner>
             BasicElements,  //Iniciadores y partes principales
             InOutElements,  //In, Out, Const, Signal para variables
             VarTypeElements,    //Integer, bit, bit array
-            cLiteralConstElements,   //Dafts tipo I
-            cLiteralVarElements,    //Variables
+            cLiteralElements,   //Dafts tipo I
+            cLiteralVarElements,    //Variables y literales
+            cVarElements,
             cOperatorsElements,     //Linkers tipo a
             cOperatorsPlusElements, //Linker tipo e
+            cVarOutsElements,
+            cVarInsElements,
             EdgeType
             ;  
     private static ArrayList<Summoner> selectedFinder;
@@ -39,9 +49,13 @@ public class Controller {
     private static GLFWKeyCallback keyCallback;
     private static int layerOnly = -1;
     
+    //Variables y logia
+    private static ArrayList<Variable> vars;
+    
     
     public static void initer(long window){
         elements = new ArrayList<>();
+        vars = new ArrayList<>();
         Controller.window = window;
         focus = -1; Rfocus = -1; lastFocus= -1;
         
@@ -53,6 +67,18 @@ public class Controller {
         movingElement = null;
         
         //Create summonersPack
+        finderInit();
+        
+        
+        Global.openProyect("test");
+        changeRoom(Global.ROOM_DESIGN);
+        
+        
+        
+        glfwShowWindow(window); 
+    }
+    
+    private static void finderInit(){
         BasicElements = new ArrayList<>();
         finderADD(BasicElements, 1f, Global.SUMMON_DECLARATRON);
         finderADD(BasicElements, 1f, Global.SUMMON_INICIALIZER);
@@ -80,19 +106,18 @@ public class Controller {
         finderADD(VarTypeElements, 1f, Global.SUMMON_TIP_BIT);
         finderADD(VarTypeElements, 1f, Global.SUMMON_TIP_ARRAY);
         
-        cLiteralConstElements = new ArrayList<>();
-        finderADD(cLiteralConstElements, 1f, Global.SUMMON_CONSTRUCTOR_OPEN);
-        finderADD(cLiteralConstElements, 1f, Global.SUMMON_CONSTRUCTOR_CLOSE);
-        finderADD(cLiteralConstElements, 1f, Global.SUMMON_CONSTRUCTOR_LITERAL_N);
-        finderADD(cLiteralConstElements, 1f, Global.SUMMON_CONSTRUCTOR_LITERAL_B);
-        finderADD(cLiteralConstElements, 1f, Global.SUMMON_CONSTRUCTOR_LITERAL_A);
-        //cLiteralConstElements.add(new Summoner(25, 260, 3, 1f, Global.SUMMON_CONSTRUCTOR_VAR_C)); //Esto depende de las variables
+        cLiteralElements = new ArrayList<>();
+        finderADD(cLiteralElements, 1f, Global.SUMMON_CONSTRUCTOR_OPEN);
+        finderADD(cLiteralElements, 1f, Global.SUMMON_CONSTRUCTOR_CLOSE);
+        finderADD(cLiteralElements, 1f, Global.SUMMON_CONSTRUCTOR_LITERAL_N);
+        finderADD(cLiteralElements, 1f, Global.SUMMON_CONSTRUCTOR_LITERAL_B);
+        finderADD(cLiteralElements, 1f, Global.SUMMON_CONSTRUCTOR_LITERAL_A);
         
         cLiteralVarElements = new ArrayList<>();
-        finderADD(cLiteralConstElements, 1f, Global.SUMMON_CONSTRUCTOR_OPEN);
-        finderADD(cLiteralConstElements, 1f, Global.SUMMON_CONSTRUCTOR_CLOSE);
-        cLiteralVarElements.addAll(cLiteralConstElements);
+        finderADD(cLiteralVarElements, cLiteralElements);
         //Depende de las variables
+        
+        cVarElements = new ArrayList<>();
         
         cOperatorsElements = new ArrayList<>();
         finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_OPEN);
@@ -111,19 +136,17 @@ public class Controller {
         finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_LOGIC_NOT);
         
         cOperatorsPlusElements = new ArrayList<>();
-        cOperatorsPlusElements.addAll(cOperatorsElements);
         finderADD(cOperatorsPlusElements, 1f, Global.SUMMON_CONSTRUCTOR_EQUALITY);
+        finderADD(cOperatorsPlusElements, cOperatorsElements);
         
         EdgeType = new ArrayList<>();
         finderADD(EdgeType, 1f, Global.SUMMON_TIP_RISSING);
         finderADD(EdgeType, 1f, Global.SUMMON_TIP_LOWERING);
         
+        cVarOutsElements = new ArrayList<>();
+        cVarInsElements = new ArrayList<>();
+        
         selectedFinder = new ArrayList<>();
-        
-        
-        changeRoom(Global.ROOM_DESIGN);
-        
-        glfwShowWindow(window); 
     }
     
     private static void finderADD(ArrayList<Summoner> list, float scale, int type){
@@ -132,6 +155,18 @@ public class Controller {
             height += s.getHeight()+15;
         list.add(new Summoner(0, height, 3, scale, type));
         list.get(list.size()-1).move((400-list.get(list.size()-1).getWidth())/2, 0);
+    }
+    private static void finderADD(ArrayList<Summoner> list, ArrayList<Summoner> news){
+        for(Summoner s:news)
+            finderADD(list, s.getScale(), s.getItem());
+    }
+    private static void finderADD(ArrayList<Summoner> list, float scale, Variable var){
+        finderADD(list, scale, Global.SUMMON_VAR);
+        list.get(list.size()-1).setVar(var);
+    }
+    private static void finderADD(ArrayList<Summoner> list, float scale, ArrayList<Variable> vars){
+        for(Variable var:vars)
+            finderADD(list,scale,var);
     }
     
     public static void loop(){
@@ -160,21 +195,10 @@ public class Controller {
         
         //Seleccionar elementos
         //for (int i = 0; i < elements.size(); i++) {
-        for (int i = elements.size()-1; i >= 0; i--) {
-            Element element = elements.get(i);
-            if(Mouse.getLeftClick()){
-                if((focus == -1 || !focus_volatile) && element.getDragable() && element.colide(Mouse.getX(), Mouse.getY())){
-                    if(focus != -1)
-                        elements.get(focus).focus_end();
-                    focus = i;
-                    focus_volatile = elements.get(focus).focus_init();
-                }else if(focus == i && !focus_volatile){
-                    elements.get(focus).focus_end();
-                    resumeFocus();
-                }
-            }
+        selectRoutine(0);
+        for (int i = elements.size()-1; i >= 1; i--) {
+            selectRoutine(i);
         }
-        System.out.println(focus);
         //Rutina de seleccionados
         if(focus != -1){
             if(Mouse.getLeftDown()){
@@ -196,10 +220,12 @@ public class Controller {
             if(!Global.DEBUG_MODE || layerOnly == -1 || layerOnly == dl)
             for(int i = 0; i < elements.size(); i++){
                 if(dl == 2){
-                    elements.get(0).action(Global.EVENT_DRAW_FLOD);
-                    selectedFinder.forEach((summoner) -> {
-                        summoner.draw();
-                    });
+                    if(slidingFinder != -1){
+                        elements.get(0).action(Global.EVENT_DRAW_FLOD);
+                        selectedFinder.forEach((summoner) -> {
+                            summoner.draw();
+                        });
+                    }
                 }
                 if(elements.get(i).getDepth() == dl && elements.get(i).getDrawable() && inScreen(elements.get(i)))
                     elements.get(i).draw();
@@ -269,6 +295,21 @@ public class Controller {
                     e.move(Mouse.getMoveX(), Mouse.getMoveY());
         }
     }
+    private static void selectRoutine(int i){
+        Element element = elements.get(i);
+        if(Mouse.getLeftClick()){
+            if((focus == -1 || !focus_volatile) && element.getDragable() && element.colide(Mouse.getX(), Mouse.getY())){
+                if(focus != -1)
+                    elements.get(focus).focus_end();
+                focus = i;
+                focus_volatile = elements.get(focus).focus_init();
+            }else if(focus == i && !focus_volatile){
+                elements.get(focus).focus_end();
+                resumeFocus();
+            }
+        }
+        //System.out.println("SELECTED: "+focus+" VOlATILE: "+focus_volatile);
+    }
     
     
     private static boolean inScreen(Element object){
@@ -276,10 +317,14 @@ public class Controller {
                 object.getY() < -Global.DRAWING_RADIUS_LIMIT || object.getY() > Global.WINDOW_HEIGHT+Global.DRAWING_RADIUS_LIMIT);
     }
     private static void unLink(int n){
-        if(elements.size() > n){
-            elements.get(n).delete();
-            elements.remove(n);
-        }
+        Element e = null;
+        if(elements.size() > n)
+            e = elements.get(n);
+        
+        if(e != null)
+            e.delete();
+        if(e != null)
+            elements.remove(e);
     }
     
     public static void moveAuto(ElementBase e, int x2, int y2, int tics){
@@ -295,8 +340,9 @@ public class Controller {
     }
     
     
-    public static int generateID(){
+    public static long generateID(){
         idCounter += 1;
+        while(getElementByID(idCounter) != null) idCounter++;
         return idCounter;
     }
     public static int idSearch(int ID){
@@ -345,20 +391,44 @@ public class Controller {
     public static void dockingAlign(Element e1, Port p1){
         moveAuto(e1, p1.getConnectedPort().getX1()-p1.getX1()+e1.getX(), p1.getConnectedPort().getY1()-p1.getY1()+e1.getY(), 30);
     }
+    public static void autoDock(String id1, String id2, int port1, int port2){
+        if(id1 == null || id1.isEmpty() || id1.equals("-1") ||
+           id2 == null || id2.isEmpty() || id2.equals("-1")) return;
+        
+        Element e1 = getElementByID(Integer.parseInt(id1));
+        Element e2 = getElementByID(Integer.parseInt(id2));
+        
+        if(e1.getPort(port1) == null || e1.getPort(port1).isOcupied() ||
+           e2.getPort(port2) == null || e2.getPort(port2).isOcupied()) return;
+        
+        docking(e1, e2, e1.getPort(port1), e2.getPort(port2));
+    }
     
     //Game mechanics
     public static void setFinder(int type){
-        finder = type;
-        switch(finder){
-            case 1: selectedFinder = BasicElements; break;
-            case Global.HOLE_VAR_INOUT: selectedFinder = InOutElements; break;
-            case Global.HOLE_VAR_TYPE: selectedFinder = VarTypeElements; break;
-            case Global.CONSTRUCTOR_LITERAL_CONST: selectedFinder = cLiteralConstElements; break;
-            case Global.CONSTRUCTOR_LITERAL_VARS: selectedFinder = cLiteralVarElements; break;
-            case Global.CONSTRUCTOR_OPERATORS: selectedFinder = cOperatorsElements; break;
-            case Global.CONSTRUCTOR_OPERATORS_PLUS: selectedFinder = cOperatorsPlusElements; break;
-            case Global.HOLE_EDGE: selectedFinder = EdgeType; break;
+        
+        //System.out.println(Thread.currentThread().getStackTrace()[2].getMethodName());
+        if((currentRoom != Global.ROOM_DESIGN && currentRoom != Global.ROOM_IMPLEMENT) || type == -1){
+            selectedFinder = new ArrayList<>();
         }
+        if(elements.size() > 1 && currentRoom == Global.ROOM_DESIGN)
+            loadVars();
+        finder = type;
+        
+        switch(finder){
+            case 1:                                     selectedFinder = BasicElements; break;
+            case Global.HOLE_VAR_INOUT:                 selectedFinder = InOutElements; break;
+            case Global.HOLE_VAR_TYPE:                  selectedFinder = VarTypeElements; break;
+            //case Global.CONSTRUCTOR_LITERAL_CONST:      selectedFinder = cLiteralElements; break;
+            case Global.CONSTRUCTOR_LITERAL_VARS:       selectedFinder = cLiteralVarElements; break;
+            case Global.CONSTRUCTOR_OPERATORS:          selectedFinder = cOperatorsElements; break;
+            case Global.CONSTRUCTOR_OPERATORS_PLUS:     selectedFinder = cOperatorsPlusElements; break;
+            case Global.HOLE_EDGE:                      selectedFinder = EdgeType; break;
+            case Global.HOLE_VAR:                       selectedFinder = cVarElements; break;
+            case Global.HOLE_VAR_IN:                    selectedFinder = cVarInsElements; break;
+            case Global.HOLE_VAR_OUT:                   selectedFinder = cVarOutsElements; break;
+        }
+        
         for(Summoner s: selectedFinder)
             s.move(finderPos-375-s.getX(), 0);
         if(!(slidingFinder == 0 && finderPos == 400)){
@@ -366,7 +436,7 @@ public class Controller {
         }
     }
 
-    public static void deleteElement(int ID) {
+    public static void deleteElement(long ID) {
         for(int i = 0; i < elements.size(); i++)
             if(elements.get(i).getID() == ID){
                 if(i == lastFocus)
@@ -375,8 +445,8 @@ public class Controller {
             }
     }
     
-    public static int getClolideID(){
-        int id;
+    public static long getClolideID(){
+        long id;
         for(Element e:elements){
             id = e.colideID(Mouse.getX(), Mouse.getY());
             if(id != -1)
@@ -384,7 +454,7 @@ public class Controller {
         }
         return -1;
     }
-    public static Hole searchHole(int id){
+    public static Hole searchHole(long id){
         if(id == -1) return null;
         Hole h;
         for(Element e:elements){
@@ -394,29 +464,49 @@ public class Controller {
         }
         return null;
     }
-    public static Element getElementByID(int id){
+    public static Element getElementByID(long id){
         for(Element e:elements)
             if(e.getID() == id)
                 return e;
         return null;
     }
+    public static Element getElementByID(String id){
+        return getElementByID(Integer.parseInt(id));
+    }
     
     public static void changeRoom(int room){
-        elements.clear();
+        BUCKLE.save();
         switch(room){
             case Global.ROOM_MENU: break;
             case Global.ROOM_CREATE: break;
             case Global.ROOM_OPEN: break;
             case Global.ROOM_SETTINGS: break;
             case Global.ROOM_DESIGN:
+                elements.clear();
                 elements.add(new DesignGUI());
                 slidingFinder = 0;
                 finderPos = 400;
                 setFinder(1);
-                break;
-            case Global.ROOM_IMPLEMENT: break;
-            case Global.ROOM_SIMULATE: break;
+            break;
+            case Global.ROOM_IMPLEMENT:
+                elements.clear();
+                elements.add(new ImplementGUI());
+                slidingFinder = 0;
+                finderPos = 400;
+                setFinder(Global.HOLE_VAR);
+                implementImplementElements();
+            break;
+            case Global.ROOM_SIMULATE:
+                elements.clear();
+                slidingFinder = -1;
+                elements.add(new SimulateGUI());
+                elements.get(elements.size()-1).action(Global.EVENT_CREATE_SPARTAN);
+                finderPos = 0;
+                setFinder(-1);
+            break;
         }
+        currentRoom = room;
+        BUCKLE.load();
     }
     public static void finderToggle(){
         if(finderPos == 400){
@@ -427,7 +517,7 @@ public class Controller {
         elements.get(0).action(Global.EVENT_TOOGLE_TOGGLE);
     }
     
-    public static void putOnTop(int id){
+    public static void putOnTop(long id){
         Element e = getElementByID(id);
         if(elements.indexOf(e) == focus)
             focus = elements.size()-1;
@@ -435,5 +525,93 @@ public class Controller {
             int i = elements.indexOf(e);
             Collections.swap(elements, i, i+1);
         }
+    }
+
+    private static void implementImplementElements(){
+        for(int i = 0; i < 8; i++)
+            elements.add(new Implementer(500, 95+(125*i), Global.IMPLEMENTER_LED, i+1));
+        for(int i = 0; i < 4; i++)
+            elements.add(new Implementer(965, 95+(125*i), Global.IMPLEMENTER_SWITCH, i+1));
+        for(int i = 0; i < 4; i++)
+            elements.add(new Implementer(965, 95+(125*(i+4)), Global.IMPLEMENTER_BUTTON, i+1));
+        for(int i = 0; i < 2; i++)
+            elements.add(new Implementer(1430, 95+(125*i), Global.IMPLEMENTER_BCD, i+1));
+        elements.add(new Implementer(1430, 95+(125*3), Global.IMPLEMENTER_CLOCK, 1));
+        
+    }
+    
+    //HardWork
+    public static void loadVars(){
+        cLiteralVarElements.clear();
+        cVarElements.clear();
+        cVarOutsElements.clear();
+        cVarInsElements.clear();
+        for(Element e: elements){
+            if(e.getClass() == Declarator.class){
+                Declarator d = (Declarator) e;
+                if(d.isComplete()){
+                    ArrayList<Variable> tmp = d.getVars();
+                    if(tmp != null){
+                        vars.addAll(tmp);
+                        finderADD(cVarElements, 1f, tmp);
+                        finderADD(cLiteralVarElements, 1f, tmp);
+                        for(Variable v:tmp)
+                            if(v.inout == Global.TIP_VAR_OUT)
+                                finderADD(cVarOutsElements, 1f, v);
+                            else if(v.inout == Global.TIP_VAR_IN)
+                                finderADD(cVarInsElements, 1f, v);
+                    }
+                }
+            }
+        }
+        finderADD(cLiteralVarElements, cLiteralElements);
+        //finderADD(cLiteralVarElements, cVarElements);
+    }
+    public static Variable getVarByName(String name){
+        for(Variable var:vars)
+            if(var.name.equals(name)) return var;
+        return null;
+    }
+    public static ArrayList<Element> getBoard(){
+        if(elements.size() <= 1) return null;
+        ArrayList<Element> piezes = new ArrayList<>();
+        for(Element e:elements)
+            if(e.isRemovableByUser() && e.isMother()) piezes.add(e);
+        
+        return piezes;
+    }
+    public static ArrayList<Element> getBoardAll(){
+        if(elements.size() <= 1) return null;
+        ArrayList<Element> piezes = new ArrayList<>();
+        for(Element e:elements)
+            if((e.isRemovableByUser() && e.getClass() != Tip.class) ||
+                    e.getClass() == Implementer.class) piezes.add(e);
+        
+        return piezes;
+    }
+    
+    public static void addToBoard(Element e){
+        elements.add(e);
+        e.setDepth(5);
+    }
+    public static Element getFromBoard(int n){
+        if(n < elements.size())
+            return elements.get(n);
+        else
+            return null;
+    }
+    public static Implementer getImplementerFromIdentifier(String indentifier){
+        Implementer Im;
+        for(Element e:elements)
+            if(e.getClass() == Implementer.class){
+                Im = (Implementer) e;
+                if(Im.getIdentifier().equals(indentifier))
+                    return Im;
+            }
+        return null;
+    }
+    
+    public static int getRoom(){
+        return currentRoom;
     }
 }

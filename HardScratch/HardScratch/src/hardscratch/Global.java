@@ -2,8 +2,9 @@ package hardscratch;
 
 import hardscratch.base.*;
 import hardscratch.base.shapes.*;
-import hardscratch.elements.subParts.Constructor;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 
@@ -20,6 +21,8 @@ public class Global {
     
     public static final float MOUSE_SCROLL_SEPED = 10;
     
+    public static String SAVE_NAME;
+    
     //public static final int WINDOW_WIDTH = 1920;
     //public static final int WINDOW_HEIGHT = 1080;
     //public static final boolean FULLSCREEN = true;
@@ -28,7 +31,7 @@ public class Global {
     public static final int FRAME_RATE = 60;
     
     public static boolean DEBUG_MODE = false;
-    public static int DRAWING_RADIUS_LIMIT = 100;
+    public static int DRAWING_RADIUS_LIMIT = 500;   //Algun dia habra que quitar esto
     
     public static final float[][] SHAPE_SQUARE = new float[][] {
         new float[] { 0, 0,},
@@ -88,7 +91,19 @@ public class Global {
             COLOR_GUI_3,
             COLOR_GUI_4,
             COLOR_GUI_5,
-            COLOR_GUI_6
+            COLOR_GUI_6,
+            COLOR_VAR_IN,
+            COLOR_VAR_OUT,
+            COLOR_VAR_SIGNAL,
+            COLOR_VAR_CONST,
+            COLOR_IMPLEMENTER,
+            COLOR_CIRCUIT_GREEN,
+            COLOR_CIRCUIT_DKGREEN,
+            COLOR_CIRCUIT_BROWN,
+            COLOR_CIRCUIT_DKBROWN,
+            COLOR_CIRCUIT_DKGRAY,
+            COLOR_CIRCUIT_LIGHT,
+            COLOR_CIRCUIT_DKLIGHT
             ;
     
     
@@ -103,7 +118,6 @@ public class Global {
             ROOM_SETTINGS = 7
             ;
     public static final int
-            HOLE_VAR = 1,
             HOLE_VAR_INOUT = 2,
             HOLE_VAR_TYPE = 3,
             HOLE_CONSTRUCTOR = 4,   //Para todos los elementos del constructor
@@ -111,7 +125,10 @@ public class Global {
             CONSTRUCTOR_OPERATORS = 6,
             CONSTRUCTOR_OPERATORS_PLUS = 7,  //agrega el =
             CONSTRUCTOR_LITERAL_VARS = 8,
-            HOLE_EDGE = 9
+            HOLE_EDGE = 9,
+            HOLE_VAR = 10,
+            HOLE_VAR_IN = 11,
+            HOLE_VAR_OUT = 12
             ;
     public static final int
             TIP_VAR_IN = 1,
@@ -144,7 +161,8 @@ public class Global {
             TIP_VAR_BIT = 28,
             TIP_VAR_ARRAY = 29,
             TIP_EDGE_RISING = 30,
-            TIP_EDGE_LOWERING = 31
+            TIP_EDGE_LOWERING = 31,
+            TIP_VAR = 32
             ;
     public static final int
             SUMMON_DECLARATRON = 1,
@@ -191,7 +209,8 @@ public class Global {
             SUMMON_WAITFOR = 43,
             SUMMON_FORNEXT = 44,
             SUMMON_TIP_RISSING = 45,
-            SUMMON_TIP_LOWERING = 46
+            SUMMON_TIP_LOWERING = 46,
+            SUMMON_VAR = 47
             ;
     public static final int
             CREATOR_I = 1,
@@ -224,7 +243,25 @@ public class Global {
             EVENT_DRAW_BACKGROUND = 13,
             EVENT_DRAW_FLOD = 14,
             EVENT_TOOGLE_TOGGLE = 15,
-            EVENT_DOCK = 16
+            EVENT_DOCK = 16,
+            EVENT_CREATE_SPARTAN = 17,
+            EVENT_TURN_ON = 18,
+            EVENT_TURN_OFF = 19
+            ;
+    public static final int
+            IMPLEMENTER_LED = 1,
+            IMPLEMENTER_SWITCH = 2,
+            IMPLEMENTER_BUTTON = 3,
+            IMPLEMENTER_BCD = 4,
+            IMPLEMENTER_CLOCK = 5
+            ;
+    public static final int
+            SIM_POWER_ON = 1,
+            SIM_POWER_OFF = 2,
+            SIM_BUTTON_ON = 3,
+            SIM_BUTTON_OFF = 4,
+            SIM_LED_ON = 5,
+            SIM_LED_OFF = 6
             ;
     
     public static float distance(int x1, int y1, int x2, int y2){
@@ -276,6 +313,21 @@ public class Global {
         COLOR_GUI_5 = new float[]                   {255/255f,255/255f,255/255f};
         COLOR_GUI_6 = new float[]                   {116/255f,179/255f,179/255f};
         
+        COLOR_VAR_IN = new float[]                  {116/255f,179/255f,179/255f};//Modificar
+        COLOR_VAR_OUT = new float[]                 {255/255f,179/255f,179/255f};
+        COLOR_VAR_SIGNAL = new float[]              {116/255f,255/255f,179/255f};
+        COLOR_VAR_CONST = new float[]               {116/255f,179/255f,255/255f};
+        //Implement
+        COLOR_IMPLEMENTER = new float[]             {183/255f,150/255f,114/255f};
+        //Simulate
+        COLOR_CIRCUIT_GREEN = new float[]           { 70/255f,242/255f, 90/255f};
+        COLOR_CIRCUIT_DKGREEN = new float[]         {  6/255f,107/255f,  3/255f};
+        COLOR_CIRCUIT_BROWN = new float[]           {205/255f,160/255f, 90/255f};
+        COLOR_CIRCUIT_DKBROWN = new float[]         {160/255f,113/255f, 40/255f};
+        COLOR_CIRCUIT_DKGRAY = new float[]          { 57/255f, 80/255f, 80/255f};
+        COLOR_CIRCUIT_DKLIGHT = new float[]         {156/255f,156/255f, 20/255f};
+        COLOR_CIRCUIT_LIGHT = new float[]           {240/255f,240/255f, 30/255f};
+        
         //COLOR_DECLARATOR = new int[]{255,71,240};
     }
     
@@ -299,6 +351,66 @@ public class Global {
         e.addShape(new Shape_Square(0, 0, color, 1, 3, 30, 30), x2+90, y2);
         e.addShape(new Shape_Square(0, 0, color, 1, 3, 30, 30), x2+180, y2);
         e.addPort(x2, x2+210, y2, y2+30, PORT_FEMALE, PORT_SEQUENTIAL);
+    }
+    public static void addGUIframe(Element e){
+        e.addShape(new Shape_Square(0, 0, Global.COLOR_GUI_2, 1, 4, Global.WINDOW_WIDTH, 70), 0, 0);
+        e.addImage(new Image(0, 0, 3, Global.TEXTURE_HOUSE, 1, Global.COLOR_GUI_3), Global.WINDOW_WIDTH-80, 0);
+        e.addImage(new Image(0, 0, 3, Global.TEXTURE_SAVE, 1, Global.COLOR_GUI_3), Global.WINDOW_WIDTH-160, 0);
+        e.addShape(new Shape_BorderedBox(0, 0, Global.COLOR_GUI_4, Global.COLOR_GUI_5, 1, 3, 200, 52, 5), 36, 10);
+        e.addShape(new Shape_BorderedBox(0, 0, Global.COLOR_GUI_4, Global.COLOR_GUI_5, 1, 3, 200, 52, 5), 246, 10);
+        e.addShape(new Shape_BorderedBox(0, 0, Global.COLOR_GUI_4, Global.COLOR_GUI_5, 1, 3, 200, 52, 5), 456, 10);
+        e.addLabel(new TextLabel(0, 0, 2, 0.42f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "DESIGN", true), 136, 36);
+        e.addLabel(new TextLabel(0, 0, 2, 0.42f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "IMPLEMENT", true), 346, 36);
+        e.addLabel(new TextLabel(0, 0, 2, 0.42f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "SIMULATE", true), 556, 36);
+        e.getLabel(0).setScretch(1.8f);
+        e.getLabel(1).setScretch(1.8f);
+        e.getLabel(2).setScretch(1.8f);
+        
+        e.addBoundingBox(Global.WINDOW_WIDTH-80, Global.WINDOW_WIDTH-10, 0, 70, Global.EVENT_GO_HOMO);
+        e.addBoundingBox(Global.WINDOW_WIDTH-160, Global.WINDOW_WIDTH-90, 0, 70, Global.EVENT_SAVE);
+        e.addBoundingBox(36, 236, 10, 62, Global.EVENT_GO_DESIGN);
+        e.addBoundingBox(246, 446, 10, 62, Global.EVENT_GO_IMPLEMENT);
+        e.addBoundingBox(456, 656, 10, 62, Global.EVENT_GO_SIMULATE);
+    }
+    
+    public static String concatenate(String list[]){
+        return concatenateWith(list, "");
+    }
+    public static String concatenate(ArrayList<String> list){
+        return concatenateWith(list, "");
+    }
+    public static String concatenateWith(String list[],String divider){
+        String text = "";
+        
+        for(String s:list)
+            text += (text.isEmpty()?"":divider) + s;
+        
+        return text;
+    }
+    public static String concatenateWith(ArrayList<String> list,String divider){
+        String[] data = new String[list.size()];
+        for(int i = 0; i < list.size(); i++)
+            data[i] = list.get(i);
+        return concatenateWith(data, divider);
+    }
+    
+    
+    public static void createProyect(String nombre){
+        SAVE_NAME = nombre;
+        File proyectFolder = new File(System.getenv("APPDATA")+"/HardScratch/"+SAVE_NAME);
+        proyectFolder.mkdirs();
+        
+        //Resto de cosas
+    }
+    public static void openProyect(String name){
+        SAVE_NAME = name;
+        File proyectFolder = new File(System.getenv("APPDATA")+"/HardScratch/"+SAVE_NAME);
+        if(!proyectFolder.exists())
+            proyectFolder.mkdirs();
+    }
+    
+    public static String getProyectFolder(){
+        return System.getenv("APPDATA")+"/HardScratch/"+SAVE_NAME;
     }
     
 }

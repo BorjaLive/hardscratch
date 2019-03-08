@@ -54,7 +54,10 @@ public class TextLabel extends ElementBase{
     }
     
     private void generateLetters(){
-        letters = text.toCharArray();
+        if(text == null)
+            letters = new char[0];
+        else
+            letters = text.toCharArray();
     }
     
     public int getLines(){

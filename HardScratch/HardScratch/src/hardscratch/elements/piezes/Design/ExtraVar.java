@@ -1,15 +1,26 @@
-package hardscratch.elements.piezes;
+package hardscratch.elements.piezes.Design;
 
 import hardscratch.Global;
 import hardscratch.base.Element;
 import hardscratch.base.shapes.Shape_Square;
 import hardscratch.base.shapes.TextBox;
 import hardscratch.base.shapes.TextLabel;
+import hardscratch.elements.piezes.Constructor;
+import hardscratch.inputs.Mouse;
+import java.util.ArrayList;
 
 public class ExtraVar extends Element{
     
-    public ExtraVar(int x, int y) {
-        super(x, y, true, true, true);
+    public ExtraVar(){
+        this(Mouse.getX()-159, Mouse.getY()-59);
+    }
+    
+    public ExtraVar(int x, int y){
+        this(x, y, -1, "");
+    }
+    
+    public ExtraVar(int x, int y, int id, String varName) {
+        super(x, y, id, true, true, true);
         
         addTextBox(new TextBox(0, 0, 1, 0.5f, null, "VAR NAME", null, null, null, null, null, 8, 1, 10, true, true, true), 10, 75);
         addPort(0,318,0,30, Global.PORT_MALE, Global.PORT_EXTRAVAR);
@@ -24,11 +35,49 @@ public class ExtraVar extends Element{
         addShape(new Shape_Square(0, 0, Global.COLOR_EXTRAVAR, 1, 2, 30, 30), 192, 148);
         addShape(new Shape_Square(0, 0, Global.COLOR_EXTRAVAR, 1, 2, 222, 118), 0, 30);
         
+        boxen.get(0).setText(varName);
+        
         addBoundingBox(0, 222, 30, 148, -1);
     }
 
+    
+    //HardWork
+    public ArrayList<String> getVars(){
+        ArrayList<String> names;
+        if(ports.get(2).isOcupied()){
+            ExtraVar e = (ExtraVar) ports.get(2).getDock();
+            names = e.getVars();
+        }else{
+            names = new ArrayList<>();
+        }
+        
+        if(isComplete())
+            names.add(boxen.get(0).getText());
+        else
+            names.add(null);
+        
+        return names;
+    }
+    public ArrayList<Constructor> getCreators(){
+        ArrayList<Constructor> crts;
+        if(ports.get(2).isOcupied()){
+            ExtraVar e = (ExtraVar) ports.get(2).getDock();
+            crts = e.getCreators();
+        }else{
+            crts = new ArrayList<>();
+        }
+        
+        if(ports.get(1).isOcupied())
+            crts.add(ports.get(1).getDock().getCreator(0));
+        else
+            crts.add(null);
+        
+        return crts;
+    }
+    
+    
     @Override
-    protected int colideExtra(int x, int y) {
+    protected long colideExtra(int x, int y) {
         return -1;
     }
 
@@ -41,7 +90,7 @@ public class ExtraVar extends Element{
     }
 
     @Override
-    protected void select_init(int ID) {
+    protected void select_init(long ID) {
     }
 
     @Override

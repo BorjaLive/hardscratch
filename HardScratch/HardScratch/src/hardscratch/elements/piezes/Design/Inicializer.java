@@ -1,14 +1,23 @@
-package hardscratch.elements.piezes;
+package hardscratch.elements.piezes.Design;
 
 import hardscratch.Global;
 import hardscratch.base.*;
 import hardscratch.base.shapes.*;
-import hardscratch.elements.subParts.Constructor;
+import hardscratch.elements.piezes.Constructor;
+import hardscratch.inputs.Mouse;
 
 public class Inicializer extends Element{
     
-    public Inicializer(int x, int y) {
-        super(x, y, true, true, true);
+    public Inicializer(){
+        this(Mouse.getX()-140, Mouse.getY()-59);
+    }
+    
+    public Inicializer(int x, int y){
+        this(x, y, -1);
+    }
+    
+    public Inicializer(int x, int y, int id) {
+        super(x, y, id, true, true, true);
         
         addPort(0,30,0,118, Global.PORT_MALE, Global.PORT_INICIALIZER);
         
@@ -22,7 +31,7 @@ public class Inicializer extends Element{
     }
 
     @Override
-    protected int colideExtra(int x, int y) {
+    protected long colideExtra(int x, int y) {
         return -1;
     }
 
@@ -35,7 +44,7 @@ public class Inicializer extends Element{
     }
 
     @Override
-    protected void select_init(int ID) {
+    protected void select_init(long ID) {
     }
 
     @Override
@@ -69,10 +78,10 @@ public class Inicializer extends Element{
                 shapes.remove(1);
                 whipeBounds();
                 if(data1 <= 300){
-                    addShape(new Shape_Square(0, 0, Global.COLOR_DECLARATOR, 1, 2, 320, 118), 30, 0);
+                    addShape(new Shape_Square(0, 0, Global.COLOR_INICIALIZER, 1, 2, 320, 118), 30, 0);
                     addBoundingBox(30, 350, 0, 118, -1);
                 }else{
-                    addShape(new Shape_Square(0, 0, Global.COLOR_DECLARATOR, 1, 2, 20+data1, 118), 30, 0);
+                    addShape(new Shape_Square(0, 0, Global.COLOR_INICIALIZER, 1, 2, 20+data1, 118), 30, 0);
                     addBoundingBox(30, data1+20, 0, 118, -1);
                 }
             break;

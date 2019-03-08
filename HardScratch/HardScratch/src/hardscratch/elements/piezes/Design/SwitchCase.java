@@ -1,21 +1,30 @@
-package hardscratch.elements.piezes;
+package hardscratch.elements.piezes.Design;
 
 import hardscratch.Global;
 import hardscratch.base.Element;
 import hardscratch.base.Port;
 import hardscratch.base.shapes.Shape_Square;
 import hardscratch.base.shapes.TextLabel;
-import hardscratch.elements.subParts.Constructor;
-import hardscratch.elements.subParts.Hole;
+import hardscratch.elements.piezes.Constructor;
+import hardscratch.elements.piezes.Hole;
+import hardscratch.inputs.Mouse;
 import java.util.ArrayList;
 
 public class SwitchCase extends Element{
 
     private int width;
     private static ArrayList<Constructor> Creator_To_Delete;
+
+    public SwitchCase(){
+        this(Mouse.getX()-181, Mouse.getY()-117);
+    }
     
-    public SwitchCase(int x, int y) {
-        super(x, y, true, true, true);
+    public SwitchCase(int x, int y){
+        this(x, y, -1);
+    }
+    
+    public SwitchCase(int x, int y, int id) {
+        super(x, y, id, true, true, true);
         width = 362;
         Creator_To_Delete = new ArrayList<>();
         
@@ -28,6 +37,7 @@ public class SwitchCase extends Element{
         
         addLabel(new TextLabel(0, 0, 3, 0.42f, Global.FONT_MONOFONTO, Global.COLOR_TEXT_INPUT, "ELSE", true), 75, 191);
         addCreator(new Constructor(0, 0, Global.CREATOR_I, this, 1), 150, 149);
+        creators.get(creators.size()-1).setDepthNegative();
         addShape(new Shape_Square(0, 0, Global.COLOR_SWITCHCASE, 1, 4, 210, 55), width, 149);
         addPort(width, width+210, 204, 234, Global.PORT_FEMALE, Global.PORT_SEQUENTIAL);
         addShape(new Shape_Square(0, 0, Global.COLOR_SWITCHCASE, 1, 3, 30, 30), width, 204);
@@ -154,9 +164,39 @@ public class SwitchCase extends Element{
     protected void selected_loop() {
         actDeleteQuee();
     }
+    
+    
+    
+    
+    //HardWork
+    public ArrayList<Constructor> getConditions(){
+        ArrayList<Constructor> list = new ArrayList<>();
+        
+        for(int i = 1; i < creators.size(); i++)
+            list.add(creators.get(i));
+        
+        return list;
+    }
+    public ArrayList<Element> getInstructions(){
+        ArrayList<Element> list = new ArrayList<>();
+        
+        for(int i = 2; i < ports.size(); i++)
+            list.add(ports.get(i).getDock());
+        
+        return list;
+    }
+    public ArrayList<Port> getInstructionsPort(){
+        ArrayList<Port> list = new ArrayList<>();
+        
+        for(int i = 2; i < ports.size(); i++)
+            list.add(ports.get(i));
+        
+        return list;
+    }
+    
 
     @Override
-    protected int colideExtra(int x, int y) {
+    protected long colideExtra(int x, int y) {
         return -1;
     }
 
@@ -169,7 +209,7 @@ public class SwitchCase extends Element{
     }
 
     @Override
-    protected void select_init(int ID) {
+    protected void select_init(long ID) {
     }
 
     @Override

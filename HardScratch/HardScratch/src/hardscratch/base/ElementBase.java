@@ -7,7 +7,7 @@ public abstract class ElementBase {
     
     protected int depth, rot;
     protected float scale;
-    protected int ID;
+    protected long ID;
     
     public ElementBase(int x, int y, int depth, float scale){
         position = new Dot(x, y);
@@ -29,6 +29,9 @@ public abstract class ElementBase {
         if(dep < 0)
             dep = 0;
         depth = dep;
+    }
+    public void setDepthNegative(){
+        depth = -1;
     }
     public int getDepth(){
         return depth;
@@ -55,7 +58,7 @@ public abstract class ElementBase {
         return position.getCordY();
     }
     
-    public int getID(){
+    public long getID(){
         return ID;
     }
     

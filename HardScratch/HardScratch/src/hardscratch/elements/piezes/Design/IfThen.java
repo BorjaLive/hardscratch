@@ -1,11 +1,12 @@
-package hardscratch.elements.piezes;
+package hardscratch.elements.piezes.Design;
 
 import hardscratch.Global;
 import hardscratch.base.Element;
 import hardscratch.base.Port;
 import hardscratch.base.shapes.Shape_Square;
 import hardscratch.base.shapes.TextLabel;
-import hardscratch.elements.subParts.Constructor;
+import hardscratch.elements.piezes.Constructor;
+import hardscratch.inputs.Mouse;
 import java.util.ArrayList;
 
 public class IfThen extends Element{
@@ -13,8 +14,16 @@ public class IfThen extends Element{
     private int width;
     private static ArrayList<Constructor> Creator_To_Delete;
 
-    public IfThen(int x, int y) {
-        super(x, y, true, true, true);
+    public IfThen(){
+        this(Mouse.getX()-115, Mouse.getY()-85);
+    }
+    
+    public IfThen(int x, int y){
+        this(x, y, -1);
+    }
+
+    public IfThen(int x, int y, int id) {
+        super(x, y, id, true, true, true);
         width = 120;
         Creator_To_Delete = new ArrayList<>();
         
@@ -25,6 +34,7 @@ public class IfThen extends Element{
         
         addLabel(new TextLabel(0, 0, 3, 0.42f, Global.FONT_MONOFONTO, Global.COLOR_TEXT_INPUT, "ELSE", true), 50, 127);
         addCreator(new Constructor(0, 0, Global.CREATOR_E, this, 1), 100, 95);
+        creators.get(creators.size()-1).setDepthNegative();
         addShape(new Shape_Square(0, 0, Global.COLOR_IFTHEN, 1, 4, 210, 55), 110+width, 85);
         addPort(110+width, 330+width, 140, 170, Global.PORT_FEMALE, Global.PORT_SEQUENTIAL);
         addShape(new Shape_Square(0, 0, Global.COLOR_IFTHEN, 1, 3, 30, 30), 110+width, 140);
@@ -50,6 +60,7 @@ public class IfThen extends Element{
             case Global.EVENT_DOCK:
                 if(ports.get(0).isOcupied())
                     ports.get(0).getDock().updateEvent(Global.EVENT_DOCK, data1, data2, data3);
+            break;
             case Global.EVENT_RESIZE:
                 //Anchar el ancho
                 width = 0;
@@ -155,12 +166,40 @@ public class IfThen extends Element{
         actDeleteQuee();
     }
     
+    
+    
+    //HardWork
+    public ArrayList<Constructor> getConditions(){
+        ArrayList<Constructor> list = new ArrayList<>();
+        
+        for(int i = 1; i < creators.size(); i++)
+            list.add(creators.get(i));
+        
+        return list;
+    }
+    public ArrayList<Element> getInstructions(){
+        ArrayList<Element> list = new ArrayList<>();
+        
+        for(int i = 2; i < ports.size(); i++)
+            list.add(ports.get(i).getDock());
+        
+        return list;
+    }
+    public ArrayList<Port> getInstructionsPort(){
+        ArrayList<Port> list = new ArrayList<>();
+        
+        for(int i = 2; i < ports.size(); i++)
+            list.add(ports.get(i));
+        
+        return list;
+    }
+    
     @Override
     protected void select_end() {
     }
 
     @Override
-    protected int colideExtra(int x, int y) {
+    protected long colideExtra(int x, int y) {
         return -1;
     }
 
@@ -173,7 +212,7 @@ public class IfThen extends Element{
     }
 
     @Override
-    protected void select_init(int ID) {
+    protected void select_init(long ID) {
     }
 
     @Override

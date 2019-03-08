@@ -50,7 +50,6 @@ public class Display {
     
     public void update() {
         Controller.loop();
-        
         glfwSwapBuffers(window); 
         glfwPollEvents();
         try{

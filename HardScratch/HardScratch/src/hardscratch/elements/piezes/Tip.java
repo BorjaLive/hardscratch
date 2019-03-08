@@ -1,7 +1,8 @@
-package hardscratch.elements.subParts;
+package hardscratch.elements.piezes;
 
 import hardscratch.Controller;
 import hardscratch.Global;
+import hardscratch.backend.Variable;
 import hardscratch.base.Element;
 import hardscratch.base.shapes.Shape_Square;
 import hardscratch.base.shapes.TextBox;
@@ -13,12 +14,22 @@ public class Tip extends Element{
     private int value, compativility;
     private int width, height;
     private int selectedI;
+    private Variable var;
+    
+    public Tip(int value){
+        this(0,0,value);
+        move(Mouse.getX()-width/2, Mouse.getY()-height/2);
+    }
     
     public Tip(int x, int y, int value) {
-        super(x, y, true, true, true);
+        super(x, y, -1, true, true, true);
         this.value = value;
         selectedI = -1;
         
+        initShapes();
+    }
+    
+    private void initShapes(){
         switch(value){
             case Global.TIP_VAR_IN:
                 width = 155; height = 44;
@@ -52,7 +63,7 @@ public class Tip extends Element{
                 addLabel(new TextLabel(0, 0, 2, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "\"", true), 182, 20);
                 addTextBox(new TextBox(0, 0, 3, 0.4f, Global.FONT_MONOFONTO, "00000000", Global.COLOR_TEXT_INPUT, Global.COLOR_TEXT_INPUT_PLACEHOLDER, Global.TEXT_INPUT_BACK, Global.COLOR_BORDER_UNSELECTED, Global.COLOR_BORDER_SELECTED, 8, 1, 10, true, true, true), 15, 3);
             break;
-            case Global.TIP_CONSTRUCTOR_VAR_I:
+            case Global.TIP_CONSTRUCTOR_VAR_I:  //Deprecated
             break;
             case Global.TIP_CONSTRUCTOR_VAR_B:
             break;
@@ -68,9 +79,30 @@ public class Tip extends Element{
                 width = 30; height = 44;
                 addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, ")", true), 20, (height/2));
             break;
+            case Global.TIP_CONSTRUCTOR_EQUALITY:
+                width = 40; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "=", true), (width/2), (height/2));
+            break;
+            case Global.TIP_CONSTRUCTOR_CONCAT:
+                width = 40; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "&", true), (width/2), (height/2));
+            break;
+            
             case Global.TIP_CONSTRUCTOR_ARITH_ADD:
                 width = 40; height = 44;
                 addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "+", true), (width/2), (height/2));
+            break;
+            case Global.TIP_CONSTRUCTOR_ARITH_SUB:
+                width = 40; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "-", true), (width/2), (height/2));
+            break;
+            case Global.TIP_CONSTRUCTOR_ARITH_TIM:
+                width = 40; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "*", true), (width/2), (height/2));
+            break;
+            case Global.TIP_CONSTRUCTOR_ARITH_TAK:
+                width = 40; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "/", true), (width/2), (height/2));
             break;
             
             
@@ -78,6 +110,31 @@ public class Tip extends Element{
                 width = 95; height = 44;
                 addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "AND", true), (width/2), (height/2));
             break;
+            case Global.TIP_CONSTRUCTOR_LOGIC_OR:
+                width = 65; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "OR", true), (width/2), (height/2));
+            break;
+            case Global.TIP_CONSTRUCTOR_LOGIC_XOR:
+                width = 95; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "XOR", true), (width/2), (height/2));
+            break;
+            case Global.TIP_CONSTRUCTOR_LOGIC_NAND:
+                width = 125; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "NAND", true), (width/2), (height/2));
+            break;
+            case Global.TIP_CONSTRUCTOR_LOGIC_NOR:
+                width = 95; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "NOR", true), (width/2), (height/2));
+            break;
+            case Global.TIP_CONSTRUCTOR_LOGIC_XNOR:
+                width = 125; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "XNOR", true), (width/2), (height/2));
+            break;
+            case Global.TIP_CONSTRUCTOR_LOGIC_NOT:
+                width = 95; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "NOT", true), (width/2), (height/2));
+            break;
+            
             case Global.TIP_VAR_INT:
                 width = 155; height = 44;
                 addLabel(new TextLabel(0, 0, 3, 0.42f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "INTEGER", true), (width/2), (height/2));
@@ -88,7 +145,8 @@ public class Tip extends Element{
             break;
             case Global.TIP_VAR_ARRAY:
                 width = 155; height = 44;
-                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "ARRAY", true), (width/2), (height/2));
+                addLabel(new TextLabel(0, 0, 3, 0.38f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "ARRAY", false), 52, (height/2));
+                addTextBox(new TextBox(0, 0, 3, 0.4f, Global.FONT_MONOFONTO, "00", Global.COLOR_TEXT_INPUT, Global.COLOR_TEXT_INPUT_PLACEHOLDER, Global.TEXT_INPUT_BACK, Global.COLOR_BORDER_UNSELECTED, Global.COLOR_BORDER_SELECTED, 2, 1, 10, true, true, true), 103, 3);
             break;
             case Global.TIP_EDGE_RISING:
                 width = 202; height = 44;
@@ -99,6 +157,10 @@ public class Tip extends Element{
                 width = 202; height = 44;
                 addLabel(new TextLabel(0, 0, 3, 0.3f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "LOWERING EDGE", true), (width/2), (height/2));
                 labels.get(labels.size()-1).setScretch(1.6f);
+            break;
+            case Global.TIP_VAR:
+                width = 202; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "ERROR", true), (width/2), (height/2));
             break;
         }
         switch(value){
@@ -133,23 +195,32 @@ public class Tip extends Element{
             case Global.TIP_CONSTRUCTOR_LOGIC_NOT:      compativility = Global.HOLE_CONSTRUCTOR; break;
             case Global.TIP_EDGE_RISING:
             case Global.TIP_EDGE_LOWERING:              compativility = Global.HOLE_EDGE; break;
+            case Global.TIP_VAR:                        compativility = Global.HOLE_VAR; break;
         }
         
         addShape(new Shape_Square(0, 0, Global.COLOR_BORDER_SELECTED, 1, 3, width, height), 0, 0);
         addShape(new Shape_Square(0, 0, Global.COLOR_HOLE_BACK, 1, 3, width-10, height-10), 5, 5);
     }
     
+    public Tip setVar(Variable v){
+        var = v;
+        labels.get(0).setText(v.name);
+        compativility = Global.HOLE_VAR;
+        return this;
+    }
+    public Variable getVar(){return var;}
+    
     @Override
     public void moveExtra(int x, int y){}
 
     @Override
-    protected int colideExtra(int x, int y) {return -1;}
+    protected long colideExtra(int x, int y) {return -1;}
 
     @Override
     protected void drawExtra() {}
 
     @Override
-    protected void select_init(int ID) {
+    protected void select_init(long ID) {
         int x = Mouse.getX(), y = Mouse.getY();
         for(int i = 0; i < boxen.size(); i++){
             TextBox box = boxen.get(i);
@@ -207,7 +278,7 @@ public class Tip extends Element{
     public void action(int action){}
 
     @Override
-    public Hole getHoleByID(int id) {
+    public Hole getHoleByID(long id) {
         return null;
     }
 
@@ -221,5 +292,13 @@ public class Tip extends Element{
 
     @Override
     public void latWish() {
+    }
+    
+    //HardWork
+    public String getInputText(int n){
+        if(boxen.size() > n)
+            return boxen.get(0).getText();
+        else
+            return null;
     }
 }

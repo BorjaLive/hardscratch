@@ -23,6 +23,9 @@ public class Shape_BorderedBox extends Shape{
     public void changeBorderColor(float[] color){
         borderbox.setColor(color);
     }
+    public void changeBackColor(float[] color){
+        backbox.setColor(color);
+    }
     public void setPalete(float[] base){
         backbox.setColor(base);
         borderbox.setColor(new float[]{base[0]*0.5f,base[1]*0.5f,base[2]*0.5f});

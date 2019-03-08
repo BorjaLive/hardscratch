@@ -1,9 +1,11 @@
-package hardscratch.elements.piezes;
+package hardscratch.elements.piezes.Design;
 
+import hardscratch.elements.piezes.Hole;
+import hardscratch.elements.piezes.Constructor;
 import hardscratch.Global;
 import hardscratch.base.*;
 import hardscratch.base.shapes.*;
-import hardscratch.elements.subParts.*;
+import hardscratch.inputs.Mouse;
 import java.util.ArrayList;
 
 public class SetSwitch extends Element{
@@ -11,8 +13,16 @@ public class SetSwitch extends Element{
     private int width1, width2, rows;
     private static ArrayList<Constructor> Creator_To_Delete;
     
-    public SetSwitch(int x, int y) {
-        super(x, y, true, true, true);
+    public SetSwitch(){
+        this(Mouse.getX()-331, Mouse.getY()-112);
+    }
+    
+    public SetSwitch(int x, int y){
+        this(x, y, -1);
+    }
+    
+    public SetSwitch(int x, int y, int id) {
+        super(x, y, id, true, true, true);
         width1 = 120; width2 = 120; rows = 1;
         Creator_To_Delete = new ArrayList<>();
         
@@ -99,9 +109,29 @@ public class SetSwitch extends Element{
             Creator_To_Delete.clear();
         }
     }
+    
+    
+    //HardWork
+    public ArrayList<Constructor> getExpresions(){
+        ArrayList<Constructor> expresions = new ArrayList<>();
+        
+        for(int i = 1; i < creators.size(); i+=2)
+            expresions.add(creators.get(i));
+        
+        return expresions;
+    }
+    public ArrayList<Constructor> getValues(){
+        ArrayList<Constructor> values = new ArrayList<>();
+        
+        for(int i = 0; i < creators.size(); i+=2)
+            values.add(creators.get(i));
+        
+        return values;
+    }
+    
 
     @Override
-    protected int colideExtra(int x, int y) {
+    protected long colideExtra(int x, int y) {
         return -1;
     }
 
@@ -114,7 +144,7 @@ public class SetSwitch extends Element{
     }
 
     @Override
-    protected void select_init(int ID) {
+    protected void select_init(long ID) {
     }
 
     @Override

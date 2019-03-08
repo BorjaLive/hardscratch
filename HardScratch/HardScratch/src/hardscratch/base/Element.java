@@ -1,16 +1,17 @@
 package hardscratch.base;
 
+import hardscratch.elements.piezes.Hole;
+import hardscratch.elements.piezes.Constructor;
 import hardscratch.Controller;
 import hardscratch.Global;
 import hardscratch.base.shapes.*;
-import hardscratch.elements.subParts.*;
 import java.util.ArrayList;
 
 public abstract class Element extends ElementBase{
     
     private boolean drawable, dragable, deleteable;
     private int maxDepth;
-    private int focus_item, focus_itemPRE;
+    private long focus_item, focus_itemPRE;
     private boolean drag_forced;
     
     protected ArrayList<Shape> shapes;
@@ -23,10 +24,13 @@ public abstract class Element extends ElementBase{
     protected ArrayList<Shape_Square> bounds;
     private ArrayList<int[]> boundingBoxes;
     
-    public Element(int x, int y, boolean drawable, boolean dragable, boolean deleteable) {
+    public Element(int x, int y, int ID, boolean drawable, boolean dragable, boolean deleteable) {
         super(x, y, 2, 1);
         
-        this.ID = Controller.generateID();
+        if(ID == -1)
+            this.ID = Controller.generateID();
+        else
+            this.ID = ID;
         this.drawable = drawable;
         this.dragable = dragable;
         this.deleteable = deleteable;
@@ -129,22 +133,22 @@ public abstract class Element extends ElementBase{
         
         return false;
     }
-    public int colideID(int x, int y){
-        int colide = -1;
+    public long colideID(int x, int y){
+        long colide = -1;
         
         for(TextBox e: boxen){
             if(x > e.getX() && x < e.getX()+e.getWidth()
-            && y > e.getY() && y < e.getY()+e.getHeight())
+            && y > e.getY() && y < e.getY()+e.getHeight() && e.getDepth() != -1)
                     colide = e.getID();
         }
         for(Hole e: holes){
             if(x > e.getX() && x < e.getX()+e.getWidth()
-            && y > e.getY() && y < e.getY()+e.getHeight())
+            && y > e.getY() && y < e.getY()+e.getHeight() && e.getDepth() != -1)
                     colide = e.getID();
         }
         for(Constructor e: creators){
             if(x > e.getX() && x < e.getX()+e.getWidth()
-            && y > e.getY() && y < e.getY()+e.getHeight())
+            && y > e.getY() && y < e.getY()+e.getHeight() && e.getDepth() != -1)
                     colide = e.getID();
         }
         if(colide != -1)
@@ -152,9 +156,9 @@ public abstract class Element extends ElementBase{
         
         return colideExtra(x,y);
     }
-    protected abstract int colideExtra(int x, int y);
+    protected abstract long colideExtra(int x, int y);
     
-    public Hole getHoleByID(int id){
+    public Hole getHoleByID(long id){
         Hole hole;
         for(Constructor c:creators){
             hole = c.getHoleByID(id);
@@ -169,7 +173,7 @@ public abstract class Element extends ElementBase{
     }
     
     @Override
-    public final void move(int x, int y){
+    public void move(int x, int y){
         moveAbsolute(position.getCordX()+x, position.getCordY()+y);
         shapes.forEach((shape) -> {
             shape.move(x, y);
@@ -275,7 +279,7 @@ public abstract class Element extends ElementBase{
                     creator.on_selected();
             }
             
-            depth = 2;
+            depth = 4;
             Controller.putOnTop(ID);
             select_init(focus_item);
             return false;
@@ -289,7 +293,7 @@ public abstract class Element extends ElementBase{
             return true;
         }
     }
-    protected abstract void select_init(int ID);
+    protected abstract void select_init(long ID);
     public final void focus_end(){
         if(focus_item != -1){
             for(TextBox box:boxen){
@@ -390,5 +394,43 @@ public abstract class Element extends ElementBase{
         return false;
     }
     
+    public boolean isComplete(){
+            for (TextBox box : boxen)
+                if(box.isEmpty())
+                    return false;
+            for (Hole hole : holes)
+                if(!(hole.isAsigned() && hole.getTip().isComplete()))
+                    return false;
+            for (Constructor creator : creators)
+                if(creator.isEmpty())
+                    return false;
+            return true;
+    }
+    
     public int getHeight(){return -1;}
+
+    public boolean isMother() {
+        for(Port p:ports)
+            if(p.getGender() == Global.PORT_MALE && p.isOcupied())
+                return false;
+        return true;
+    }
+    
+    
+    
+    public Hole getHole(int n){
+        if(n < holes.size()) return holes.get(n); else return null;
+    }
+    public TextBox getBox(int n){
+        if(n < boxen.size()) return boxen.get(n); else return null;
+    }
+    public Constructor getCreator(int n){
+        if(n < creators.size()) return creators.get(n); else return null;
+    }
+    public Port getPort(int n){
+        if(n < ports.size()) return ports.get(n); else return null;
+    }
+    public TextLabel getLabel(int n){
+        if(n < labels.size()) return labels.get(n); else return null;
+    }
 }

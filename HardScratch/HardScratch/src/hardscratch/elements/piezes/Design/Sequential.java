@@ -1,14 +1,23 @@
-package hardscratch.elements.piezes;
+package hardscratch.elements.piezes.Design;
 
 import hardscratch.Global;
 import hardscratch.base.Element;
 import hardscratch.base.shapes.Shape_Square;
 import hardscratch.base.shapes.TextLabel;
+import hardscratch.inputs.Mouse;
 
 public class Sequential extends Element{
 
-    public Sequential(int x, int y) {
-        super(x, y, true, true, true);
+    public Sequential(){
+        this(Mouse.getX()-200, Mouse.getY()-27);
+    }
+    
+    public Sequential(int x, int y){
+        this(x, y, -1);
+    }
+    
+    public Sequential(int x, int y, int id) {
+        super(x, y, id, true, true, true);
         
         addShape(new Shape_Square(0, 0, Global.COLOR_SEQUENTIAL, 1, 3, 400, 54), 0, 0);
         addLabel(new TextLabel(0, 0, 2, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_TEXT_INPUT, "SEQUENTIAL", true), 200, 27);
@@ -26,7 +35,7 @@ public class Sequential extends Element{
     }
 
     @Override
-    protected int colideExtra(int x, int y) {
+    protected long colideExtra(int x, int y) {
         return -1;
     }
 
@@ -39,7 +48,7 @@ public class Sequential extends Element{
     }
 
     @Override
-    protected void select_init(int ID) {
+    protected void select_init(long ID) {
     }
 
     @Override

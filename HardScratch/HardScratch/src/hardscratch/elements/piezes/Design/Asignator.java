@@ -1,17 +1,26 @@
-package hardscratch.elements.piezes;
+package hardscratch.elements.piezes.Design;
 
 import hardscratch.Global;
 import hardscratch.base.*;
 import hardscratch.base.shapes.Image;
 import hardscratch.base.shapes.Shape_Square;
 import hardscratch.base.shapes.TextLabel;
-import hardscratch.elements.subParts.Constructor;
-import hardscratch.elements.subParts.Hole;
+import hardscratch.elements.piezes.Constructor;
+import hardscratch.elements.piezes.Hole;
+import hardscratch.inputs.Mouse;
 
 public class Asignator extends Element{
     
-    public Asignator(int x, int y) {
-        super(x, y, true, true, true);
+    public Asignator(){
+        this(Mouse.getX()-198, Mouse.getY()-64);
+    }
+    
+    public Asignator(int x, int y){
+        this(x, y, -1);
+    }
+    
+    public Asignator(int x, int y, int id) {
+        super(x, y, id, true, true, true);
         
         addHole(new Hole(0,0, 1, Global.HOLE_VAR), 10, 53);
         addCreator(new Constructor(0,0,Global.CREATOR_A,this,1), 266, 43);
@@ -24,7 +33,7 @@ public class Asignator extends Element{
     }
 
     @Override
-    protected int colideExtra(int x, int y) {
+    protected long colideExtra(int x, int y) {
         return -1;
     }
 
@@ -37,7 +46,7 @@ public class Asignator extends Element{
     }
 
     @Override
-    protected void select_init(int ID) {
+    protected void select_init(long ID) {
     }
 
     @Override

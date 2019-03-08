@@ -1,12 +1,10 @@
 package hardscratch.base;
 
-import hardscratch.Global;
 import hardscratch.base.shapes.Texture;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-import static org.lwjgl.opengl.GL11.*;
 
 public class Font {
     

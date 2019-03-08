@@ -1,15 +1,24 @@
-package hardscratch.elements.piezes;
+package hardscratch.elements.piezes.Design;
 
 import hardscratch.base.Element;
+import hardscratch.inputs.Mouse;
 
 public class ForNext extends Element{
 
-    public ForNext(int x, int y) {
-        super(x, y, true, true, true);
+    public ForNext(){
+        this(Mouse.getX()-0, Mouse.getY()-0);
+    }
+    
+    public ForNext(int x, int y){
+        this(x, y, -1);
+    }
+    
+    public ForNext(int x, int y, int id) {
+        super(x, y, id, true, true, true);
     }
 
     @Override
-    protected int colideExtra(int x, int y) {
+    protected long colideExtra(int x, int y) {
         return -1;
     }
 
@@ -22,7 +31,7 @@ public class ForNext extends Element{
     }
 
     @Override
-    protected void select_init(int ID) {
+    protected void select_init(long ID) {
     }
 
     @Override
