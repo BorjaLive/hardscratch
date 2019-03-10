@@ -216,4 +216,8 @@ public class Hole extends ElementBase{
         
         tip.select_end();
     }
+
+    public boolean isSelected() {
+        return selected;
+    }
 }

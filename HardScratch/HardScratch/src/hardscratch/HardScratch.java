@@ -7,6 +7,7 @@ public class HardScratch {
 
     public void run(){
         System.out.println("LWJGL " + Version.getVersion());
+        //Global.sayLinesOfCode();
 
         Display mainWindow = new Display();
         mainWindow.init();

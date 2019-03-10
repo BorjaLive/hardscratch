@@ -6,7 +6,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class Image extends ElementBase{
     
-    private final Texture texture;
+    private Texture texture;
     private float[] color;
     private int width, height;
     private boolean reverseW, reverseH;
@@ -21,6 +21,10 @@ public class Image extends ElementBase{
         
         reverseW = false;
         reverseH = false;
+    }
+    
+    public void setTexture(Texture t){
+        texture = t;
     }
     
     public int getWidth(){

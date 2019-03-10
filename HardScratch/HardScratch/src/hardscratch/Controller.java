@@ -2,13 +2,11 @@ package hardscratch;
 
 import hardscratch.elements.piezes.Hole;
 import hardscratch.elements.piezes.Tip;
-import hardscratch.elements.piezes.GUIs.ImplementGUI;
-import hardscratch.elements.piezes.GUIs.DesignGUI;
-import hardscratch.elements.piezes.GUIs.SimulateGUI;
-import hardscratch.elements.piezes.Summoner;
-import hardscratch.elements.piezes.Design.Declarator;
+import hardscratch.elements.piezes.GUIs.*;
+import hardscratch.elements.piezes.*;
 import hardscratch.backend.*;
 import hardscratch.base.*;
+import hardscratch.elements.piezes.Design.Declarator;
 import hardscratch.elements.piezes.Implementation.Implementer;
 import hardscratch.inputs.*;
 import java.util.ArrayList;
@@ -175,16 +173,17 @@ public class Controller {
         
         
         //Click en summoners
-        for(Summoner summoner : selectedFinder){
-            if(Mouse.getLeftClick() && summoner.colide(Mouse.getX(),Mouse.getY())){
-                elements.add(summoner.summon(Mouse.getX(),Mouse.getY()));
-                Rfocus = focus;
-                Rfocus_volatile = focus_volatile;
-                focus = elements.size()-1;
-                focus_volatile = true;
-                elements.get(focus).focus_force_drag();
+        if(Mouse.getX() < finderPos && Mouse.getY() > 70 )
+            for(Summoner summoner : selectedFinder){
+                if(Mouse.getLeftClick() && summoner.colide(Mouse.getX(),Mouse.getY())){
+                    elements.add(summoner.summon(Mouse.getX(),Mouse.getY()));
+                    Rfocus = focus;
+                    Rfocus_volatile = focus_volatile;
+                    focus = elements.size()-1;
+                    focus_volatile = true;
+                    elements.get(focus).focus_force_drag();
+                }
             }
-        }
         
         //Scrool de elementos summoneables
         float scroll = Mouse.getScroll()*Global.MOUSE_SCROLL_SEPED;
@@ -609,6 +608,9 @@ public class Controller {
                     return Im;
             }
         return null;
+    }
+    public static ArrayList<Variable> getAllVars(){
+        return vars;
     }
     
     public static int getRoom(){

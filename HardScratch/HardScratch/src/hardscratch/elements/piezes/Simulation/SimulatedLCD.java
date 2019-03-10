@@ -1,14 +1,53 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package hardscratch.elements.piezes.Simulation;
 
-/**
- *
- * @author Arlin-T2
- */
-public class SimulatedLCD {
+import hardscratch.Global;
+import hardscratch.base.shapes.Shape_BorderedBox;
+import hardscratch.base.shapes.TextLabel;
+
+
+public class SimulatedLCD extends Simulated{
+    
+    private String state;
+    private boolean backlight;
+    private TextLabel label;
+    private Shape_BorderedBox shape;
+
+    public SimulatedLCD(int x, int y, int unit, String name) {
+        super(x, y, unit, name);
+        state = "";
+        backlight = false;
+        
+        shape = new Shape_BorderedBox(0, 0, Global.COLOR_CIRCUIT_LCD_OFF, Global.COLOR_CIRCUIT_DKBROWN, 1, 5, unit*7, unit*2, 5);
+        addShape(shape , 0, 0);
+        label = new TextLabel(0, 0, depth, unit/100f, Global.FONT_LCD, Global.COLOR_CIRCUIT_LCD_LETTER, state, true);
+        addLabel(label, (int) (unit*3.5f),  unit);
+    }
+
+    @Override
+    public void action(int action) {
+    }
+    
+    @Override
+    public void updateEvent(int event, int data1, int data2, String data3) {
+        switch(event){
+            case Global.EVENT_TURN_ON:
+                shape.changeBackColor(Global.COLOR_CIRCUIT_LCD_ON);
+                state = "";
+                backlight = false;
+            break;
+            case Global.EVENT_TURN_OFF:
+                shape.changeBackColor(Global.COLOR_CIRCUIT_LCD_OFF);
+                state = "Booting up...";
+                backlight = true;
+            break;
+            default:
+                state = data3;
+            
+        }
+        
+        label.setText(state);
+        
+    }
+    
     
 }

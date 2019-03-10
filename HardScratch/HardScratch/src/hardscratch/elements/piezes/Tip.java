@@ -259,7 +259,7 @@ public class Tip extends Element{
         changeColorShape(0, Global.COLOR_BORDER_UNSELECTED);
         Hole h = Controller.searchHole(Controller.getClolideID());
         //System.out.println("ME DIERON: "+h.getID());
-        if(h == null || !h.assign(this))
+        if(h == null || !h.isSelected() || !h.assign(this))
             Controller.deleteElement(ID);
         setDragable(false);
         depth = 3;

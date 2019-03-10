@@ -14,7 +14,7 @@ public class SimulateSwitch extends Simulated{
         state = Global.SIM_POWER_OFF;
         
         addShape(new Shape_BorderedBox(0, 0, Global.COLOR_CIRCUIT_DKGREEN, Global.COLOR_CIRCUIT_DKBROWN, 1, 3, unit, (int) (unit*2.5f), 5), 0, 0);
-        addShape(new Shape_Square(0, 0, Global.COLOR_CIRCUIT_DKGRAY, scale, 2, unit-12, unit), 6, (int) ((unit*1.5f)-5));
+        addShape(new Shape_Square(0, 0, Global.COLOR_CIRCUIT_DKGRAY, scale, 2, unit-10, unit), 5, (int) ((unit*1.5f)-5));
         
         addBoundingBox(0, unit, 0, (int) (unit*2.5f), 1);
     }
@@ -36,7 +36,7 @@ public class SimulateSwitch extends Simulated{
             else
                 state = Global.SIM_POWER_ON;
         }
-        shapes.get(1).move(0, (int) (((unit*1.5)-12)*(state==Global.SIM_POWER_OFF?1:-1)));
+        shapes.get(1).move(0, (int) (((unit*1.5)-10)*(state==Global.SIM_POWER_OFF?1:-1)));
     }
     
 }

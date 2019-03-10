@@ -5,6 +5,9 @@ import hardscratch.base.shapes.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 
@@ -50,10 +53,11 @@ public class Global {
     public static final float FUNCTION_QR_B = 0.1428571f;
     public static final float FUNCTION_QR_C = -0.0003571429f;
     
-    public static Texture TEXTURE_TEST, TEXTURE_CAT, TEXTURE_ARROW_1, TEXTURE_ARROW_2, TEXTURE_FINDERSLIDER, TEXTURE_HOUSE, TEXTURE_SAVE;
+    public static Texture TEXTURE_TEST, TEXTURE_CAT, TEXTURE_ARROW_1, TEXTURE_ARROW_2, TEXTURE_FINDERSLIDER, TEXTURE_HOUSE, TEXTURE_SAVE, TEXTURE_BORELICIOUS;
+    public static Texture[] TEXTURE_BCD;
     public static final String SOUND_TEST = RESOURCES+"sound/test.wav";
     public static final String SOUND_TEST2 = RESOURCES+"sound/pipe.wav";
-    public static Font FONT_TEST, FONT_MONOFONTO;
+    public static Font FONT_TEST, FONT_MONOFONTO, FONT_LCD;
     
     public static final String TASKBAR_ICON = RESOURCES+"img/icon_light.png";
 
@@ -103,7 +107,10 @@ public class Global {
             COLOR_CIRCUIT_DKBROWN,
             COLOR_CIRCUIT_DKGRAY,
             COLOR_CIRCUIT_LIGHT,
-            COLOR_CIRCUIT_DKLIGHT
+            COLOR_CIRCUIT_DKLIGHT,
+            COLOR_CIRCUIT_LCD_OFF,
+            COLOR_CIRCUIT_LCD_ON,
+            COLOR_CIRCUIT_LCD_LETTER
             ;
     
     
@@ -279,6 +286,11 @@ public class Global {
         TEXTURE_SAVE = new Texture("src/res/img/save.png");
         FONT_TEST = new Font("src/res/fonts/test.png",32,32,16,16);
         FONT_MONOFONTO = new Font("src/res/fonts/monofonto.png",64,64,48,64+5);//Sumarle +5 al ultimo 64
+        FONT_LCD = new Font("src/res/fonts/lcd.png",64,64,42,64+8);
+        TEXTURE_BCD = new Texture[11];
+        TEXTURE_BORELICIOUS = new Texture("src/res/img/borelicious.png");
+        for(int i = 0; i < 11; i++)
+            TEXTURE_BCD[i] = new Texture("src/res/img/bcd"+i+".jpg");
         
         
         //Color load
@@ -327,6 +339,9 @@ public class Global {
         COLOR_CIRCUIT_DKGRAY = new float[]          { 57/255f, 80/255f, 80/255f};
         COLOR_CIRCUIT_DKLIGHT = new float[]         {156/255f,156/255f, 20/255f};
         COLOR_CIRCUIT_LIGHT = new float[]           {240/255f,240/255f, 30/255f};
+        COLOR_CIRCUIT_LCD_OFF = new float[]         { 17/255f, 24/255f,102/255f};
+        COLOR_CIRCUIT_LCD_ON = new float[]          {  4/255f, 95/255f,186/255f};
+        COLOR_CIRCUIT_LCD_LETTER = new float[]      {153/255f,227/255f,255/255f};
         
         //COLOR_DECLARATOR = new int[]{255,71,240};
     }
@@ -373,6 +388,38 @@ public class Global {
         e.addBoundingBox(456, 656, 10, 62, Global.EVENT_GO_SIMULATE);
     }
     
+    public static void sayLinesOfCode(){
+        final String folderPath = "src";
+        try{
+            long totalLineCount = 0;
+            final List<File> folderList = new LinkedList<>();
+            folderList.add(new File(folderPath));
+            while (!folderList.isEmpty()) {
+                final File folder = folderList.remove(0);
+                if (folder.isDirectory() && folder.exists()) {
+                    final File[] fileList = folder.listFiles();
+                    for (final File file : fileList) {
+                        if (file.isDirectory()) {
+                            folderList.add(file);
+                        } else if (file.getName().endsWith(".java")
+                                || file.getName().endsWith(".sql")) {
+                            long lineCount = 0;
+                            final Scanner scanner = new Scanner(file);
+                            while (scanner.hasNextLine()) {
+                                scanner.nextLine();
+                                lineCount++;
+                            }
+                            totalLineCount += lineCount;
+                        }
+                    }
+                }
+            }
+            System.out.println("Lines of code: " + totalLineCount);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+    
     public static String concatenate(String list[]){
         return concatenateWith(list, "");
     }
@@ -406,7 +453,7 @@ public class Global {
         SAVE_NAME = name;
         File proyectFolder = new File(System.getenv("APPDATA")+"/HardScratch/"+SAVE_NAME);
         if(!proyectFolder.exists())
-            proyectFolder.mkdirs();
+            createProyect(name);
     }
     
     public static String getProyectFolder(){

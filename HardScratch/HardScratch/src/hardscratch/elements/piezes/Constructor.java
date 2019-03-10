@@ -261,6 +261,28 @@ public class Constructor extends ElementBase{
                     tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_EQUALITY);
                 else if(data.equals("&"))
                     tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_CONCAT);
+                else if(data.equals("+"))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_ARITH_ADD);
+                else if(data.equals("_"))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_ARITH_SUB);
+                else if(data.equals("*"))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_ARITH_TIM);
+                else if(data.equals("/"))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_ARITH_TAK);
+                else if(data.equals("AND"))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_LOGIC_AND);
+                else if(data.equals("OR"))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_LOGIC_OR);
+                else if(data.equals("XOR"))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_LOGIC_XOR);
+                else if(data.equals("NAND"))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_LOGIC_NAND);
+                else if(data.equals("NOR"))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_LOGIC_NOR);
+                else if(data.equals("XNOR"))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_LOGIC_XNOR);
+                else if(data.equals("NOT"))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_LOGIC_NOT);
                 else{
                     Variable var = Controller.getVarByName(data);
                     if(var != null)

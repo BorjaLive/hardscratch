@@ -85,7 +85,14 @@ import java.util.Collections;
     SEQ FORNEXT
         work in progress
 
+        
 
+    VARIABLE LIST SINTAXIS
+        prefix: VAR     name|inout|type|params
+        NAME:   string
+        INOUT:  1 in, 2 out, 3 signal, 4 const
+        TYPE:   1 int, 2 bit, 3 array
+        PARAM:  string or -1
 */
 
 public class BUMLAY {
@@ -120,30 +127,30 @@ public class BUMLAY {
                 if(extraName != null && extraInicialized != null && extraName.size() == extraInicialized.size()){
                     for(int i = 0; i < extraName.size(); i++)
                         if(extraName.get(i) != null)
-                            addVAR(extraName.get(i), inout, type, param, creator2String(extraInicialized.get(i)));
+                            addVAR(e.getID(),extraName.get(i), inout, type, param, creator2String(extraInicialized.get(i)));
                 }
                 
-                addVAR(e.getBox(0).getText(), inout, type, param, inicialized);
+                addVAR(e.getID(),e.getBox(0).getText(), inout, type, param, inicialized);
             }else if(e.getClass() == Converter.class){
                 //Buscar conversiones
                 if(!e.isComplete()) break;
                 
-                addCONV(e.getHole(0).getTip().getVar().name, e.getHole(1).getTip().getVar().name);
+                addCONV(e.getID(),e.getHole(0).getTip().getVar().name, e.getHole(1).getTip().getVar().name);
             }else if(e.getClass() == Asignator.class){
                 //Buscar asignaciones
                 if(!e.isComplete()) break;
                 
-                addASIG(e.getHole(0).getTip().getVar().name, creator2String(e.getCreator(0)));
+                addASIG(e.getID(),e.getHole(0).getTip().getVar().name, creator2String(e.getCreator(0)));
             }else if(e.getClass() == SetIf.class){
                 //Buscar SETIFs
                 SetIf s = (SetIf) e;
                 
-                addASETIF(s.getHole(0).getTip().getVar().name,creator2String(s.getExpresions()),creator2String(s.getValues()));
+                addASETIF(s.getID(),s.getHole(0).getTip().getVar().name,creator2String(s.getExpresions()),creator2String(s.getValues()));
             }else if(e.getClass() == SetSwitch.class){
                 //Buscar SETSWITCHs
                 SetSwitch s = (SetSwitch) e;
                 
-                addASETSWITCH(s.getHole(0).getTip().getVar().name,s.getHole(1).getTip().getVar().name,
+                addASETSWITCH(s.getID(),s.getHole(0).getTip().getVar().name,s.getHole(1).getTip().getVar().name,
                               creator2String(s.getExpresions()),creator2String(s.getValues()));
             }else if(e.getClass() == Sequential.class){
                 //Buscar secuenciales
@@ -155,60 +162,54 @@ public class BUMLAY {
                 for(String s:list)
                     seq += s;
                 
-                addSEQ(seq);
+                addSEQ(e.getID(),seq);
             }
         }
-        
-        
-        
-        
-        
         
         write("circuit");
     }
     
-    
     private static void wipe(){tmp = "";}
-    private static void add(String prefix, String data){tmp += "[" + prefix + ":" + data +"]\n";};
+    private static void add(String prefix, Long id, String data){tmp += "[" + prefix + "|" + Long.toString(id) + "|" + data +"]\n";};
     
-    private static void addVAR(String name, int inout, int type, int param, String inicialized){
-        add("VAR",name+"|"+inout+"|"+type+"|"+param+"|"+inicialized);
+    private static void addVAR(long id , String name, int inout, int type, int param, String inicialized){
+        add("VAR",id,name+"|"+inout+"|"+type+"|"+param+"|"+inicialized);
     }
-    private static void addCONV(String var1, String var2){
-        add("CONV",var1+"|"+var2);
+    private static void addCONV(long id , String var1, String var2){
+        add("CONV",id,var1+"|"+var2);
     }
-    private static void addASIG(String var, String value){
-        add("ASIG",var+"|"+value);
+    private static void addASIG(long id , String var, String value){
+        add("ASIG",id,var+"|"+value);
     }
-    private static void addASETIF(String var, ArrayList<String> expresions, ArrayList<String> values){
+    private static void addASETIF(long id , String var, ArrayList<String> expresions, ArrayList<String> values){
         String setif = var+"|ELSE|"+values.get(0);
         for(int i = 0; i < expresions.size(); i++)
             setif += "|"+expresions.get(i)+"|"+values.get(i+1);
-        add("SETIF",setif);
+        add("SETIF",id,setif);
     }
-    private static void addASETSWITCH(String destend, String switchh, ArrayList<String> expresions, ArrayList<String> values){
+    private static void addASETSWITCH(long id , String destend, String switchh, ArrayList<String> expresions, ArrayList<String> values){
         String setswitch = destend+"|"+switchh+"|ELSE|"+values.get(0);
         for(int i = 0; i < expresions.size(); i++)
             setswitch += "|"+expresions.get(i)+"|"+values.get(i+1);
-        add("SETSWITCH",setswitch);
+        add("SETSWITCH",id,setswitch);
     }
-    private static void addSEQ(String inner){
-        add("SEQ",inner);
+    private static void addSEQ(long id , String inner){
+        add("SEQ",id,inner);
     }
-    private static String genSEQASIG(String var, String value){
-        return "[SASIG:"+var+"|"+value+"]";
+    private static String genSEQASIG(long id , String var, String value){
+        return "[SASIG|"+Long.toString(id)+"|"+var+"|"+value+"]";
     }
-    private static String genIFTHEN(String body){
-        return "[IFTHEN:"+body+"]";
+    private static String genIFTHEN(long id , String body){
+        return "[IFTHEN|"+Long.toString(id)+"|"+body+"]";
     }
-    private static String genSWITCHCASE(String body){
-        return "[SWITCH:"+body+"]";
+    private static String genSWITCHCASE(long id , String body){
+        return "[SWITCH|"+Long.toString(id)+"|"+body+"]";
     }
-    private static String genWAITFOR(String expresion){
-        return "[WAITFOR:"+expresion+"]";
+    private static String genWAITFOR(long id , String expresion){
+        return "[WAITFOR|"+Long.toString(id)+"|"+expresion+"]";
     }
-    private static String genWAITON(String var, int edge){
-        return "[WAITON:"+var+"|"+edge+"]";
+    private static String genWAITON(long id , String var, int edge){
+        return "[WAITON|"+Long.toString(id)+"|"+var+"|"+edge+"]";
     }
     
     private static String creator2String(Constructor c){
@@ -236,7 +237,7 @@ public class BUMLAY {
         
         if(e.getClass() == AsignatorSEQ.class){
             if(e.isComplete())
-                list.add(genSEQASIG(e.getHole(0).getTip().getVar().name, creator2String(e.getCreator(0))));
+                list.add(genSEQASIG(e.getID(),e.getHole(0).getTip().getVar().name, creator2String(e.getCreator(0))));
         }else if(e.getClass() == IfThen.class){
             IfThen it = (IfThen) e;
             ArrayList<Constructor> conds = it.getConditions();
@@ -248,7 +249,7 @@ public class BUMLAY {
                     ifthen += creator2String(conds.get(i-1))+"|"+Global.concatenate(seqInterprete(insts.get(i)));
             }
             
-            list.add(genIFTHEN(ifthen));
+            list.add(genIFTHEN(e.getID(),ifthen));
         }else if(e.getClass() == SwitchCase.class){
             if(!e.getHole(0).isAsigned() || !e.getPort(2).isOcupied()) return list;
             
@@ -262,13 +263,13 @@ public class BUMLAY {
                     switchcase += creator2String(conds.get(i-1))+"|"+Global.concatenate(seqInterprete(insts.get(i)));
             }
             
-            list.add(genSWITCHCASE(switchcase));
+            list.add(genSWITCHCASE(e.getID(),switchcase));
         }else if(e.getClass() == WaitFor.class){
             if(!e.isComplete()) return list;
-            list.add(genWAITFOR(creator2String(e.getCreator(0))));
+            list.add(genWAITFOR(e.getID(),creator2String(e.getCreator(0))));
         }else if(e.getClass() == WaitOn.class){
             if(!e.isComplete()) return list;
-            list.add(genWAITON(e.getHole(0).getTip().getVar().name,e.getHole(0).getTipType()-29));
+            list.add(genWAITON(e.getID(),e.getHole(0).getTip().getVar().name,e.getHole(0).getTipType()-29));
         }else if(e.getClass() == ForNext.class){
             //Work in progress
         }

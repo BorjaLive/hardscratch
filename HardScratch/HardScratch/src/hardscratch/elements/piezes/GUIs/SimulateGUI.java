@@ -4,10 +4,9 @@ import hardscratch.Controller;
 import hardscratch.Global;
 import hardscratch.backend.BUCKLE;
 import hardscratch.base.Element;
+import hardscratch.base.shapes.Image;
 import hardscratch.base.shapes.Shape_Square;
-import hardscratch.elements.piezes.Simulation.SimulateSwitch;
-import hardscratch.elements.piezes.Simulation.SimulatedButton;
-import hardscratch.elements.piezes.Simulation.SimulatedLed;
+import hardscratch.elements.piezes.Simulation.*;
 
 public class SimulateGUI extends Element{
     
@@ -28,6 +27,7 @@ public class SimulateGUI extends Element{
         unit = width/20;
         
         backBoard = new Shape_Square(X, Y, Global.COLOR_CIRCUIT_GREEN, 1, 5, width, height);
+        addImage(new Image(0, 0, 2, Global.TEXTURE_BORELICIOUS, (5*unit)/254f, Global.COLOR_WHITE), Y+unit*15, X+(int) (unit*2.5f));
     }
     
     private void createElectronics(){
@@ -42,6 +42,15 @@ public class SimulateGUI extends Element{
         
         for(int i = 0; i < 8; i++)
             Controller.addToBoard(new SimulatedLed(X+width-(unit*(i+1)), Y+height-(unit*6), unit, "LED"+(i+1)));
+        
+        Controller.addToBoard(new SimulatedBCD(X+(unit*3), Y+(unit*4), unit, "BCD1"));
+        Controller.addToBoard(new SimulatedBCD(X+(unit*6), Y+(unit*4), unit, "BCD2"));
+        
+        Controller.addToBoard(new SimulatedLCD( X+(unit*6), Y+height-(unit*3), unit, "LCD"));
+        
+        Controller.addToBoard(new SimulatedButton((int) X+(unit*18), Y+unit, unit, "RESET"));
+        
+        Controller.addToBoard(new SimulatedClock(X+(12*unit), Y+(3*unit), unit, "CLOCK"));
     }
 
     @Override
