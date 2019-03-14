@@ -4,7 +4,6 @@ import hardscratch.base.*;
 import hardscratch.base.shapes.*;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -23,6 +22,7 @@ public class Global {
     public static int LAYOUT_LEFT = 400;
     
     public static final float MOUSE_SCROLL_SEPED = 10;
+    public static final boolean QUICK_MOVE = false;
     
     public static String SAVE_NAME;
     
@@ -169,7 +169,9 @@ public class Global {
             TIP_VAR_ARRAY = 29,
             TIP_EDGE_RISING = 30,
             TIP_EDGE_LOWERING = 31,
-            TIP_VAR = 32
+            TIP_VAR = 32,
+            TIP_VAR_SUBARRAY = 33,//CLOCK y subindice en BUMLAY
+            TIP_VAR_CLOCK = 34
             ;
     public static final int
             SUMMON_DECLARATRON = 1,
@@ -217,7 +219,9 @@ public class Global {
             SUMMON_FORNEXT = 44,
             SUMMON_TIP_RISSING = 45,
             SUMMON_TIP_LOWERING = 46,
-            SUMMON_VAR = 47
+            SUMMON_VAR = 47,
+            SUMMON_VAR_SUBARRAY = 48,
+            SUMMON_VAR_CLOCK = 49
             ;
     public static final int
             CREATOR_I = 1,

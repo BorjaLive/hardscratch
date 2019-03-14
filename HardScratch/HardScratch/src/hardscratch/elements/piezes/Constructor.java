@@ -242,25 +242,53 @@ public class Constructor extends ElementBase{
         
         Hole h;
         String[] list = text.replace("\n", "").replace("\r", "").split(Pattern.quote("-"));
+        Variable var;
         for(String data:list){
             h = holes.get(holes.size()-1);
             //System.out.println("ESTOY LEYENDO: "+data);
             Tip tip = null;
             if(data.contains(":")){
                 String[] parts = data.split(Pattern.quote(":"));
-                if(parts[0].equals("LN"))
-                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_LITERAL_N);
-                else if(parts[0].equals("LB"))
-                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_LITERAL_B);
-                else if(parts[0].equals("LA"))
-                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_LITERAL_A);
-                if(tip != null && parts.length > 1)
-                    tip.getBox(0).setText(parts[1]);
+                switch (parts[0]) {
+                    case "LN":
+                        tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_LITERAL_N);
+                        tip.getBox(0).setText(parts[1]);
+                    break;
+                    case "LB":
+                        tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_LITERAL_B);
+                        tip.getBox(0).setText(parts[1]);
+                    break;
+                    case "LA":
+                        tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_LITERAL_A);
+                        tip.getBox(0).setText(parts[1]);
+                    break;
+                    case "SA":
+                        var = Controller.getVarByName(parts[2]);
+                        if(var != null){
+                            tip = new Tip(h.getX(),h.getY(),Global.TIP_VAR_SUBARRAY);
+                            tip.setVar(var);
+                            System.out.println(parts[1]);
+                            if(!parts[1].equals("100"))
+                                tip.getBox(0).setText(parts[1]);
+                        }
+                    break;
+                    case "CK":
+                        var = Controller.getVarByName(parts[1]);
+                        tip = new Tip(h.getX(),h.getY(),Global.TIP_VAR_CLOCK);
+                        if(var != null)
+                            tip.setVar(var);
+                    break;
+                }
+                    
             }else{
                 if(data.equals("="))
                     tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_EQUALITY);
                 else if(data.equals("&"))
                     tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_CONCAT);
+                else if(data.equals("("))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_OPEN);
+                else if(data.equals(")"))
+                    tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_CLOSE);
                 else if(data.equals("+"))
                     tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_ARITH_ADD);
                 else if(data.equals("_"))
@@ -284,7 +312,7 @@ public class Constructor extends ElementBase{
                 else if(data.equals("NOT"))
                     tip = new Tip(h.getX(),h.getY(),Global.TIP_CONSTRUCTOR_LOGIC_NOT);
                 else{
-                    Variable var = Controller.getVarByName(data);
+                    var = Controller.getVarByName(data);
                     if(var != null)
                         tip = new Tip(h.getX(),h.getY(),Global.TIP_VAR).setVar(var);
                 }
@@ -324,6 +352,14 @@ public class Constructor extends ElementBase{
                     case Global.TIP_CONSTRUCTOR_LOGIC_XNOR: data.add("XNOR");break;
                     case Global.TIP_CONSTRUCTOR_LOGIC_NOT: data.add("NOT");break;
                     case Global.TIP_VAR: data.add(h.getTip().getVar().name);break;
+                    case Global.TIP_VAR_SUBARRAY:
+                        String sub = h.getTip().getBox(0).getText();
+                        if(sub.isEmpty()) sub = "100";
+                        data.add("SA:"+sub+":"+h.getTip().getVar().name);
+                    break;
+                    case Global.TIP_VAR_CLOCK:
+                        data.add("CK:"+h.getTip().getVar().name);
+                    break;
                 }
             }
         }

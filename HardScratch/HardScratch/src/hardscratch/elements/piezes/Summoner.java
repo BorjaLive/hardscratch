@@ -1,19 +1,6 @@
 package hardscratch.elements.piezes;
 
-import hardscratch.elements.piezes.Design.SetIf;
-import hardscratch.elements.piezes.Design.Sequential;
-import hardscratch.elements.piezes.Design.WaitOn;
-import hardscratch.elements.piezes.Design.Asignator;
-import hardscratch.elements.piezes.Design.AsignatorSEQ;
-import hardscratch.elements.piezes.Design.SetSwitch;
-import hardscratch.elements.piezes.Design.ForNext;
-import hardscratch.elements.piezes.Design.Inicializer;
-import hardscratch.elements.piezes.Design.Converter;
-import hardscratch.elements.piezes.Design.ExtraVar;
-import hardscratch.elements.piezes.Design.Declarator;
-import hardscratch.elements.piezes.Design.IfThen;
-import hardscratch.elements.piezes.Design.WaitFor;
-import hardscratch.elements.piezes.Design.SwitchCase;
+import hardscratch.elements.piezes.Design.*;
 import hardscratch.Global;
 import hardscratch.backend.Variable;
 import hardscratch.base.Element;
@@ -87,15 +74,30 @@ public class Summoner extends ElementBase{
         }
     }
     public void setVar(Variable v){
-        if(item == Global.SUMMON_VAR && v != null){
-            var = v;
-            name.setText(v.name);
-            switch(v.inout){
-                case Global.TIP_VAR_IN:     shape.setPalete(Global.COLOR_VAR_IN); break;
-                case Global.TIP_VAR_OUT:    shape.setPalete(Global.COLOR_VAR_OUT); break;
-                case Global.TIP_VAR_SIGNAL: shape.setPalete(Global.COLOR_VAR_SIGNAL); break;
-                case Global.TIP_VAR_CONST:  shape.setPalete(Global.COLOR_VAR_CONST); break;
-            }
+        if(v == null) return;
+        var = v;
+        switch (item) {
+            case Global.SUMMON_VAR:
+                name.setText(v.name);
+            break;
+            case Global.SUMMON_VAR_SUBARRAY:
+                String nom = v.name;
+                String spacer = "";
+                if(nom.length() > 6) nom = nom.substring(0, 6);
+                if(nom.length() < 6)
+                    for(int i = nom.length(); i < 8; i++)
+                        spacer += "";
+                name.setText(nom+spacer+"[]");
+            break;
+            case Global.SUMMON_VAR_CLOCK:
+                name.setText("CLOCK TICK "+v.name);
+            break;
+        }
+        switch(v.inout){
+            case Global.TIP_VAR_IN:     shape.setPalete(Global.COLOR_VAR_IN); break;
+            case Global.TIP_VAR_OUT:    shape.setPalete(Global.COLOR_VAR_OUT); break;
+            case Global.TIP_VAR_SIGNAL: shape.setPalete(Global.COLOR_VAR_SIGNAL); break;
+            case Global.TIP_VAR_CONST:  shape.setPalete(Global.COLOR_VAR_CONST); break;
         }
     }
     
@@ -143,6 +145,8 @@ public class Summoner extends ElementBase{
             case Global.SUMMON_TIP_RISSING:             return new Tip(Global.TIP_EDGE_RISING);
             case Global.SUMMON_TIP_LOWERING:            return new Tip(Global.TIP_EDGE_LOWERING);
             case Global.SUMMON_VAR:                     return new Tip(Global.TIP_VAR).setVar(var);
+            case Global.SUMMON_VAR_SUBARRAY:            return new Tip(Global.TIP_VAR_SUBARRAY).setVar(var);
+            case Global.SUMMON_VAR_CLOCK:               return new Tip(Global.TIP_VAR_CLOCK).setVar(var);
             case Global.SUMMON_DECLARATRON:             return new Declarator();
             case Global.SUMMON_INICIALIZER:             return new Inicializer();
             case Global.SUMMON_EXTRAVAR:                return new ExtraVar();

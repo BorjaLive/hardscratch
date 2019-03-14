@@ -2,19 +2,7 @@ package hardscratch.backend;
 //HardWork - BUMLAY: B0vE's Useless Markup Languaje Ain't YAML (A.K. BUM: B0vE's Useless MarkupLanguaje)
 
 import hardscratch.elements.piezes.Constructor;
-import hardscratch.elements.piezes.Design.SetIf;
-import hardscratch.elements.piezes.Design.Sequential;
-import hardscratch.elements.piezes.Design.WaitOn;
-import hardscratch.elements.piezes.Design.Asignator;
-import hardscratch.elements.piezes.Design.AsignatorSEQ;
-import hardscratch.elements.piezes.Design.SetSwitch;
-import hardscratch.elements.piezes.Design.ForNext;
-import hardscratch.elements.piezes.Design.Converter;
-import hardscratch.elements.piezes.Design.ExtraVar;
-import hardscratch.elements.piezes.Design.Declarator;
-import hardscratch.elements.piezes.Design.IfThen;
-import hardscratch.elements.piezes.Design.WaitFor;
-import hardscratch.elements.piezes.Design.SwitchCase;
+import hardscratch.elements.piezes.Design.*;
 import hardscratch.Controller;
 import hardscratch.Global;
 import hardscratch.base.*;
@@ -35,6 +23,7 @@ import java.util.Collections;
     
     VARIABLE
         prefix:     VAR
+        data0:      ID          Integer
         data1:      NAME        Arbitary String
         data2:      INOUT       1 IN, 2 OUT, 3 SIGNAL, 4 CONST
         data3:      TYPE        1 INT, 2 BIT, 3 ARRAY
@@ -42,57 +31,58 @@ import java.util.Collections;
         data5:      INICIALICED CREATOR STRING or -1
     CONVERTER
         prefix:     CONV
+        data0:      ID          Integer
         data1:      VAR1        String Varable name
         data2:      VAR2        String Varable name
     ASIGNATOR
         prefix:     ASIG
+        data0:      ID          Integer
         data1:      VAR1        String Varable name
         data2:      VALUE       CREATOR STRING
     SETIF
         prefix:     SETIF
+        data0:      ID          Integer
         data1:      VAR         String Varable name
         data(2n):   CONDITION   CREATOR STRING          --First one is ELSE
         data(2n+1): VALUE       CREATOR STRING
     SETSWITCH
         prefix:     SETSWITCH
+        data0:      ID          Integer
         data1:      DESTINE     String Varable name
         data2:      SWITCH      String Varable name
         data(2n-1): CONDITION   CREATOR STRING          --First one is ELSE
         data(2n):   VALUE       CREATOR STRING
     SEQUENTIAL
         prefix:     SEQ
+        data0:      ID          Integer
         data1:      INSTRUCTIONS    String Recursive search
     SEQ ASIGNATION
         prefix:     SASIG
+        data0:      ID          Integer
         data1:      VAR1        String Varable name
         data2:      VALUE       CREATOR STRING
     SEQ IFTHEN
         prefix:     IFTHEN
+        data0:      ID          Integer
         data(2n):   CONDITION   CREATOR STRING          --First one is ELSE
         data(2n+1): INSTRUCTION String Recursive search
     SEQ SWITCHCASE
         prefix:     SWITCH
+        data0:      ID          Integer
         data1:      VAR         String Variable name
         data(2n-1): CONDITION   CREATOR STRING          --First one is ELSE
         data(2n):   INSTRUCTION String Recursive search
     SEQ WAITFOR
         prefix:     WFOR
+        data0:      ID          Integer
         data1:      VALUE       CREATOR STRING
     SEQ WAITON
         prefix:     WON
+        data0:      ID          Integer
         data1:      VAR         String Variable name
         data2:      EDGE        1 Rising, 2 Lowering
     SEQ FORNEXT
         work in progress
-
-        
-
-    VARIABLE LIST SINTAXIS
-        prefix: VAR     name|inout|type|params
-        NAME:   string
-        INOUT:  1 in, 2 out, 3 signal, 4 const
-        TYPE:   1 int, 2 bit, 3 array
-        PARAM:  string or -1
 */
 
 public class BUMLAY {
@@ -103,7 +93,7 @@ public class BUMLAY {
         wipe();
         
         ArrayList<Element> piezes = Controller.getBoard();
-        if(piezes == null || piezes.size() == 0) write(Global.SAVE_NAME);
+        if(piezes == null || piezes.isEmpty()) write(Global.SAVE_NAME);
         
         for(Element e:piezes){
             if(e.getClass() == Declarator.class){
@@ -170,7 +160,7 @@ public class BUMLAY {
     }
     
     private static void wipe(){tmp = "";}
-    private static void add(String prefix, Long id, String data){tmp += "[" + prefix + "|" + Long.toString(id) + "|" + data +"]\n";};
+    private static void add(String prefix, Long id, String data){tmp += "[" + prefix + "|" + Long.toString(id) + "|" + data +"|]|\n";};
     
     private static void addVAR(long id , String name, int inout, int type, int param, String inicialized){
         add("VAR",id,name+"|"+inout+"|"+type+"|"+param+"|"+inicialized);
@@ -197,19 +187,19 @@ public class BUMLAY {
         add("SEQ",id,inner);
     }
     private static String genSEQASIG(long id , String var, String value){
-        return "[SASIG|"+Long.toString(id)+"|"+var+"|"+value+"]";
+        return "[SASIG|"+Long.toString(id)+"|"+var+"|"+value+"|]|\n";
     }
     private static String genIFTHEN(long id , String body){
-        return "[IFTHEN|"+Long.toString(id)+"|"+body+"]";
+        return "[IFTHEN|"+Long.toString(id)+"|"+body+"|]|\n";
     }
     private static String genSWITCHCASE(long id , String body){
-        return "[SWITCH|"+Long.toString(id)+"|"+body+"]";
+        return "[SWITCH|"+Long.toString(id)+"|"+body+"|]|\n";
     }
     private static String genWAITFOR(long id , String expresion){
-        return "[WAITFOR|"+Long.toString(id)+"|"+expresion+"]";
+        return "[WFOR|"+Long.toString(id)+"|"+expresion+"|]|\n";
     }
     private static String genWAITON(long id , String var, int edge){
-        return "[WAITON|"+Long.toString(id)+"|"+var+"|"+edge+"]";
+        return "[WON|"+Long.toString(id)+"|"+var+"|"+edge+"|]|\n";
     }
     
     private static String creator2String(Constructor c){
@@ -242,11 +232,15 @@ public class BUMLAY {
             IfThen it = (IfThen) e;
             ArrayList<Constructor> conds = it.getConditions();
             ArrayList<Element> insts = it.getInstructions();
-            String ifthen = "ELSE|"+Global.concatenate(seqInterprete(insts.get(0)));
+            String ifthen;
+            if(insts.get(0)==null)
+                ifthen = "ELSE|-1";
+            else
+                ifthen = "ELSE|"+Global.concatenate(seqInterprete(insts.get(0)));
             
             for(int i = 1; i < insts.size(); i++){
                 if(!conds.get(i-1).isEmpty() && insts.get(i) != null)
-                    ifthen += creator2String(conds.get(i-1))+"|"+Global.concatenate(seqInterprete(insts.get(i)));
+                    ifthen += "|"+creator2String(conds.get(i-1))+"|"+Global.concatenate(seqInterprete(insts.get(i)));
             }
             
             list.add(genIFTHEN(e.getID(),ifthen));
@@ -269,7 +263,7 @@ public class BUMLAY {
             list.add(genWAITFOR(e.getID(),creator2String(e.getCreator(0))));
         }else if(e.getClass() == WaitOn.class){
             if(!e.isComplete()) return list;
-            list.add(genWAITON(e.getID(),e.getHole(0).getTip().getVar().name,e.getHole(0).getTipType()-29));
+            list.add(genWAITON(e.getID(),e.getHole(1).getTip().getVar().name,e.getHole(0).getTipType()-29));
         }else if(e.getClass() == ForNext.class){
             //Work in progress
         }
@@ -279,6 +273,10 @@ public class BUMLAY {
     
     private static void write(String file){
         //System.out.println(tmp);
+        //Limpiar el tmp de dobles ||
+        while(tmp.contains("||"))
+            tmp = tmp.replace("||", "|");
+        
         try {
             Files.write(Paths.get(Global.getProyectFolder()+"/"+file+".b0ve"), tmp.getBytes());
         } catch (IOException e) {

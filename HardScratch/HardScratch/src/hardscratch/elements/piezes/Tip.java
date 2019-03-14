@@ -4,6 +4,7 @@ import hardscratch.Controller;
 import hardscratch.Global;
 import hardscratch.backend.Variable;
 import hardscratch.base.Element;
+import hardscratch.base.ElementBase;
 import hardscratch.base.shapes.Shape_Square;
 import hardscratch.base.shapes.TextBox;
 import hardscratch.base.shapes.TextLabel;
@@ -13,7 +14,8 @@ public class Tip extends Element{
     
     private int value, compativility;
     private int width, height;
-    private int selectedI;
+    //private int selectedI;
+    private ElementBase selected;
     private Variable var;
     
     public Tip(int value){
@@ -24,7 +26,7 @@ public class Tip extends Element{
     public Tip(int x, int y, int value) {
         super(x, y, -1, true, true, true);
         this.value = value;
-        selectedI = -1;
+        selected = null;
         
         initShapes();
     }
@@ -162,6 +164,15 @@ public class Tip extends Element{
                 width = 202; height = 44;
                 addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "ERROR", true), (width/2), (height/2));
             break;
+            case Global.TIP_VAR_SUBARRAY:
+                width = 202; height = 44;
+                addTextBox(new TextBox(0, 0, 3, 0.4f, Global.FONT_MONOFONTO, "0", Global.COLOR_TEXT_INPUT, Global.COLOR_TEXT_INPUT_PLACEHOLDER, Global.TEXT_INPUT_BACK, Global.COLOR_BORDER_UNSELECTED, Global.COLOR_BORDER_SELECTED, 2, 1, 10, true, true, true), 149, 3);
+                addLabel(new TextLabel(0, 0, 3, 0.39f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "ERROR", true), 77, (height/2));
+            break;
+            case Global.TIP_VAR_CLOCK:
+                width = 310; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "ERROR", true), (width/2), (height/2));
+            break;
         }
         switch(value){
             case Global.TIP_VAR_IN:
@@ -192,10 +203,12 @@ public class Tip extends Element{
             case Global.TIP_CONSTRUCTOR_LOGIC_NAND:
             case Global.TIP_CONSTRUCTOR_LOGIC_NOR:
             case Global.TIP_CONSTRUCTOR_LOGIC_XNOR:
-            case Global.TIP_CONSTRUCTOR_LOGIC_NOT:      compativility = Global.HOLE_CONSTRUCTOR; break;
+            case Global.TIP_CONSTRUCTOR_LOGIC_NOT:
+            case Global.TIP_VAR_CLOCK:                  compativility = Global.HOLE_CONSTRUCTOR; break;
             case Global.TIP_EDGE_RISING:
             case Global.TIP_EDGE_LOWERING:              compativility = Global.HOLE_EDGE; break;
-            case Global.TIP_VAR:                        compativility = Global.HOLE_VAR; break;
+            case Global.TIP_VAR:
+            case Global.TIP_VAR_SUBARRAY:               compativility = Global.HOLE_VAR; break;
         }
         
         addShape(new Shape_Square(0, 0, Global.COLOR_BORDER_SELECTED, 1, 3, width, height), 0, 0);
@@ -204,8 +217,16 @@ public class Tip extends Element{
     
     public Tip setVar(Variable v){
         var = v;
-        labels.get(0).setText(v.name);
-        compativility = Global.HOLE_VAR;
+        switch(value){
+            case Global.TIP_VAR:
+            case Global.TIP_VAR_SUBARRAY:
+                labels.get(0).setText(v.name);
+            break;
+            case Global.TIP_VAR_CLOCK:
+                labels.get(0).setText("CLK "+v.name);
+            break;
+        }
+        
         return this;
     }
     public Variable getVar(){return var;}
@@ -222,29 +243,63 @@ public class Tip extends Element{
     @Override
     protected void select_init(long ID) {
         int x = Mouse.getX(), y = Mouse.getY();
-        for(int i = 0; i < boxen.size(); i++){
+        int i;
+        selected = null;
+        
+        i = 0;
+        while(i < boxen.size() && selected == null){
             TextBox box = boxen.get(i);
             if(x > box.getX() && x < box.getX()+box.getWidth() &&
                y > box.getY() && y < box.getY()+box.getHeight())
-                selectedI = i;
+                selected = box;
+            i++;
         }
-        if(selectedI != -1)
-            boxen.get(selectedI).on_selected();
+        i = 0;
+        while(i < holes.size() && selected == null){
+            Hole hole = holes.get(i);
+            if(x > hole.getX() && x < hole.getX()+hole.getWidth() &&
+               y > hole.getY() && y < hole.getY()+hole.getHeight())
+                selected = hole;
+            i++;
+        }
+        
+        selectedSelect();
+        
+        
         changeColorShape(0, Global.COLOR_BORDER_SELECTED);
     }
 
     @Override
     protected void select_end() {
-        if(selectedI != -1)
-            boxen.get(selectedI).de_select();
-        selectedI = -1;
+        selectedDeselect();
         changeColorShape(0, Global.COLOR_BORDER_UNSELECTED);
     }
 
     @Override
     protected void selected_loop() {
-        if(selectedI != -1)
-            boxen.get(selectedI).act();
+        if(selected != null){
+            if(selected.getClass() == TextBox.class)
+                ((TextBox) selected).act();
+            else if(selected.getClass() == Hole.class)
+                ((Hole) selected).act();
+        }
+    }
+    
+    private void selectedSelect(){
+        if(selected != null){
+            if(selected.getClass() == TextBox.class)
+                ((TextBox) selected).on_selected();
+            else if(selected.getClass() == Hole.class)
+                ((Hole) selected).on_selected();
+        }
+    }
+    private void selectedDeselect(){
+        if(selected != null){
+            if(selected.getClass() == TextBox.class)
+                ((TextBox) selected).de_select();
+            else if(selected.getClass() == Hole.class)
+                ((Hole) selected).de_select();
+        }
     }
 
     @Override
@@ -283,7 +338,7 @@ public class Tip extends Element{
     }
 
     public boolean middleSelected(){
-        return selectedI != -1;
+        return selected != null;
     }
 
     @Override

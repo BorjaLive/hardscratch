@@ -320,7 +320,7 @@ public abstract class Element extends ElementBase{
                     port.undock();
         
                 if(port.isOcupied() && port.getGender()==Global.PORT_MALE)
-                    Controller.dockingAlign(this, port);
+                    Controller.dockingAlign(this, port, Global.QUICK_MOVE);
             }
             depth = 5;
             drag_end();

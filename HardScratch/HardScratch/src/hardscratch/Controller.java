@@ -161,6 +161,13 @@ public class Controller {
     private static void finderADD(ArrayList<Summoner> list, float scale, Variable var){
         finderADD(list, scale, Global.SUMMON_VAR);
         list.get(list.size()-1).setVar(var);
+        if(var.type == Global.TIP_VAR_ARRAY){
+            finderADD(list, scale, Global.SUMMON_VAR_SUBARRAY);
+            list.get(list.size()-1).setVar(var);
+        }else if(var.type == Global.TIP_VAR_BIT){
+            finderADD(list, scale, Global.SUMMON_VAR_CLOCK);
+            list.get(list.size()-1).setVar(var);
+        }
     }
     private static void finderADD(ArrayList<Summoner> list, float scale, ArrayList<Variable> vars){
         for(Variable var:vars)
@@ -194,10 +201,10 @@ public class Controller {
         
         //Seleccionar elementos
         //for (int i = 0; i < elements.size(); i++) {
-        selectRoutine(0);
-        for (int i = elements.size()-1; i >= 1; i--) {
-            selectRoutine(i);
-        }
+        if(!selectRoutine(0))
+            for (int i = elements.size()-1; i >= 1; i--)
+                selectRoutine(i);
+                
         //Rutina de seleccionados
         if(focus != -1){
             if(Mouse.getLeftDown()){
@@ -294,7 +301,9 @@ public class Controller {
                     e.move(Mouse.getMoveX(), Mouse.getMoveY());
         }
     }
-    private static void selectRoutine(int i){
+    private static boolean selectRoutine(int i){
+        boolean doneSomething = false;
+        
         Element element = elements.get(i);
         if(Mouse.getLeftClick()){
             if((focus == -1 || !focus_volatile) && element.getDragable() && element.colide(Mouse.getX(), Mouse.getY())){
@@ -302,12 +311,15 @@ public class Controller {
                     elements.get(focus).focus_end();
                 focus = i;
                 focus_volatile = elements.get(focus).focus_init();
+                
+                doneSomething = true;
             }else if(focus == i && !focus_volatile){
                 elements.get(focus).focus_end();
                 resumeFocus();
             }
         }
         //System.out.println("SELECTED: "+focus+" VOlATILE: "+focus_volatile);
+        return doneSomething;
     }
     
     
@@ -365,7 +377,7 @@ public class Controller {
                     for(Element e:elements){
                         Port[] Ports2 = e.getPorts();
                         for(Port p2: Ports2){
-                            docking(elements.get(focus), e, p1, p2);
+                            docking(elements.get(focus), e, p1, p2, Global.QUICK_MOVE);
                         }
                     }
                 }
@@ -373,7 +385,7 @@ public class Controller {
             focus = -1;
         }
     }
-    public static boolean docking(Element e1, Element e2, Port p1, Port p2){
+    public static boolean docking(Element e1, Element e2, Port p1, Port p2, boolean auto){
         if(e1.getID() == e2.getID()) return false;
         if(!Port.couple(p1, p2)) return false;
         
@@ -381,14 +393,18 @@ public class Controller {
         p2.dock(e1, p1);
         
         if(p1.getGender() == Global.PORT_MALE)
-            dockingAlign(e1,p1);
+            dockingAlign(e1,p1, auto);
         else
-            dockingAlign(e2,p2);
+            dockingAlign(e2,p2, auto);
         
+        //System.out.println("DOCKED: "+e1.getClass()+" with "+e2.getClass());
         return true;
     }
-    public static void dockingAlign(Element e1, Port p1){
-        moveAuto(e1, p1.getConnectedPort().getX1()-p1.getX1()+e1.getX(), p1.getConnectedPort().getY1()-p1.getY1()+e1.getY(), 30);
+    public static void dockingAlign(Element e1, Port p1, boolean auto){
+        if(auto)
+            e1.move(p1.getConnectedPort().getX1()-p1.getX1(), p1.getConnectedPort().getY1()-p1.getY1());
+        else
+            moveAuto(e1, p1.getConnectedPort().getX1()-p1.getX1()+e1.getX(), p1.getConnectedPort().getY1()-p1.getY1()+e1.getY(), 30);
     }
     public static void autoDock(String id1, String id2, int port1, int port2){
         if(id1 == null || id1.isEmpty() || id1.equals("-1") ||
@@ -397,10 +413,10 @@ public class Controller {
         Element e1 = getElementByID(Integer.parseInt(id1));
         Element e2 = getElementByID(Integer.parseInt(id2));
         
-        if(e1.getPort(port1) == null || e1.getPort(port1).isOcupied() ||
-           e2.getPort(port2) == null || e2.getPort(port2).isOcupied()) return;
+        if(e1 == null || e1.getPort(port1) == null || e1.getPort(port1).isOcupied() ||
+           e2 == null || e2.getPort(port2) == null || e2.getPort(port2).isOcupied()) return;
         
-        docking(e1, e2, e1.getPort(port1), e2.getPort(port2));
+        docking(e1, e2, e1.getPort(port1), e2.getPort(port2), true);
     }
     
     //Game mechanics
@@ -522,7 +538,8 @@ public class Controller {
             focus = elements.size()-1;
         while(elements.indexOf(e) != elements.size()-1){
             int i = elements.indexOf(e);
-            Collections.swap(elements, i, i+1);
+            if(i != -1)
+                Collections.swap(elements, i, i+1);
         }
     }
 
@@ -554,6 +571,7 @@ public class Controller {
                         vars.addAll(tmp);
                         finderADD(cVarElements, 1f, tmp);
                         finderADD(cLiteralVarElements, 1f, tmp);
+                        finderADD(cLiteralElements, 1f, tmp);
                         for(Variable v:tmp)
                             if(v.inout == Global.TIP_VAR_OUT)
                                 finderADD(cVarOutsElements, 1f, v);

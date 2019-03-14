@@ -1,20 +1,7 @@
 package hardscratch.backend;
 //HardWork - BUCKLE: B0vE's Unnecessary Complicated marKup LanguajE
 
-import hardscratch.elements.piezes.Design.SetIf;
-import hardscratch.elements.piezes.Design.Sequential;
-import hardscratch.elements.piezes.Design.WaitOn;
-import hardscratch.elements.piezes.Design.Asignator;
-import hardscratch.elements.piezes.Design.AsignatorSEQ;
-import hardscratch.elements.piezes.Design.SetSwitch;
-import hardscratch.elements.piezes.Design.ForNext;
-import hardscratch.elements.piezes.Design.Inicializer;
-import hardscratch.elements.piezes.Design.Converter;
-import hardscratch.elements.piezes.Design.ExtraVar;
-import hardscratch.elements.piezes.Design.Declarator;
-import hardscratch.elements.piezes.Design.IfThen;
-import hardscratch.elements.piezes.Design.WaitFor;
-import hardscratch.elements.piezes.Design.SwitchCase;
+import hardscratch.elements.piezes.Design.*;
 import hardscratch.Controller;
 import hardscratch.Global;
 import hardscratch.base.*;
@@ -143,11 +130,10 @@ public class BUCKLE {
         data4:  Y Absolute cord     Integer
         data5:  ID dock SEQ-P M     Integer or -1
         data6:  ID dock SEQ-P F     Integer or -1
-        data7:  Var 1               Var name string
-        data8:  Var 2               Var name string
-        data9:  ID dock SEQ-P else  Integer or -1
-        data10+i:Constructor A      Constructor string
-        data11+i: ID dock SEQ-P     Integer or -1
+        data7:  Var                 Var name string
+        data8:  ID dock SEQ-P else  Integer or -1
+        data9+i: Constructor A      Constructor string
+        data10+i: ID dock SEQ-P     Integer or -1
     
         SEQ WAITFOR
         data1:  IDENTIFICATOR       WFOR
@@ -308,8 +294,8 @@ public class BUCKLE {
                 data[4] = port2string(e.getPort(0));
                 data[5] = port2string(e.getPort(1));
                 
-                data[6] = hole2string(e.getHole(0));
-                data[7] = var2string(e.getHole(1));
+                data[6] = var2string(e.getHole(1));
+                data[7] = hole2string(e.getHole(0));
             }else if(e.getClass() == ForNext.class){
                 data = new String[4];
                 //work in progress
@@ -374,8 +360,14 @@ public class BUCKLE {
     }
     private static String var2string(Hole h){
         if(h.isAsigned())
-            return h.getTip().getVar().name;
-        else return "-1";
+            if(h.getTipType() == Global.TIP_VAR)
+                return h.getTip().getVar().name;
+            else if(h.getTipType() == Global.TIP_VAR_SUBARRAY){
+                String sub = h.getTip().getBox(0).getText();
+                if(sub.isEmpty()) sub = "100";
+                return "SA:"+sub+":"+h.getTip().getVar().name;
+            }
+        return "-1";
     }
     private static String hole2string(Hole h){
         if(h.isAsigned()){
@@ -497,13 +489,7 @@ public class BUCKLE {
                 }
                 
                 if(data[0].equals("IFTHEN")){
-                    Element e = Controller.getElementByID(data[1]);
-                    
                 }else if(data[0].equals("SWITCH")){
-                    Element e = Controller.getElementByID(data[1]);
-                    
-                    for(int i = 7; i < data.length; i+=2)
-                        Controller.autoDock(data[1], data[i], (i-3)/2, 0);
                 }
             }
             
@@ -544,6 +530,7 @@ public class BUCKLE {
                     for(int i = 6; i < data.length; i++)
                         e.getCreator(i-6).forceSet(data[i]);
                     
+                    
                 }else if(data[0].equals("SASIG")){
                     Controller.getElementByID(data[1]).getHole(0).forceAsign(data[6]);
                     Controller.getElementByID(data[1]).getCreator(0).forceSet(data[7]);
@@ -567,6 +554,7 @@ public class BUCKLE {
                 }else if(data[0].equals("SWITCH")){
                     Element e = Controller.getElementByID(data[1]);
                     
+                    Controller.getElementByID(data[1]).getHole(0).forceAsign(data[6]);
                     for(int i = 6; i < data.length; i+=2){
                         if(i != 6)
                             e.getCreator((i-6)/2).forceSet(data[i]);
@@ -578,9 +566,29 @@ public class BUCKLE {
                     Controller.getElementByID(data[1]).getCreator(0).forceSet(data[6]);
                     
                 }else if(data[0].equals("WON")){
-                    Controller.getElementByID(data[1]).getHole(0).forceAsign(data[6]);
+                    Controller.getElementByID(data[1]).getHole(1).forceAsign(data[6]);
+                    Controller.getElementByID(data[1]).getHole(0).forceAsign(data[7]);
                 }
             }
+            
+            //TODO: Eliminar todos los dockings anteriores, este se lleva la palma. Pero no lo hagas, algo podria romperse.
+            ArrayList<Element> elements = Controller.getBoardAll();
+            Port[] ports1, ports2;
+            boolean changes;
+            do{
+                changes = false;
+                for(Element e1:elements){
+                    for(Element e2:elements){
+                        ports1 = e1.getPorts();
+                        ports2 = e2.getPorts();
+                        for(Port p1:ports1)
+                            for(Port p2:ports2)
+                                if(Controller.docking(e1, e2, p1, p2, true))
+                                    changes = true;
+                    }
+                }
+            }while(changes);
+            
             
         } catch (IOException e) {
             e.printStackTrace();

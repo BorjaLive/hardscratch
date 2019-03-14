@@ -146,7 +146,10 @@ public class Hole extends ElementBase{
                           (t.getCompativility() == Global.HOLE_VAR && (hole_type == Global.HOLE_VAR_IN || hole_type == Global.HOLE_VAR_OUT))){
             tip = t;
             //tip.move(getX()-tip.getX(), getY()-tip.getY());
-            Controller.moveAuto(tip, getX(), getY(), 30);
+            if(Global.QUICK_MOVE)
+                tip.move(getX()-tip.getX(),getY()-tip.getY());
+            else
+                Controller.moveAuto(tip, getX(), getY(), 30);
             on_selected();
             if(fedBack != null){
                 fedBack.checkHoles();
@@ -209,12 +212,23 @@ public class Hole extends ElementBase{
                 tip = new Tip(getX(),getY(), Integer.parseInt(parts[0]));
                 if(parts.length > 1)
                     tip.getBox(0).setText(parts[1]);
+            }else if(parts[0].equals("SA")){
+                tip = new Tip(getX(),getY(), Global.TIP_VAR_SUBARRAY);
+                Variable variable = Controller.getVarByName(parts[2]);
+                if(variable != null){
+                    tip.setVar(variable);
+                    if(!parts[1].equals("100"))
+                        tip.getBox(0).setText(parts[1]);
+                }else{
+                    tip = null;
+                }
             }
         }else{
             tip = new Tip(getX(),getY(), Integer.parseInt(value));
         }
         
-        tip.select_end();
+        if(tip != null)
+            tip.select_end();
     }
 
     public boolean isSelected() {

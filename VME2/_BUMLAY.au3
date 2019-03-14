@@ -28,32 +28,37 @@ Func ___readFile($file)
 	return StringReplace(StringReplace(FileRead($file),@CR,""),@LF,"")
 EndFunc
 Func ___divide($text)
+	If StringInStr($text,"|") = 0 Then Return $text
+
 	$list = __getArray()
 	$tmp = ""
-
-	If StringInStr($text,"[") = 0 Then Return StringSplit($text,"|")
 
 	$level = 0
 	For $i = 1 To StringLen($text)
 		$c = StringMid($text,$i,1)
 
-		$tmp &= $c
+
+		If $level = 0 And $c = "|" Then
+			__add($list,___divide(___deleteFirstAndLast($tmp)))
+			$tmp = ""
+		Else
+			$tmp &= $c
+		EndIf
 		If $c = "[" Then
 			$level += 1
 		ElseIf $c = "]" Then
 			$level -= 1
-			If $level = 0 Then
-				__add($list, ___divide(___deleteFirstAndLast($tmp)))
-				$tmp = ""
-			EndIf
 		EndIf
+		;ConsoleWrite("C: "&$c&"  Level: "&$level&"  TMP: "&$tmp&@CRLF)
 	Next
 
+	;_ArrayDisplay($list)
 	return $list
 EndFunc
 
 
 Func ___deleteFirstAndLast($text)
+	If StringInStr($text,"]") = 0 Then Return $text
 	$text = StringTrimLeft($text,StringInStr($text,"["))
 	return StringTrimRight($text,StringLen($text)-StringInStr($text,"]",0,-1)+1)
 EndFunc

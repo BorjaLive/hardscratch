@@ -60,7 +60,7 @@ public class IfThen extends Element{
             case Global.EVENT_DOCK:
                 if(ports.get(0).isOcupied())
                     ports.get(0).getDock().updateEvent(Global.EVENT_DOCK, data1, data2, data3);
-            break;
+                //No tiene break para que se ejecute el resize
             case Global.EVENT_RESIZE:
                 //Anchar el ancho
                 width = 0;
