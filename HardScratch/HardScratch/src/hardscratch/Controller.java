@@ -42,14 +42,14 @@ public class Controller {
     private static ElementBase movingElement;
     private static int[][] movingPos;
     private static int movingCounter;
-    private static int slidingFinder, finderPos;
+    private static int slidingFinder, finderPos, slidingCurrent;
+    private static int[] slidingPos;
     
     private static GLFWKeyCallback keyCallback;
     private static int layerOnly = -1;
     
     //Variables y logia
     private static ArrayList<Variable> vars;
-    
     
     public static void initer(long window){
         elements = new ArrayList<>();
@@ -63,6 +63,12 @@ public class Controller {
         
         //Movement
         movingElement = null;
+        
+        //Calcular posiciones del finder
+        slidingPos = new int[30];
+        for(int i = 0; i < 30; i++)
+            slidingPos[i] = (int) (400*functionSM((float)i/30));
+        slidingPos[29] = 400;
         
         //Create summonersPack
         finderInit();
@@ -249,22 +255,22 @@ public class Controller {
             }
         }
         if(slidingFinder == 1 || slidingFinder == 2){
-            int move;
-            if(slidingFinder == 1 && finderPos <= 0){
-                move = 0 - finderPos;
-                slidingFinder = 0;
-            }else if(slidingFinder == 2 && finderPos >= 400){
-                move = 400 - finderPos;
+            int move = 0;
+            if(slidingCurrent >= slidingPos.length || slidingCurrent < 0){
                 slidingFinder = 0;
             }else{
-                move = Math.round(Global.FUNCTION_QR_A + (Global.FUNCTION_QR_B*finderPos) + (Global.FUNCTION_QR_C*finderPos*finderPos));
-                move *= (slidingFinder==1?-1:1);
+                if(slidingFinder == 1){
+                    move = slidingPos[slidingCurrent];
+                    slidingCurrent--;
+                }else if(slidingFinder == 2){
+                    move = slidingPos[slidingCurrent];
+                    slidingCurrent++;
+                }
+                elements.get(0).updateEvent(Global.EVENT_FINDER_MOVE,move-finderPos,0,"");
+                for(Summoner s:selectedFinder)
+                    s.move(move-finderPos, 0);
+                finderPos = move;
             }
-            //System.out.println(Global.FUNCTION_QR_A + (Global.FUNCTION_QR_B*finderPos) + (Global.FUNCTION_QR_C*finderPos*finderPos));
-            finderPos += move;
-            elements.get(0).updateEvent(Global.EVENT_FINDER_MOVE,move,0,"");
-            for(Summoner s:selectedFinder)
-                s.move(move, 0);
         }
         
         
@@ -344,10 +350,16 @@ public class Controller {
         movingPos = new int[tics+1][];
         int x1 = e.getX(), y1 = e.getY();
         for(int i = 0; i <= tics; i++){
-            movingPos[i] = new int[]{   x1+Math.round((x2-x1)*((float)i/tics)),
-                                        y1+Math.round((y2-y1)*((float)i/tics))};
+            movingPos[i] = new int[]{   x1+Math.round((x2-x1)*functionSM((float)i/tics)),
+                                        y1+Math.round((y2-y1)*functionSM((float)i/tics))};
         }
         movingCounter = 0;
+    }
+    private static float functionQR(float x){
+        return Global.FUNCTION_QR_A + (Global.FUNCTION_QR_B*x) + (Global.FUNCTION_QR_C*x*x);
+    }
+    private static float functionSM(float x){
+        return Global.FUNCTION_SM_A + (Global.FUNCTION_SM_B*x) + (Global.FUNCTION_SM_C*x*x);
     }
     
     
@@ -526,8 +538,10 @@ public class Controller {
     public static void finderToggle(){
         if(finderPos == 400){
             slidingFinder = 1;
+            slidingCurrent = 29;
         }else if(finderPos == 0){
             slidingFinder = 2;
+            slidingCurrent = 0;
         }
         elements.get(0).action(Global.EVENT_TOOGLE_TOGGLE);
     }

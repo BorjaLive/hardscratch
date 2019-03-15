@@ -49,9 +49,12 @@ public class Global {
         new float[] { 0, 0,},
     };
     
-    public static final float FUNCTION_QR_A = 4.857143f;
-    public static final float FUNCTION_QR_B = 0.1428571f;
-    public static final float FUNCTION_QR_C = -0.0003571429f;
+    public static final float FUNCTION_QR_A = 0.5f;
+    public static final float FUNCTION_QR_B = 1.8f;
+    public static final float FUNCTION_QR_C = -1.8f;
+    public static final float FUNCTION_SM_A = 0f;
+    public static final float FUNCTION_SM_B = 1.8f;
+    public static final float FUNCTION_SM_C = -0.8f;
     
     public static Texture TEXTURE_TEST, TEXTURE_CAT, TEXTURE_ARROW_1, TEXTURE_ARROW_2, TEXTURE_FINDERSLIDER, TEXTURE_HOUSE, TEXTURE_SAVE, TEXTURE_BORELICIOUS;
     public static Texture[] TEXTURE_BCD;
