@@ -58,6 +58,20 @@ public class ExtraVar extends Element{
         
         return names;
     }
+    public ArrayList<Long> getIDs(){
+        ArrayList<Long> ids;
+        
+        if(ports.get(2).isOcupied()){
+            ExtraVar e = (ExtraVar) ports.get(2).getDock();
+            ids = e.getIDs();
+        }else{
+            ids = new ArrayList<>();
+        }
+        
+        ids.add(ID);
+        
+        return ids;
+    }
     public ArrayList<Constructor> getCreators(){
         ArrayList<Constructor> crts;
         if(ports.get(2).isOcupied()){

@@ -18,8 +18,31 @@ public class SimulatedBCD extends Simulated{
 
     @Override
     public void action(int action) {
-        image.setTexture(Global.TEXTURE_BCD[action]);
-        state = action;
+        if(action <= 10){
+            image.setTexture(Global.TEXTURE_BCD[action]);
+            state = action;
+        }
+    }
+
+    @Override
+    public String getValue() {
+        return String.valueOf(state);
+    }
+
+    @Override
+    public void setValue(String value) {
+        if(value.contains("U")){
+            action(10);
+        }else if(value.contains("'")){
+            if(value.equals("'1'"))
+                action(1);
+            else if(value.equals("'0'"))
+                action(0);
+        }else if(value.contains("\"")){
+            action(Integer.parseInt(value.substring(1, value.length()-1),2));
+        }else{
+            action(Integer.parseInt(value));
+        }
     }
     
 }

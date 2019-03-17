@@ -12,7 +12,7 @@ public class Image extends ElementBase{
     private boolean reverseW, reverseH;
     
     public Image(int x, int y, int depth, Texture texture, float scale, float[] color) {
-        super(x, y, depth, scale);
+        super(x, y, -1, depth, scale);
         
         this.texture = texture;
         this.color = color;

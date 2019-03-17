@@ -9,13 +9,15 @@ public abstract class ElementBase {
     protected float scale;
     protected long ID;
     
-    public ElementBase(int x, int y, int depth, float scale){
+    public ElementBase(int x, int y, long id, int depth, float scale){
         position = new Dot(x, y);
         this.depth = depth;
         this.scale = scale;
         this.rot = 0;
         
-        ID = Controller.generateID();
+        if(id == -1)
+            ID = Controller.generateID();
+        else ID = id;
     }
     
     public void move(int x, int y){

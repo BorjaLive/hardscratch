@@ -63,6 +63,8 @@ public class Global {
     public static Font FONT_TEST, FONT_MONOFONTO, FONT_LCD;
     
     public static final String TASKBAR_ICON = RESOURCES+"img/icon_light.png";
+    
+    public static final String VMESS_EXE = RESOURCES+"vmess/vmess.exe";
 
     public static final float[] COLOR_AQUA = new float[]    {0, 1, 1};
     public static final float[] COLOR_RED = new float[]     {1, 0, 0};
@@ -260,7 +262,8 @@ public class Global {
             EVENT_DOCK = 16,
             EVENT_CREATE_SPARTAN = 17,
             EVENT_TURN_ON = 18,
-            EVENT_TURN_OFF = 19
+            EVENT_TURN_OFF = 19,
+            EVENT_SIMULATION_STEP = 20
             ;
     public static final int
             IMPLEMENTER_LED = 1,

@@ -14,7 +14,7 @@ public class TextLabel extends ElementBase{
     private float strech;
     
     public TextLabel(int x, int y, int depth, float scale, Font font, float[] color, String text, boolean align) {
-        super(x, y, depth, scale);
+        super(x, y, -1, depth, scale);
         strech = 1;
         
         this.font = font;

@@ -20,7 +20,7 @@ public class Hole extends ElementBase{
     private boolean selected;
 
     public Hole(int x, int y, int depth, int hole_type) {
-        super(x, y, depth, 1);
+        super(x, y, -1, depth, 1);
         
         ID = Controller.generateID();
         this.hole_type = hole_type;

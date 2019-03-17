@@ -8,6 +8,7 @@ import hardscratch.backend.*;
 import hardscratch.base.*;
 import hardscratch.elements.piezes.Design.Declarator;
 import hardscratch.elements.piezes.Implementation.Implementer;
+import hardscratch.elements.piezes.Simulation.*;
 import hardscratch.inputs.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -647,5 +648,35 @@ public class Controller {
     
     public static int getRoom(){
         return currentRoom;
+    }
+
+    public static void simulationChange() {
+        SimulateGUI gui = (SimulateGUI) elements.get(0);
+        if(gui != null){
+            String[][] list = new String[22][2];
+            int i = 1;//recorrer elements
+            int j = 0;//recorrer list
+            while(i < elements.size() && j < list.length){
+                Simulated s = (Simulated) elements.get(i);
+                if(s != null){
+                    list[j][0] = s.getName();
+                    list[j][1] = s.getValue();
+                    j++;
+                }
+                i++;
+            }
+            gui.simulationStep(list);
+        }
+    }
+    public static void simulationSet(String[][] data){
+        for(String[] dat:data){
+            for(int i = 1; i < elements.size(); i++){
+                Simulated s = (Simulated) elements.get(i);
+                if(s != null && s.is(dat[0]) && !(s.getClass() == SimulateSwitch.class || s.getClass() == SimulatedButton.class || s.getClass() == SimulatedClock.class)){
+                    s.setValue(dat[1]);
+                    break;
+                }
+            }
+        }
     }
 }

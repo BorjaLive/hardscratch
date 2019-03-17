@@ -7,7 +7,7 @@ public class Shape extends ElementBase{
     protected float color[];
     
     public Shape(int x, int y, float[] color, float scale, int depth) {
-        super(x, y, depth, scale);
+        super(x, y, -1, depth, scale);
         
         this.color = color;
     }

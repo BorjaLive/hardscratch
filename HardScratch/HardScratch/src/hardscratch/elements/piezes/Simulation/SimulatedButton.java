@@ -1,5 +1,6 @@
 package hardscratch.elements.piezes.Simulation;
 
+import hardscratch.Controller;
 import hardscratch.Global;
 import hardscratch.base.shapes.Shape_BorderedBox;
 
@@ -22,16 +23,33 @@ public class SimulatedButton extends Simulated{
     protected void select_init(long ID) {
         shape.changeBackColor(Global.COLOR_CIRCUIT_BROWN);
         state = Global.SIM_BUTTON_ON;
+        
+        action(1);
     }
 
     @Override
     protected void select_end() {
         shape.changeBackColor(Global.COLOR_CIRCUIT_DKGRAY);
         state = Global.SIM_BUTTON_OFF;
+        
+        action(1);
     }
 
     @Override
     public void action(int action) {
+        Controller.simulationChange();
+    }
+
+    @Override
+    public String getValue() {
+        return state == Global.SIM_BUTTON_ON?"ON":"OFF";
+    }
+
+    @Override
+    public void setValue(String value) {
+        if(value.equals("ON"))
+            select_init(ID);
+        else select_end();
     }
     
 }

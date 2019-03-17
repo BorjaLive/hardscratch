@@ -108,16 +108,18 @@ public class BUMLAY {
                 if(e.getPort(1).isOcupied()) inicialized = creator2String(e.getPort(1).getDock().getCreator(0));
                 
                 ArrayList<String> extraName = null;
+                ArrayList<Long> extraIDs = null;
                 ArrayList<Constructor> extraInicialized = null;
                 if(e.getPort(0).isOcupied()){
                     ExtraVar extra = (ExtraVar) e.getPort(0).getDock();
                     extraName = extra.getVars();
+                    extraIDs = extra.getIDs();
                     extraInicialized = extra.getCreators();
                 }
                 if(extraName != null && extraInicialized != null && extraName.size() == extraInicialized.size()){
                     for(int i = 0; i < extraName.size(); i++)
                         if(extraName.get(i) != null)
-                            addVAR(e.getID(),extraName.get(i), inout, type, param, creator2String(extraInicialized.get(i)));
+                            addVAR(extraIDs.get(i),extraName.get(i), inout, type, param, creator2String(extraInicialized.get(i)));
                 }
                 
                 addVAR(e.getID(),e.getBox(0).getText(), inout, type, param, inicialized);

@@ -610,6 +610,25 @@ public class BUCKLE {
             e.printStackTrace();
         }
     }
+    public static String[][] getImplement(){
+        try {
+            String[] lines = Files.readString(Paths.get(Global.getProyectFolder()+"/implement.b0ve")).replace("\n", "").replace("\r", "").split(Pattern.quote("{}"));
+            String[][] data = new String[lines.length][2];
+            String[] parts;
+            
+            for(int i = 0; i < lines.length; i++){
+                parts = lines[i].split(Pattern.quote("|"));
+                if(parts[0].equals("IMPL")){ if(parts.length != 3){ somebodyTouchedMySpagget();return null;}
+                    data[i][0] = parts[1];
+                    data[i][1] = parts[2];
+                }
+            }
+            return data;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     
     
     private static void somebodyTouchedMySpagget(){

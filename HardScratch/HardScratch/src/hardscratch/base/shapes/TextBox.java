@@ -18,7 +18,7 @@ public class TextBox extends ElementBase{
     private float[] color_selected, color_notSelected, color_text, color_placeholder;
     
     public TextBox(int x, int y, int depth, float scale, Font font, String placeholder, float[] color_text, float[] color_placeholder, float[] color_back, float[] color_border_1, float[] color_border_2, int width, int height, int border, boolean sizeMode, boolean tight, boolean align) {
-        super(x, y, depth, scale);
+        super(x, y, -1, depth, scale);
         
         if(font == null)                font = Global.FONT_MONOFONTO;
         if(color_text == null)          color_text =  Global.COLOR_TEXT_INPUT;

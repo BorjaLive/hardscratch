@@ -29,5 +29,18 @@ public class SimulatedLed extends Simulated{
             break;
         }
     }
+
+    @Override
+    public String getValue() {
+        return state == Global.SIM_LED_ON?"ON":"OFF";
+    }
+
+    @Override
+    public void setValue(String value) {
+        if(value.equals("ON"))
+            action(Global.EVENT_TURN_ON);
+        else
+            action(Global.EVENT_TURN_OFF);
+    }
     
 }

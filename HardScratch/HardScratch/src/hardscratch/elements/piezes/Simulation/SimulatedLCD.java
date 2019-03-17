@@ -32,12 +32,10 @@ public class SimulatedLCD extends Simulated{
         switch(event){
             case Global.EVENT_TURN_ON:
                 shape.changeBackColor(Global.COLOR_CIRCUIT_LCD_ON);
-                state = "";
                 backlight = false;
             break;
             case Global.EVENT_TURN_OFF:
                 shape.changeBackColor(Global.COLOR_CIRCUIT_LCD_OFF);
-                state = "Booting up...";
                 backlight = true;
             break;
             default:
@@ -45,8 +43,21 @@ public class SimulatedLCD extends Simulated{
             
         }
         
-        label.setText(state);
+    }
+
+    @Override
+    public String getValue() {
+        return label.getText();
+    }
+
+    @Override
+    public void setValue(String value) {
+        label.setText(value);
         
+        if(value.isEmpty())
+            updateEvent(Global.EVENT_TURN_OFF, 0, 0 ,"");
+        else
+            updateEvent(Global.EVENT_TURN_ON, 0, 0 ,"");
     }
     
     

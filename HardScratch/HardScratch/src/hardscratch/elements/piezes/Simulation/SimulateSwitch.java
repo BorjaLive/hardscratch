@@ -1,5 +1,6 @@
 package hardscratch.elements.piezes.Simulation;
 
+import hardscratch.Controller;
 import hardscratch.Global;
 import hardscratch.base.shapes.Shape_BorderedBox;
 import hardscratch.base.shapes.Shape_Square;
@@ -37,6 +38,19 @@ public class SimulateSwitch extends Simulated{
                 state = Global.SIM_POWER_ON;
         }
         shapes.get(1).move(0, (int) (((unit*1.5)-10)*(state==Global.SIM_POWER_OFF?1:-1)));
+        
+        
+        Controller.simulationChange();
+    }
+
+    @Override
+    public String getValue() {
+        return state == Global.SIM_POWER_ON?"ON":"OFF";
+    }
+
+    @Override
+    public void setValue(String value) {
+        if((value.equals("ON") && state == Global.SIM_POWER_OFF) || (value.equals("OFF") && state == Global.SIM_POWER_ON)) action(1);
     }
     
 }

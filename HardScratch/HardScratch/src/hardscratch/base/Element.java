@@ -25,7 +25,7 @@ public abstract class Element extends ElementBase{
     private ArrayList<int[]> boundingBoxes;
     
     public Element(int x, int y, int ID, boolean drawable, boolean dragable, boolean deleteable) {
-        super(x, y, 2, 1);
+        super(x, y, -1, 2, 1);
         
         if(ID == -1)
             this.ID = Controller.generateID();

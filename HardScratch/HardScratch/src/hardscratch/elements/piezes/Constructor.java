@@ -23,7 +23,7 @@ public class Constructor extends ElementBase{
     private int iniciate;
     
     public Constructor(int x, int y, int type, Element father, int identifier) {
-        super(x, y, 2, 1);
+        super(x, y, -1, 2, 1);
         this.type = type;
         this.father = father;
         holes = new ArrayList<>();

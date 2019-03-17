@@ -1,5 +1,6 @@
 package hardscratch.elements.piezes.Simulation;
 
+import hardscratch.Controller;
 import hardscratch.Global;
 import hardscratch.base.shapes.Shape_BorderedBox;
 
@@ -10,7 +11,7 @@ public class SimulatedClock extends Simulated{
     
     public SimulatedClock(int x, int y, int unit, String name) {
         super(x, y, unit, name);
-        state = Global.SIM_LED_OFF;
+        state = Global.SIM_LED_ON;
         
         shape = new Shape_BorderedBox(0, 0, Global.COLOR_CIRCUIT_BROWN, Global.COLOR_CIRCUIT_DKBROWN, 1, 3, (int) (unit*1.5f), (int) unit, 8);
         addShape(shape,0, 0);
@@ -28,5 +29,19 @@ public class SimulatedClock extends Simulated{
                 shape.changeBackColor(Global.COLOR_CIRCUIT_DKBROWN);
             break;
         }
+        Controller.simulationChange();
+    }
+
+    @Override
+    public String getValue() {
+        return state == Global.SIM_LED_ON?"ON":"OFF";
+    }
+
+    @Override
+    public void setValue(String value) {
+        if(value.equals("ON"))
+            action(Global.EVENT_TURN_ON);
+        else
+            action(Global.EVENT_TURN_OFF);
     }
 }

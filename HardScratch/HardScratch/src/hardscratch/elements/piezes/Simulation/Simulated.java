@@ -21,6 +21,11 @@ public abstract class Simulated extends Element{
     public final boolean is(String t){
         return name.equals(t);
     }
+    public final String getName(){
+        return name;
+    }
+    public abstract String getValue();
+    public abstract void setValue(String value);
 
     @Override
     protected final long colideExtra(int x, int y) {

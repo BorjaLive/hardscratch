@@ -17,7 +17,7 @@ public class Summoner extends ElementBase{
     private Variable var;
     
     public Summoner(int x, int y, int depth, float scale, int item) {
-        super(x, y, depth, scale);
+        super(x, y, -2, depth, scale);
         this.item = item;
         
         shape = new Shape_BorderedBox(x, y, Global.COLOR_SUMMONER_BACK, Global.COLOR_SUMMONER_BORDER, scale, depth, 350, 50, 5);
