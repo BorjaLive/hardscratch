@@ -1,8 +1,12 @@
 package hardscratch;
 
+import hardscratch.backend.CONF;
+import hardscratch.backend.Resolution;
 import hardscratch.base.*;
 import hardscratch.base.shapes.*;
+import hardscratch.elements.piezes.WaitCourtain;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,9 +18,9 @@ public class Global {
     
     public static final String RESOURCES = "src/res/";
     
-    public static final int WINDOW_WIDTH = 1024;
-    public static final int WINDOW_HEIGHT = 640;
-    public static final boolean FULLSCREEN = false;
+    public static int WINDOW_WIDTH;
+    public static int WINDOW_HEIGHT;
+    public static boolean FULLSCREEN;
     
     public static final int LAYOUT_TOP = 70;
     public static int LAYOUT_LEFT = 400;
@@ -26,15 +30,12 @@ public class Global {
     
     public static String SAVE_NAME;
     
-    //public static final int WINDOW_WIDTH = 1920;
-    //public static final int WINDOW_HEIGHT = 1080;
-    //public static final boolean FULLSCREEN = true;
-    
     
     public static final int FRAME_RATE = 60;
     
     public static boolean DEBUG_MODE = false;
     public static int DRAWING_RADIUS_LIMIT = 500;   //Algun dia habra que quitar esto
+    public static String VERSION_NAME = "v1.0 OpenWound BETA";
     
     public static final float[][] SHAPE_SQUARE = new float[][] {
         new float[] { 0, 0,},
@@ -56,20 +57,24 @@ public class Global {
     public static final float FUNCTION_SM_B = 1.8f;
     public static final float FUNCTION_SM_C = -0.8f;
     
-    public static Texture TEXTURE_TEST, TEXTURE_CAT, TEXTURE_ARROW_1, TEXTURE_ARROW_2, TEXTURE_FINDERSLIDER, TEXTURE_HOUSE, TEXTURE_SAVE, TEXTURE_BORELICIOUS;
+    public static Texture  TEXTURE_ARROW_1, TEXTURE_ARROW_2, TEXTURE_FINDERSLIDER, TEXTURE_HOUSE, TEXTURE_SAVE, TEXTURE_BORELICIOUS, TEXTURE_CLOSE_CROSS, TEXTURE_LOGO, TEXTURE_SETTINGS, TEXTURE_TRASHCAN;
     public static Texture[] TEXTURE_BCD;
     public static final String SOUND_TEST = RESOURCES+"sound/test.wav";
     public static final String SOUND_TEST2 = RESOURCES+"sound/pipe.wav";
-    public static Font FONT_TEST, FONT_MONOFONTO, FONT_LCD;
+    public static Font FONT_MONOFONTO, FONT_LCD;
     
     public static final String TASKBAR_ICON = RESOURCES+"img/icon_light.png";
     
     public static final String VMESS_EXE = RESOURCES+"vmess/vmess.exe";
+    public static final String LAUNCHER_EXE = "HardScratch.exe";
 
     public static final float[] COLOR_AQUA = new float[]    {0, 1, 1};
     public static final float[] COLOR_RED = new float[]     {1, 0, 0};
     public static final float[] COLOR_PURPLE = new float[]  {1, 0, 1};
     public static final float[] COLOR_WHITE = new float[]   {1, 1, 1};
+    
+    //Resoluciones
+    public static Resolution[] RESOLUTION_LIST = new Resolution[15];
     
     //Paleta de color
     public static float[]
@@ -115,7 +120,9 @@ public class Global {
             COLOR_CIRCUIT_DKLIGHT,
             COLOR_CIRCUIT_LCD_OFF,
             COLOR_CIRCUIT_LCD_ON,
-            COLOR_CIRCUIT_LCD_LETTER
+            COLOR_CIRCUIT_LCD_LETTER,
+            COLOR_OK,
+            COLOR_NOOK
             ;
     
     
@@ -263,7 +270,10 @@ public class Global {
             EVENT_CREATE_SPARTAN = 17,
             EVENT_TURN_ON = 18,
             EVENT_TURN_OFF = 19,
-            EVENT_SIMULATION_STEP = 20
+            EVENT_SIMULATION_STEP = 20,
+            EVENT_GO_HELP = 21,
+            EVENT_SCROLL = 22,
+            EVENT_DELETE = 23
             ;
     public static final int
             IMPLEMENTER_LED = 1,
@@ -281,27 +291,56 @@ public class Global {
             SIM_LED_OFF = 6
             ;
     
+    
+    public static final int
+            ERROR_BOKEY = 0,
+            ERROR_CANNOT_INICIALIZE_INOUT = 1,
+            ERROR_CONST_MUST_BE_INICIALIZED = 2,
+            ERROR_OUT_VAR_CANNOT_BE_READEN = 3,
+            ERROR_CONST_VAR_CANNOT_BE_ASIGNED = 4,
+            ERROR_CONVERSION_NOT_ALLOWED = 5,
+            ERROR_IN_VAR_CANNOT_BE_ASIGNED = 6,
+            ERROR_SETIF_IS_USELESS = 7,
+            ERROR_SETSWITCH_IS_USELESS = 8,
+            ERROR_ELSE_VALUE_NEEDED = 9,
+            ERROR_SWITCH_NEEDS_DEFAULT_CASE = 10,
+            ERROR_VARIABLE_DOES_NOT_EXIST = 11,
+            ERROR_ILEGAL_USE_OF_OPERATOR_ADD = 12,
+            ERROR_ILEGAL_USE_OF_OPERATOR_SUB = 13,
+            ERROR_ILEGAL_USE_OF_OPERATOR_TIM = 14,
+            ERROR_ILEGAL_USE_OF_OPERATOR_TAK = 15,
+            ERROR_ILEGAL_USE_OF_OPERATOR_CONCATENATE = 16,
+            ERROR_BAD_INICIALIZATION = 17,
+            ERROR_CANT_CHANGE_LENGTH_OF_BITARRAY = 18
+            ;
+    public static final String[] ERROR_NAME = new String[]{"BOKEY", "Input And Output variables\ncan not be initialized.",
+    "Constants must\nbe initialized.","Output var\ncannot be read.","Constants cannot\nbe assigned.","Illegal conversion.",
+    "Input vars cannot\nbe assigned.","SetIf structure\nis empty.","SetSwitch structure\nis empty.","Set Switch requires\nelse instruction.",
+    "Switch needs\ndefault case.","Variable does\nnot exist.","Illegal use of addition operator.","Illegal use of subtraction operator.",
+    "Illegal use of\nproduct operator.","Illegal use of\ndivision operator.","Illegal use of\nconcatenate operator.",
+    "Illegal inicialization.","Length of bit array\ncannot be modified."};
+    
     public static float distance(int x1, int y1, int x2, int y2){
         return (float) Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
     }
     
     
-    public static void load(){
-        TEXTURE_TEST = new Texture("src/res/img/test.png");
-        TEXTURE_CAT = new Texture("src/res/img/cat.jpg");
-        TEXTURE_ARROW_1 = new Texture("src/res/img/arrow1.png");
-        TEXTURE_ARROW_2 = new Texture("src/res/img/arrow2.png");
-        TEXTURE_FINDERSLIDER = new Texture("src/res/img/finderSlider.png");
-        TEXTURE_HOUSE = new Texture("src/res/img/house.png");
-        TEXTURE_SAVE = new Texture("src/res/img/save.png");
-        FONT_TEST = new Font("src/res/fonts/test.png",32,32,16,16);
-        FONT_MONOFONTO = new Font("src/res/fonts/monofonto.png",64,64,48,64+5);//Sumarle +5 al ultimo 64
-        FONT_LCD = new Font("src/res/fonts/lcd.png",64,64,42,64+8);
-        TEXTURE_BCD = new Texture[11];
-        TEXTURE_BORELICIOUS = new Texture("src/res/img/borelicious.png");
-        for(int i = 0; i < 11; i++)
-            TEXTURE_BCD[i] = new Texture("src/res/img/bcd"+i+".jpg");
-        
+    public static void preload(){
+        RESOLUTION_LIST[0] = new Resolution(1024,640);
+        RESOLUTION_LIST[1] = new Resolution(1280,720);
+        RESOLUTION_LIST[2] = new Resolution(1024,768);
+        RESOLUTION_LIST[3] = new Resolution(1366,768);
+        RESOLUTION_LIST[4] = new Resolution(1280,800);
+        RESOLUTION_LIST[5] = new Resolution(1280,960);
+        RESOLUTION_LIST[6] = new Resolution(1400,1050);
+        RESOLUTION_LIST[7] = new Resolution(1680,1050);
+        RESOLUTION_LIST[8] = new Resolution(1440,1080);
+        RESOLUTION_LIST[9] = new Resolution(1920,1080);
+        RESOLUTION_LIST[10] = new Resolution(1920,1440);
+        RESOLUTION_LIST[11] = new Resolution(2340,1440);
+        RESOLUTION_LIST[12] = new Resolution(2560,1440);
+        RESOLUTION_LIST[13] = new Resolution(3840,2160);
+        RESOLUTION_LIST[14] = new Resolution(7680,4320);
         
         //Color load
         COLOR_TEXT_INPUT = new float[]              {  0/255f,  0/255f,  0/255f};
@@ -327,13 +366,6 @@ public class Global {
         COLOR_WAITFOR = new float[]                 {118/255f,114/255f,234/255f};
         COLOR_WAITON = new float[]                  {176/255f,139/255f,230/255f};
         COLOR_FORNEXT = new float[]                 {118/255f, 83/255f,182/255f};
-        //Colores de GUI
-        COLOR_GUI_1 = new float[]                   { 97/255f, 97/255f, 97/255f};
-        COLOR_GUI_2 = new float[]                   {126/255f, 87/255f,194/255f};
-        COLOR_GUI_3 = new float[]                   {  0/255f,  0/255f,  0/255f};
-        COLOR_GUI_4 = new float[]                   {233/255f, 30/255f, 99/255f};
-        COLOR_GUI_5 = new float[]                   {255/255f,255/255f,255/255f};
-        COLOR_GUI_6 = new float[]                   {116/255f,179/255f,179/255f};
         
         COLOR_VAR_IN = new float[]                  {116/255f,179/255f,179/255f};//Modificar
         COLOR_VAR_OUT = new float[]                 {255/255f,179/255f,179/255f};
@@ -352,8 +384,57 @@ public class Global {
         COLOR_CIRCUIT_LCD_OFF = new float[]         { 17/255f, 24/255f,102/255f};
         COLOR_CIRCUIT_LCD_ON = new float[]          {  4/255f, 95/255f,186/255f};
         COLOR_CIRCUIT_LCD_LETTER = new float[]      {153/255f,227/255f,255/255f};
+    }
+    public static void load(){//Mete el logo y ponselo a MenuGUI y el resto
         
-        //COLOR_DECLARATOR = new int[]{255,71,240};
+        TEXTURE_ARROW_1 = new Texture(RESOURCES+"img/arrow1.png");
+        TEXTURE_ARROW_2 = new Texture(RESOURCES+"img/arrow2.png");
+        TEXTURE_FINDERSLIDER = new Texture(RESOURCES+"img/finderSlider.png");
+        TEXTURE_HOUSE = new Texture(RESOURCES+"img/house.png");
+        TEXTURE_SAVE = new Texture(RESOURCES+"img/save.png");
+        TEXTURE_CLOSE_CROSS = new Texture(RESOURCES+"img/cross.png");
+        TEXTURE_SETTINGS = new Texture(RESOURCES+"img/Setings.png");
+        TEXTURE_TRASHCAN = new Texture(RESOURCES+"img/trashcan.png");
+        //FONT_TEST = new Font("src/res/fonts/test.png",32,32,16,16);
+        FONT_MONOFONTO = new Font(RESOURCES+"fonts/monofonto.png",64,64,48,64+5);//Sumarle +5 al ultimo 64
+        FONT_LCD = new Font(RESOURCES+"fonts/lcd.png",64,64,42,64+8);
+        TEXTURE_BCD = new Texture[11];
+        TEXTURE_BORELICIOUS = new Texture(RESOURCES+"img/borelicious.png");
+        for(int i = 0; i < 11; i++)
+            TEXTURE_BCD[i] = new Texture(RESOURCES+"img/bcd"+i+".jpg");
+        
+        if(CONF.get(CONF.THEME) == 1){
+            //LIGHT THEME
+            TEXTURE_LOGO = new Texture(RESOURCES+"img/Logo_Light.png");
+            //Colores de GUI
+            COLOR_GUI_1 = new float[]                   { 37/255f,175/255f,244/255f}; //FONDO: Azul Scratch
+            COLOR_GUI_2 = new float[]                   {253/255f,184/255f, 37/255f}; //BORDE: Narangito Scratch
+            COLOR_GUI_3 = new float[]                   {  0/255f,  0/255f,  0/255f}; //NEGRO
+            COLOR_GUI_4 = new float[]                   { 96/255f,125/255f,139/255f}; //DETALLES: Azul oscuro
+            COLOR_GUI_5 = new float[]                   {255/255f,255/255f,255/255f}; //BLANCO
+            COLOR_GUI_6 = new float[]                   {139/255f,195/255f, 74/255f}; //FONDO: Verde salton apagado
+            COLOR_OK = new float[]                      { 37/255f,155/255f, 36/255f};
+            COLOR_NOOK = new float[]                    {253/255f,151/255f, 31/255f};
+            
+            //Problemas de contraste
+            COLOR_ASIGNATOR_SEQ = new float[]           {250/255f,126/255f, 44/255f};
+            COLOR_IFTHEN = new float[]                  { 58/255f, 73/255f,165/255f};
+        }else if(CONF.get(CONF.THEME) == 2){
+            //DARK THEME
+            TEXTURE_LOGO = new Texture(RESOURCES+"img/Logo_Dark.png");
+            //Colores de GUI
+            COLOR_GUI_1 = new float[]                   { 97/255f, 97/255f, 97/255f}; //FONDO: El gris claroscuro
+            COLOR_GUI_2 = new float[]                   {126/255f, 87/255f,194/255f}; //BORDE: MORADO FUXIA VIOLETA
+            COLOR_GUI_3 = new float[]                   {  0/255f,  0/255f,  0/255f}; //NEGRO
+            COLOR_GUI_4 = new float[]                   {233/255f, 30/255f, 99/255f}; //DETALLES: Rosita moradito
+            COLOR_GUI_5 = new float[]                   {255/255f,255/255f,255/255f}; //BLANCO
+            COLOR_GUI_6 = new float[]                   {116/255f,179/255f,179/255f}; //FONDO: Azul poco brillante
+            COLOR_OK = new float[]                      { 37/255f,155/255f, 36/255f};
+            COLOR_NOOK = new float[]                    {253/255f,151/255f, 31/255f};
+        }
+        
+        
+        WaitCourtain.load(RESOURCES+"img/loading/", 25, COLOR_GUI_1);
     }
     
     public static void unBind(){
@@ -397,6 +478,14 @@ public class Global {
         e.addBoundingBox(246, 446, 10, 62, Global.EVENT_GO_IMPLEMENT);
         e.addBoundingBox(456, 656, 10, 62, Global.EVENT_GO_SIMULATE);
     }
+    public static void addGUImenu(Element e){
+        int paddingBorder = (int) (WINDOW_HEIGHT*0.05);
+        e.addShape(new Shape_Square(0, 0, COLOR_GUI_2, 1, 5, WINDOW_WIDTH, WINDOW_HEIGHT), 0, 0);
+        e.addShape(new Shape_Square(0, 0, COLOR_GUI_1, 1, 5, WINDOW_WIDTH -2*paddingBorder, WINDOW_HEIGHT -2*paddingBorder), paddingBorder, paddingBorder);
+           
+        int widthLogo = (int) (WINDOW_WIDTH*0.9);
+        e.addImage(new Image(0, 0, 4, TEXTURE_LOGO, widthLogo/1920f, COLOR_WHITE), (WINDOW_WIDTH-widthLogo)/2, (int) (WINDOW_HEIGHT*0.12));
+    }
     
     public static void sayLinesOfCode(){
         final String folderPath = "src";
@@ -431,12 +520,12 @@ public class Global {
     }
     
     public static String concatenate(String list[]){
-        return concatenateWith(list, "");
+        return Global.concatenate(list, "");
     }
     public static String concatenate(ArrayList<String> list){
-        return concatenateWith(list, "");
+        return concatenate(list, "");
     }
-    public static String concatenateWith(String list[],String divider){
+    public static String concatenate(String list[],String divider){
         String text = "";
         
         for(String s:list)
@@ -444,23 +533,54 @@ public class Global {
         
         return text;
     }
-    public static String concatenateWith(ArrayList<String> list,String divider){
+    public static String concatenate(ArrayList<String> list,String divider){
         String[] data = new String[list.size()];
         for(int i = 0; i < list.size(); i++)
             data[i] = list.get(i);
-        return concatenateWith(data, divider);
+        return Global.concatenate(data, divider);
+    }
+    
+    public static String concatenate(int list[],String divider){
+        String text = "";
+        
+        for(int s:list)
+            text += (text.isEmpty()?"":divider) + s;
+        
+        return text;
     }
     
     
-    public static void createProyect(String nombre){
-        SAVE_NAME = nombre;
+    public static void createProyect(String name){
+        SAVE_NAME = name.replace(" ", "_");
         File proyectFolder = new File(System.getenv("APPDATA")+"/HardScratch/"+SAVE_NAME);
+        if(proyectFolder.exists())
+            deleteFolder(proyectFolder);
         proyectFolder.mkdirs();
         
         //Resto de cosas
     }
+    public static void deleteProyect(String name){
+        File proyectFolder = new File(System.getenv("APPDATA")+"/HardScratch/"+name.replaceAll(" ", "_"));
+        if(proyectFolder.exists())
+            deleteFolder(proyectFolder);
+        if(SAVE_NAME != null && SAVE_NAME.endsWith(name))
+            SAVE_NAME = "";
+    }
+    public static void deleteFolder(File folder) {///?Se nota que no lo he escrito yo?
+        File[] files = folder.listFiles();
+        if(files!=null) { //some JVMs return null for empty dirs
+            for(File f: files) {
+                if(f.isDirectory()) {
+                    deleteFolder(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+        folder.delete();
+    }
     public static void openProyect(String name){
-        SAVE_NAME = name;
+        SAVE_NAME = name.replace(" ", "_");
         File proyectFolder = new File(System.getenv("APPDATA")+"/HardScratch/"+SAVE_NAME);
         if(!proyectFolder.exists())
             createProyect(name);
@@ -468,6 +588,24 @@ public class Global {
     
     public static String getProyectFolder(){
         return System.getenv("APPDATA")+"/HardScratch/"+SAVE_NAME;
+    }
+    
+    public static float[] colorGlow(float[] color){
+        if(color.length != 3) return null;
+        return new float[]{color[0]*1.5f,color[1]*1.2f,color[2]*1.2f};
+    }
+    public static float[] colorDeGlow(float[] color){
+        if(color.length != 3) return null;
+        return new float[]{color[0]/1.5f,color[1]/1.2f,color[2]/1.2f};
+    }
+    
+    public static void planedRestart(){
+        try {
+            Runtime.getRuntime().exec(Global.LAUNCHER_EXE);
+            System.exit(0);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
     
 }

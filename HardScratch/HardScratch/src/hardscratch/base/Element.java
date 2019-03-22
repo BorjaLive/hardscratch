@@ -3,7 +3,7 @@ package hardscratch.base;
 import hardscratch.elements.piezes.Hole;
 import hardscratch.elements.piezes.Constructor;
 import hardscratch.Controller;
-import hardscratch.Global;
+import static hardscratch.Global.*;
 import hardscratch.base.shapes.*;
 import java.util.ArrayList;
 
@@ -13,6 +13,8 @@ public abstract class Element extends ElementBase{
     private int maxDepth;
     private long focus_item, focus_itemPRE;
     private boolean drag_forced;
+    
+    private boolean effectGlow;
     
     protected ArrayList<Shape> shapes;
     protected ArrayList<Image> images;
@@ -46,6 +48,8 @@ public abstract class Element extends ElementBase{
         boundingBoxes = new ArrayList<>();
         maxDepth = 0;
         focus_item = -1; focus_itemPRE = -1;
+        
+        effectGlow = false;
     }
     
     public final void addShape(Shape shape, int x, int y){
@@ -96,7 +100,7 @@ public abstract class Element extends ElementBase{
     }
     public final  void addBoundingBox(int x1, int x2, int y1, int y2, int action){
         boundingBoxes.add(new int[]{x1,x2,y1,y2,action});
-        Shape_Square bound = new Shape_Square(position.getCordX()+x1, position.getCordY()+y1,Global.COLOR_WHITE,1,0,x2-x1,y2-y1);
+        Shape_Square bound = new Shape_Square(position.getCordX()+x1, position.getCordY()+y1,COLOR_WHITE,1,0,x2-x1,y2-y1);
         bounds.add(bound);
     }
     public final void whipeBounds(){
@@ -243,7 +247,7 @@ public abstract class Element extends ElementBase{
                     creator.draw();
         }
         drawExtra();
-        if(Global.DEBUG_MODE)
+        if(DEBUG_MODE)
             for (Shape bound : bounds)
                 bound.draw();
     }
@@ -285,7 +289,7 @@ public abstract class Element extends ElementBase{
             return false;
         }else{
             for(Port p:ports)
-                if(p.getGender() == Global.PORT_MALE && p.isOcupied())
+                if(p.getGender() == PORT_MALE && p.isOcupied())
                     p.undock();
             depth = 4;
             drag_init();
@@ -316,11 +320,11 @@ public abstract class Element extends ElementBase{
                 if(port.isOcupied() && Controller.getElementByID(port.getID()) == null)
                     port.undock();
                 
-                if(port.isOcupied() && port.getGender()==Global.PORT_MALE && !Port.inBound(port, port.getConnectedPort()))
+                if(port.isOcupied() && port.getGender()==PORT_MALE && !Port.inBound(port, port.getConnectedPort()))
                     port.undock();
         
-                if(port.isOcupied() && port.getGender()==Global.PORT_MALE)
-                    Controller.dockingAlign(this, port, Global.QUICK_MOVE);
+                if(port.isOcupied() && port.getGender()==PORT_MALE)
+                    Controller.dockingAlign(this, port, QUICK_MOVE);
             }
             depth = 5;
             drag_end();
@@ -411,26 +415,47 @@ public abstract class Element extends ElementBase{
 
     public boolean isMother() {
         for(Port p:ports)
-            if(p.getGender() == Global.PORT_MALE && p.isOcupied())
+            if(p.getGender() == PORT_MALE && p.isOcupied())
                 return false;
         return true;
     }
     
     
     
-    public Hole getHole(int n){
+    public final Hole getHole(int n){
         if(n < holes.size()) return holes.get(n); else return null;
     }
-    public TextBox getBox(int n){
+    public final TextBox getBox(int n){
         if(n < boxen.size()) return boxen.get(n); else return null;
     }
-    public Constructor getCreator(int n){
+    public final Constructor getCreator(int n){
         if(n < creators.size()) return creators.get(n); else return null;
     }
-    public Port getPort(int n){
+    public final Port getPort(int n){
         if(n < ports.size()) return ports.get(n); else return null;
     }
-    public TextLabel getLabel(int n){
+    public final TextLabel getLabel(int n){
         if(n < labels.size()) return labels.get(n); else return null;
+    }
+    
+    public final void effectGlow(){
+        if(effectGlow)
+            for(Shape s:shapes)
+                s.setColor(colorDeGlow(s.getColor()));
+        else
+            for(Shape s:shapes)
+                s.setColor(colorGlow(s.getColor()));
+        effectGlow = !effectGlow;
+        
+    }
+    public final void effectClear(){
+        if(effectGlow) effectGlow();
+    }
+    
+    public final void HolesCorrectTipPos(){
+        for(Hole h:holes)
+            h.tipCorrectPos();
+        for(Constructor c:creators)
+            c.tipCorrectPos();
     }
 }

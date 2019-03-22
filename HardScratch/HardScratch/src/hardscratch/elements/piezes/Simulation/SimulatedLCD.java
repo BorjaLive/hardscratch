@@ -19,7 +19,7 @@ public class SimulatedLCD extends Simulated{
         
         shape = new Shape_BorderedBox(0, 0, Global.COLOR_CIRCUIT_LCD_OFF, Global.COLOR_CIRCUIT_DKBROWN, 1, 5, unit*7, unit*2, 5);
         addShape(shape , 0, 0);
-        label = new TextLabel(0, 0, depth, unit/100f, Global.FONT_LCD, Global.COLOR_CIRCUIT_LCD_LETTER, state, true);
+        label = new TextLabel(0, 0, depth, unit/80f, Global.FONT_LCD, Global.COLOR_CIRCUIT_LCD_LETTER, state, true);
         addLabel(label, (int) (unit*3.5f),  unit);
     }
 

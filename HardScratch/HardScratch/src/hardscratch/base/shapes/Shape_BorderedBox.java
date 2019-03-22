@@ -2,8 +2,8 @@ package hardscratch.base.shapes;
 
 public class Shape_BorderedBox extends Shape{
     
-    private Shape_Square borderbox, backbox;
-    private int border;
+    private final Shape_Square borderbox, backbox;
+    private final int border;
     
     public Shape_BorderedBox(int x, int y, float[] backColor, float[] borderColor, float scale, int depth, int width, int height, int border) {
         super(x, y, backColor, scale, depth);

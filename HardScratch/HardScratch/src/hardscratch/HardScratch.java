@@ -2,12 +2,14 @@ package hardscratch;
 
 import org.lwjgl.*;
 import hardscratch.base.*;
+import java.io.File;
 
 public class HardScratch {
 
     public void run(){
         System.out.println("LWJGL " + Version.getVersion());
-        //Global.sayLinesOfCode();
+        System.out.println("HARDSCRATCH v1.0.3A");
+        Global.sayLinesOfCode();
 
         Display mainWindow = new Display();
         mainWindow.init();
@@ -20,6 +22,8 @@ public class HardScratch {
     }
     
     public static void main(String[] args) {
+        System.setProperty("org.lwjgl.librarypath", new File("src/natives/").getAbsolutePath());
+        
         new HardScratch().run();
     }
     

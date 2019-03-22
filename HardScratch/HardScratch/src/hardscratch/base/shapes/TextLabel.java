@@ -13,6 +13,10 @@ public class TextLabel extends ElementBase{
     boolean align;
     private float strech;
     
+    public TextLabel(int x, int y, int depth, float scale, float[] color, String text, boolean align) {
+        this(x, y, depth, scale, Global.FONT_MONOFONTO, color, text, align);
+        strech = 1.5f;
+    }
     public TextLabel(int x, int y, int depth, float scale, Font font, float[] color, String text, boolean align) {
         super(x, y, -1, depth, scale);
         strech = 1;
@@ -76,6 +80,7 @@ public class TextLabel extends ElementBase{
     }
     
     
+    @Override
     public void draw(){
         Texture letter;
         int line = 0, count = 0;
@@ -91,12 +96,18 @@ public class TextLabel extends ElementBase{
                 line++;
                 count = 0;
             }else{
-                float paddingW, paddingH = (spacingH*(getLines()+1.5f))/2;
+                float paddingW, paddingH;
+                if(align)
+                    paddingH = (spacingH*(getLines()+1.5f))/2;
+                else paddingH = 0;
+                
                 letter = font.getCharacter((int)letters[i]);
                 letter.bind();
                 glBegin(GL_QUADS);
                 for(int j = 0; j < Global.SHAPE_TEXTURE.length; j++){
-                    paddingW = (spacingW*getCharsLine(line))/2;
+                    if(align)
+                        paddingW = (spacingW*getCharsLine(line))/2;
+                    else paddingW = 0;
                     glTexCoord2f(Global.SHAPE_TEXTURE[j][0], Global.SHAPE_TEXTURE[j][1]);
                     glVertex2f( position.getRelX()+(Global.SHAPE_TEXTURE[j][0]*width) +(spacingW*count) - paddingW,
                                 position.getRelY()+(Global.SHAPE_TEXTURE[j][1]*height*strech)-(spacingH*line)  + paddingH);

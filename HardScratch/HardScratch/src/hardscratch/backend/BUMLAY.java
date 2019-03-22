@@ -93,9 +93,10 @@ public class BUMLAY {
         wipe();
         
         ArrayList<Element> piezes = Controller.getBoard();
-        if(piezes == null || piezes.isEmpty()) write(Global.SAVE_NAME);
+        if(piezes == null || piezes.isEmpty()) return;
         
         for(Element e:piezes){
+            if(e == null) continue;
             if(e.getClass() == Declarator.class){
                 //Buscar las variables
                 if(!e.isComplete()) break;
@@ -151,8 +152,11 @@ public class BUMLAY {
                 ArrayList<String> list = seqInterprete(e.getPort(0).getDock());
                 Collections.reverse(list);
                 String seq = "";
-                for(String s:list)
-                    seq += s;
+                for(int i = 0; i < list.size(); i++){
+                    seq += list.get(i);
+                    if(i != list.size()-1)
+                        seq += "|";
+                }
                 
                 addSEQ(e.getID(),seq);
             }
@@ -189,19 +193,19 @@ public class BUMLAY {
         add("SEQ",id,inner);
     }
     private static String genSEQASIG(long id , String var, String value){
-        return "[SASIG|"+Long.toString(id)+"|"+var+"|"+value+"|]|\n";
+        return "[SASIG|"+Long.toString(id)+"|"+var+"|"+value+"|]\n";
     }
     private static String genIFTHEN(long id , String body){
-        return "[IFTHEN|"+Long.toString(id)+"|"+body+"|]|\n";
+        return "[IFTHEN|"+Long.toString(id)+"|"+body+"|]\n";
     }
     private static String genSWITCHCASE(long id , String body){
-        return "[SWITCH|"+Long.toString(id)+"|"+body+"|]|\n";
+        return "[SWITCH|"+Long.toString(id)+"|"+body+"|]\n";
     }
     private static String genWAITFOR(long id , String expresion){
-        return "[WFOR|"+Long.toString(id)+"|"+expresion+"|]|\n";
+        return "[WFOR|"+Long.toString(id)+"|"+expresion+"|]\n";
     }
     private static String genWAITON(long id , String var, int edge){
-        return "[WON|"+Long.toString(id)+"|"+var+"|"+edge+"|]|\n";
+        return "[WON|"+Long.toString(id)+"|"+var+"|"+edge+"|]\n";
     }
     
     private static String creator2String(Constructor c){
@@ -238,11 +242,11 @@ public class BUMLAY {
             if(insts.get(0)==null)
                 ifthen = "ELSE|-1";
             else
-                ifthen = "ELSE|"+Global.concatenate(seqInterprete(insts.get(0)));
+                ifthen = "ELSE|["+Global.concatenate(seqInterprete(insts.get(0)),"|")+"|]";
             
             for(int i = 1; i < insts.size(); i++){
                 if(!conds.get(i-1).isEmpty() && insts.get(i) != null)
-                    ifthen += "|"+creator2String(conds.get(i-1))+"|"+Global.concatenate(seqInterprete(insts.get(i)));
+                    ifthen += "|"+creator2String(conds.get(i-1))+"|["+Global.concatenate(seqInterprete(insts.get(i)),"|")+"|]";
             }
             
             list.add(genIFTHEN(e.getID(),ifthen));
@@ -252,11 +256,11 @@ public class BUMLAY {
             SwitchCase sc = (SwitchCase) e;
             ArrayList<Constructor> conds = sc.getConditions();
             ArrayList<Element> insts = sc.getInstructions();
-            String switchcase = sc.getHole(0).getTip().getVar().name+"|ELSE|"+Global.concatenate(seqInterprete(insts.get(0)));
+            String switchcase = sc.getHole(0).getTip().getVar().name+"|ELSE|["+Global.concatenate(seqInterprete(insts.get(0)),"|")+"|]";
             
             for(int i = 1; i < insts.size(); i++){
                 if(!conds.get(i-1).isEmpty() && insts.get(i) != null)
-                    switchcase += creator2String(conds.get(i-1))+"|"+Global.concatenate(seqInterprete(insts.get(i)));
+                    switchcase += "|"+creator2String(conds.get(i-1))+"|["+Global.concatenate(seqInterprete(insts.get(i)),"|")+"|]";
             }
             
             list.add(genSWITCHCASE(e.getID(),switchcase));

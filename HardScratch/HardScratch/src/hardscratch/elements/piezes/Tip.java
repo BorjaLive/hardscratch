@@ -147,7 +147,7 @@ public class Tip extends Element{
             break;
             case Global.TIP_VAR_ARRAY:
                 width = 155; height = 44;
-                addLabel(new TextLabel(0, 0, 3, 0.38f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "ARRAY", false), 52, (height/2));
+                addLabel(new TextLabel(0, 0, 3, 0.38f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "ARRAY", true), 52, (height/2));
                 addTextBox(new TextBox(0, 0, 3, 0.4f, Global.FONT_MONOFONTO, "00", Global.COLOR_TEXT_INPUT, Global.COLOR_TEXT_INPUT_PLACEHOLDER, Global.TEXT_INPUT_BACK, Global.COLOR_BORDER_UNSELECTED, Global.COLOR_BORDER_SELECTED, 2, 1, 10, true, true, true), 103, 3);
             break;
             case Global.TIP_EDGE_RISING:
@@ -170,7 +170,7 @@ public class Tip extends Element{
                 addLabel(new TextLabel(0, 0, 3, 0.39f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "ERROR", true), 77, (height/2));
             break;
             case Global.TIP_VAR_CLOCK:
-                width = 310; height = 44;
+                width = 260; height = 44;
                 addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "ERROR", true), (width/2), (height/2));
             break;
         }
@@ -356,4 +356,41 @@ public class Tip extends Element{
         else
             return null;
     }
+    
+    /*
+    public void correctPositions(){
+        switch(value){
+            case Global.TIP_CONSTRUCTOR_LITERAL_N:
+                labels.get(0).moveAbsolute(getX(), getY());
+            break;
+            case Global.TIP_CONSTRUCTOR_LITERAL_B:
+                labels.get(0).moveAbsolute(getX()+9, getY()+20);
+                labels.get(1).moveAbsolute(getX()+42, getY()+20);
+                boxen.get(0).moveAbsolute(getX()+10, getY()+3);
+            break;
+            case Global.TIP_CONSTRUCTOR_LITERAL_A:
+                labels.get(0).moveAbsolute(getX()+10, getY()+20);
+                labels.get(1).moveAbsolute(getX()+182, getY()+20);
+                boxen.get(0).moveAbsolute(getX()+15, getY()+3);
+            break;
+            case Global.TIP_CONSTRUCTOR_OPEN:
+                labels.get(0).moveAbsolute(getX()+10, getY()+(height/2));
+            break;
+            case Global.TIP_CONSTRUCTOR_CLOSE:
+                labels.get(0).moveAbsolute(getX()+20, getY()+(height/2));
+            break;
+            case Global.TIP_VAR_ARRAY:
+                System.out.println("CORREGIR ARRAY");
+                boxen.get(0).moveAbsolute(getX()+103, getY()+3);
+                labels.get(0).move((getX()+52)-labels.get(0).getX(), (getY()+(height/2))-labels.get(0).getY());
+            break;
+            case Global.TIP_VAR_SUBARRAY:
+                boxen.get(0).moveAbsolute(getX()+140, getY()+3);
+                labels.get(0).moveAbsolute(getX()+77, getY()+(height/2));
+            break;
+            default:
+                labels.get(0).moveAbsolute(getX()+(width/2), getY()+(height/2));
+        }
+    }
+    */
 }

@@ -105,20 +105,29 @@ public class Constructor extends ElementBase{
         }
         //Buscar que haya al menos un agujeto libre al final
         if(holes.get(holes.size()-1).isAsigned()){
-            if(holes.get(holes.size()-1).getTip().getValue() == Global.TIP_CONSTRUCTOR_OPEN || holes.get(holes.size()-1).getTip().getValue() == Global.TIP_CONSTRUCTOR_CLOSE){
-                switch(holes.get(holes.size()-1).getHoleType()){
-                    case Global.CONSTRUCTOR_LITERAL_CONST:
-                    case Global.CONSTRUCTOR_LITERAL_VARS:   insertDaft();break;
-                    case Global.CONSTRUCTOR_OPERATORS:
-                    case Global.CONSTRUCTOR_OPERATORS_PLUS: insertLinker(); break;
-                }
-            }else{
-                switch(holes.get(holes.size()-1).getHoleType()){
-                    case Global.CONSTRUCTOR_LITERAL_CONST:
-                    case Global.CONSTRUCTOR_LITERAL_VARS:   insertLinker();break;
-                    case Global.CONSTRUCTOR_OPERATORS:
-                    case Global.CONSTRUCTOR_OPERATORS_PLUS: insertDaft(); break;
-                }
+            switch (holes.get(holes.size()-1).getTip().getValue()) {
+                case Global.TIP_CONSTRUCTOR_OPEN:
+                case Global.TIP_CONSTRUCTOR_CLOSE:
+                    //No alternancia
+                    switch(holes.get(holes.size()-1).getHoleType()){
+                        case Global.CONSTRUCTOR_LITERAL_CONST:
+                        case Global.CONSTRUCTOR_LITERAL_VARS:   insertDaft();break;
+                        case Global.CONSTRUCTOR_OPERATORS:
+                        case Global.CONSTRUCTOR_OPERATORS_PLUS: insertLinker(); break;
+                    }
+                break;
+                case Global.TIP_CONSTRUCTOR_LOGIC_NOT:
+                    //Lo siguiente siempre es Daft
+                    insertDaft();
+                break;
+                default:
+                    //Alternancia
+                    switch(holes.get(holes.size()-1).getHoleType()){
+                        case Global.CONSTRUCTOR_LITERAL_CONST:
+                        case Global.CONSTRUCTOR_LITERAL_VARS:   insertLinker();break;
+                        case Global.CONSTRUCTOR_OPERATORS:
+                        case Global.CONSTRUCTOR_OPERATORS_PLUS: insertDaft(); break;
+                    }   break;
             }
         }
         
@@ -165,8 +174,8 @@ public class Constructor extends ElementBase{
     public void draw(){
         border.draw();
         back.draw();
-        for(Hole hole:holes)
-            hole.draw();
+        for(int i = holes.size()-1; i >= 0; i--)
+            holes.get(i).draw();
     }
     
     public long getColideHoleID(){
@@ -365,7 +374,11 @@ public class Constructor extends ElementBase{
         }
         
         if(data.isEmpty()) return "-1";
-        return Global.concatenateWith(data, "-");
+        return Global.concatenate(data, "-");
     }
     
+    public void tipCorrectPos(){
+        for(Hole h:holes)
+            h.tipCorrectPos();
+    }
 }

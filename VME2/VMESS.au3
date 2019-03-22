@@ -1,5 +1,13 @@
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
-#AutoIt3Wrapper_Outfile=vmess.Exe
+#AutoIt3Wrapper_Outfile=..\HardScratch\HardScratch\src\res\vmess\vmess.exe
+#AutoIt3Wrapper_Res_Description=VME Simulated Simulation
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.9
+#AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
+#AutoIt3Wrapper_Res_ProductName=VMESS
+#AutoIt3Wrapper_Res_ProductVersion=0.9
+#AutoIt3Wrapper_Res_CompanyName=Liveployers
+#AutoIt3Wrapper_Res_LegalCopyright=B0vE
+#AutoIt3Wrapper_Res_LegalTradeMarks=Borja Live
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 #include "_RunWaitGet.au3"
 #include "VME2.au3"
@@ -8,10 +16,10 @@
 ;Esto hay que eliminarlo
 ;$cmdLine = __getArray()
 ;__add($cmdLine, "sim")
-;__add($cmdLine, "C:\Users\Margaret\AppData\Roaming\HardScratch\test")
-;__add($cmdLine, "miden:'1'|cosa:'0'")
+;__add($cmdLine, "C:\Users\Arlin-T2\AppData\Roaming\HardScratch\FAIL_test")
+;__add($cmdLine, "entradaR:'1'|null")
 
-$path = __getArgument(2)
+$path = StringReplace(__getArgument(2)," ","_")
 $pathSim = $path & "\sim"
 switch(__getArgument(1))
 	case "check"
@@ -23,14 +31,13 @@ switch(__getArgument(1))
 	case "init"
 		If FileExists($pathSim) Then DirRemove($pathSim,1)
 		DirCreate($pathSim)
-
 		compile($path&"\circuit.b0ve",$pathSim&"\base.vhdl", true)
-		$response = _modifyModels($pathSim, __getArgument(3), True)
-		_detectRuntimeError($response)
-		ConsoleWrite(_createOut($response)&@CRLF)
+		__Error(0,0)
 	case "sim"
 		_loadIDLINES($pathSim&"\IDLINES.B0vE")
-		$response = _modifyModels($pathSim, __getArgument(3), False)
+		;MsgBox(0,"RECIBIDO",__getArgument(3))
+		$response = _modifyModels($pathSim, __getArgument(3))
+		;MsgBox(0,"",$path)
 		_detectRuntimeError($response)
 		ConsoleWrite(_createOut($response)&@CRLF)
 EndSwitch
@@ -99,7 +106,7 @@ Func _loadIDLINES($file)
 	$IDLINES = StringSplit(StringReplace(FileRead($file),@CRLF,""),"|")
 EndFunc
 
-Func _modifyModels($path, $text, $firstTime); Init True: No se conocen las señales, hay que leerlas del compilador $VARIABLES
+Func _modifyModels($path, $text); Init True: No se conocen las señales, hay que leerlas del compilador $VARIABLES
 	$file = $path&"\sim.vhdl"
 	$fileTest = $path&"\simTest.vhdl"
 	$model = $path&"\base.vhdl"
@@ -107,27 +114,22 @@ Func _modifyModels($path, $text, $firstTime); Init True: No se conocen las seña
 	If FileExists($file) Then FileDelete($file)
 	If FileExists($fileTest) Then FileDelete($fileTest)
 
+	$text = StringReplace($text,"null","",0,2)
+	while StringMid($text,StringLen($text),1) = "|"
+		$text = StringTrimRight($text,1)
+	WEnd
+
 	$inits = __getArray()
-	If $firstTime Then
-		For $i = 1 To $VARIABLES[0]
-			$var = $VARIABLES[$i]
-			If $var[3] = 3 And $var[6] <> "-1" Then
-				$init = __getArray()
-				__add($init,$var[2])
-				__add($init,_decodeConstructor($var[6], -1))
-				__add($inits,$init)
-			EndIf
-		Next
-	Else
-		$parts = StringSplit($text,"|")
-		For $i = 1 To $parts[0]
-			$subParts = StringSplit($parts[$i],":")
-			$init = __getArray()
-			__add($init,$subParts[1])
-			__add($init,$subParts[2])
-			__add($inits,$init)
-		Next
-	EndIf
+	$parts = StringSplit($text,"|")
+	For $i = 1 To $parts[0]
+		If StringInStr($parts[$i], ":") = "" Then ContinueLoop
+		$subParts = StringSplit($parts[$i],":")
+		$subParts[2] = __correctComas($subParts[2])
+		$init = __getArray()
+		__add($init,$subParts[1])
+		__add($init,$subParts[2])
+		__add($inits,$init)
+	Next
 
 
 	$Text_file = FileRead($model)
@@ -137,15 +139,22 @@ Func _modifyModels($path, $text, $firstTime); Init True: No se conocen las seña
 		$Text_file = StringReplace($Text_file, "<"&$init[1]&">", ":= "&$init[2])
 		$Text_fileTest = StringReplace($Text_fileTest, "<"&$init[1]&">", ":="&$init[2])
 	Next
+
+	;Generar ID de simulacion, para que GHDL no diga cosas sobre entidades duplicadas
+	$randomName = __davinciRandomGenerator(6)
+	$Text_file = StringReplace($Text_file,"<*Rname>",$randomName)
+	$Text_fileTest = StringReplace($Text_fileTest,"<*Rname>",$randomName)
+
 	$Text_file = _deleteMarks($Text_file)
 	$Text_fileTest = _deleteMarks($Text_fileTest)
+
 	FileWrite($file,$Text_file)
 	FileWrite($fileTest,$Text_fileTest)
 
 	ghdl("--clean", "")
 	ghdl("-a", $file)
 	ghdl("-a", $fileTest)
-	Return ghdl("-r","HardScratchSimulation_Entity", True, True)
+	Return ghdl("-r","HardScratchSimulation_Entity_"&$randomName, True, True)
 EndFunc
 Func _deleteMarks($text)
 	$first = False
@@ -160,7 +169,7 @@ Func _deleteMarks($text)
 				$i -= $distance+1
 				$first = False
 			Else
-				If $distance >= 8 Then
+				If $distance >= 12 Then ;Los 9 caracteres + 4 que ocupan las OUT_
 					$first = False
 				Else
 					$distance += 1
@@ -179,6 +188,10 @@ Func _deleteMarks($text)
 	Return $text
 EndFunc
 Func _createOut($text)
+	;Sanitizar el texto
+	$text = StringMid($text,StringInStr($text,"STARTHERE"))
+	$text = StringReplace($text, "STARTHERE", "")
+
 	$lines = StringSplit($text,@CRLF)
 	$outputs = ""
 	$signals = ""
@@ -207,12 +220,35 @@ Func _createOut($text)
 			EndIf
 		EndIf
 	Next
-	If $outputs <> "" Then $outputs = StringTrimRight($outputs, 1)
-	If $signals <> "" Then $signals = StringTrimRight($signals, 1)
+	If $outputs = "" Then
+		$outputs = "-1"
+	Else
+		$outputs = StringTrimRight($outputs, 1)
+	EndIf
+	If $signals = "" Then
+		$signals = "-1"
+	Else
+		$signals = StringTrimRight($signals, 1)
+	EndIf
 
-	Return $outputs&"{}"&$signals
+	Return "[]"&$outputs&"{}"&$signals
 EndFunc
 
+Func __correctComas($text)
+	If StringLen($text) > 3 And StringMid($text,1,1) = "'" And StringMid($text,StringLen($text),1) = "'" Then Return StringReplace($text,"'",'"')
+	return $text
+EndFunc
+Func __davinciRandomGenerator($digits)
+	$pwd = ""	;Cambiar un poco esto
+	Local $aSpace[3]
+	For $i = 1 To $digits
+		$aSpace[0] = Chr(Random(65, 90, 1)) ;A-Z
+		$aSpace[1] = Chr(Random(97, 122, 1)) ;a-z
+		$aSpace[2] = Chr(Random(48, 57, 1)) ;0-9
+		$pwd &= $aSpace[Random(0, 2, 1)]
+	Next
+	return $pwd
+EndFunc
 Func ghdl($action, $file, $failsafe = True, $track = false)
 	If $failsafe Then
 		$failsafe = "--ieee=synopsys -fexplicit"
@@ -220,5 +256,5 @@ Func ghdl($action, $file, $failsafe = True, $track = false)
 		$failsafe = ""
 	EndIf
 
-	Return _RunWaitGet(@ComSpec & " /c "&@ScriptDir&"\GHDL\bin\ghdl.exe "&$action&" "&$failsafe&" "&$file,$track?1:2,"",@SW_HIDE)
+	Return __runWaitGet(@ComSpec&" /c "&@ScriptDir&"\GHDL\bin\ghdl.exe "&$action&" "&$failsafe&" "&$file, false)
 EndFunc

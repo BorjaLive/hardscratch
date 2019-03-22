@@ -8,6 +8,7 @@ import hardscratch.base.*;
 import hardscratch.elements.piezes.Constructor;
 import hardscratch.elements.piezes.Hole;
 import hardscratch.elements.piezes.Implementation.Implementer;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -333,7 +334,7 @@ public class BUCKLE {
     
     private static void wipe(){tmp = "";}
     private static void add(String s[]){
-        tmp += (tmp==""?"":"{}")+Global.concatenateWith(s,"|")+"\n";
+        tmp += (tmp==""?"":"{}")+Global.concatenate(s,"|")+"\n";
     }
     
     private static String[] convergentSeq2string(ArrayList<Constructor> conditions, ArrayList<Port> instructions){
@@ -411,6 +412,9 @@ public class BUCKLE {
     
     public static void loadDesign(){
         try {
+            File file = new File(Global.getProyectFolder()+"/board.b0ve");
+            if(!file.exists()) return;
+            
             String[] lines = Files.readString(Paths.get(Global.getProyectFolder()+"/board.b0ve")).replace("\n", "").replace("\r", "").split(Pattern.quote("{}"));
             String[] data;
                        
@@ -589,7 +593,7 @@ public class BUCKLE {
                 }
             }while(changes);
             
-            
+            //Todo cargado
         } catch (IOException e) {
             e.printStackTrace();
         }

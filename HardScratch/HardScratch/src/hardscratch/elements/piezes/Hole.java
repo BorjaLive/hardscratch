@@ -203,28 +203,32 @@ public class Hole extends ElementBase{
         if(isAsigned())
             tip = null;
         
-        Variable var = Controller.getVarByName(value);
-        if(var != null){
-            tip = new Tip(getX(), getY(), Global.TIP_VAR).setVar(var);
-        }else if(value.contains(":")){
-            String[] parts = value.split(Pattern.quote(":"));
-            if(parts[0].equals("29")){  //Array
-                tip = new Tip(getX(),getY(), Integer.parseInt(parts[0]));
-                if(parts.length > 1)
-                    tip.getBox(0).setText(parts[1]);
-            }else if(parts[0].equals("SA")){
-                tip = new Tip(getX(),getY(), Global.TIP_VAR_SUBARRAY);
-                Variable variable = Controller.getVarByName(parts[2]);
-                if(variable != null){
-                    tip.setVar(variable);
-                    if(!parts[1].equals("100"))
+        try{
+            Variable var = Controller.getVarByName(value);
+            if(var != null){
+                tip = new Tip(getX(), getY(), Global.TIP_VAR).setVar(var);
+            }else if(value.contains(":")){
+                String[] parts = value.split(Pattern.quote(":"));
+                if(parts[0].equals("29")){  //Array
+                    tip = new Tip(getX(),getY(), Integer.parseInt(parts[0]));
+                    if(parts.length > 1)
                         tip.getBox(0).setText(parts[1]);
-                }else{
-                    tip = null;
+                }else if(parts[0].equals("SA")){
+                    tip = new Tip(getX(),getY(), Global.TIP_VAR_SUBARRAY);
+                    Variable variable = Controller.getVarByName(parts[2]);
+                    if(variable != null){
+                        tip.setVar(variable);
+                        if(!parts[1].equals("100"))
+                            tip.getBox(0).setText(parts[1]);
+                    }else{
+                        tip = null;
+                    }
                 }
+            }else{
+                tip = new Tip(getX(),getY(), Integer.parseInt(value));
             }
-        }else{
-            tip = new Tip(getX(),getY(), Integer.parseInt(value));
+        }catch(Exception ex){
+            ex.printStackTrace();
         }
         
         if(tip != null)
@@ -233,5 +237,10 @@ public class Hole extends ElementBase{
 
     public boolean isSelected() {
         return selected;
+    }
+    
+    public void tipCorrectPos(){
+        if(tip != null)
+            tip.move(getX()-tip.getX(), getY()-tip.getY());
     }
 }

@@ -23,7 +23,6 @@ public class SimulatedButton extends Simulated{
     protected void select_init(long ID) {
         shape.changeBackColor(Global.COLOR_CIRCUIT_BROWN);
         state = Global.SIM_BUTTON_ON;
-        
         action(1);
     }
 
@@ -31,7 +30,6 @@ public class SimulatedButton extends Simulated{
     protected void select_end() {
         shape.changeBackColor(Global.COLOR_CIRCUIT_DKGRAY);
         state = Global.SIM_BUTTON_OFF;
-        
         action(1);
     }
 

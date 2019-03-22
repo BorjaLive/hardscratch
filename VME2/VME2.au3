@@ -1,3 +1,6 @@
+#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
+#AutoIt3Wrapper_Outfile=..\HardScratch\HardScratch\src\res\vmess\vmess.exe
+#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 #include "_BUMLAY.au3"
 
 #Region ;Constantes y codigos de error
@@ -26,9 +29,14 @@ Const 	$ERROR_BOKEY = 0, _
 		$ERROR_CANT_CHANGE_LENGTH_OF_BITARRAY = 18
 
 Global $PROCESS_USED_VARS = Null, $CONSTRUCTOR_USED_VARS= Null, $VARIABLES = Null, $IDLINES = Null, $TMP_IDLINES = Null
+Global $SIMULATION_MODE = Null, $SIM_PROCESS_COUNTER = Null
 #EndRegion
 
+;compile("C:\Users\Arlin-T2\AppData\Roaming\HardScratch\test\circuit.b0ve", "C:\Users\Arlin-T2\AppData\Roaming\HardScratch\test\code.vhdl")
+
 Func compile($file, $output, $simulation = False)	;Simylation True: Crear salidas para cada señal y asignarlas. Dejar <VAR_NAME> para remplazar la incializacion de las señales Remplazar por ":= FOO". Y ejecuta CreateTest
+	$SIMULATION_MODE = $simulation
+
 	$raw = __BUMLAY_load($file)
 	;_ArrayDisplay($raw)
 
@@ -37,8 +45,8 @@ Func compile($file, $output, $simulation = False)	;Simylation True: Crear salida
 
 	$lines = __getArray()
 	__add($lines, generateHeader(), True)
-	__add($lines, generateEntity($simulation), True)
-	__add($lines, generateArchitecture($raw, $simulation), True)
+	__add($lines, generateEntity(), True)
+	__add($lines, generateArchitecture($raw), True)
 
 
 	;_ArrayDisplay($lines)
@@ -67,12 +75,12 @@ Func createTest($output)
 	)
 
 	;ENTITY
-	__add($lines, "ENTITY HardScratchSimulation_Entity IS"&@CRLF&"END HardScratchSimulation_Entity;"&@CRLF)
+	__add($lines, "ENTITY HardScratchSimulation_Entity_<*Rname> IS"&@CRLF&"END HardScratchSimulation_Entity_<*Rname>;"&@CRLF)
 
 	;ARCHITECTURE
-	__add($lines, "ARCHITECTURE HardScratchSimulation_Architecture OF HardScratchSimulation_Entity IS" & @CRLF & @CRLF & _
+	__add($lines, "ARCHITECTURE HardScratchSimulation_Architecture_<*Rname> OF HardScratchSimulation_Entity_<*Rname> IS" & @CRLF & @CRLF & _
 	@TAB&"-- Componente bajo prueba (UUT)" & @CRLF & @CRLF & _
-	@TAB&"COMPONENT HardScratch_Entity" & @CRLF & _
+	@TAB&"COMPONENT HardScratch_Entity_<*Rname>" & @CRLF & _
 	@TAB&"PORT(" & @CRLF)
 
 	$filtered = __getArray()
@@ -98,7 +106,7 @@ Func createTest($output)
 
 	For $i = 1 To $filtered[0]
 		$var = $filtered[$i]
-		If $var[3] = 1 Then __add($lines,@TAB&"Signal "&StringReplace(_variableConstructor($var, True)," In "," ",-1,2) &";")
+		If $var[3] = 1 Then __add($lines,@TAB&"Signal "&StringReplace(_variableConstructor($var)," In "," ",-1,2) &";")
 	Next
 	__add($lines,@CRLF&@TAB&"--Outputs")
 	For $i = 1 To $filtered[0]
@@ -106,7 +114,7 @@ Func createTest($output)
 		If $var[3] = 2  Then __add($lines,@TAB&"Signal "&StringReplace(_variableConstructor($var)," Out "," ",-1,2) &";")
 	Next
 
-	__add($lines, @CRLF&"BEGIN"&@CRLF&@TAB&"uut: HardScratch_Entity PORT MAP (")
+	__add($lines, @CRLF&"BEGIN"&@CRLF&@TAB&"uut: HardScratch_Entity_<*Rname> PORT MAP (")
 
 	For $i = 1 To $filtered[0]
 		$var = _simulateVar($filtered[$i])
@@ -116,7 +124,7 @@ Func createTest($output)
 		__add($lines,@TAB&@TAB&$var[2]&" => "&$var[2] &$out)
 	Next
 
-	__add($lines, @CRLF&@TAB&"--Ejecucion"&@CRLF&@TAB&"process"&@CRLF&@TAB&"begin"&@CRLF&@TAB&@TAB&"wait for 100 ns;"&@CRLF)
+	__add($lines, @CRLF&@TAB&"--Ejecucion"&@CRLF&@TAB&"process"&@CRLF&@TAB&"begin"&@CRLF&@TAB&@TAB&"wait for 100 ns;"&@CRLF&@TAB&@TAB&'report "STARTHERE";'&@CRLF)
 
 
 	For $i = 1 To $filtered[0]
@@ -138,6 +146,13 @@ Func createTest($output)
 				Next
 				__add($lines,$text&";")
 		EndSwitch
+	Next
+
+	For $i = 1 To $VARIABLES[0]
+		$var = $VARIABLES[$i]
+		If $var[3] = 1 And $var[4] = 2 And ($var[2]="CK" Or $var[2]="CLK" Or $var[2]="CLOCK") Then
+			__add($lines, "If "&$var[2]&" = '1' Then "&$var[2]&" <= '0'; End If;")
+		EndIf
 	Next
 
 	__add($lines, @CRLF&@TAB&@TAB&"wait;"&@CRLF&@TAB&"end process;"&@CRLF&"END;")
@@ -200,10 +215,13 @@ Func generateHeader()
 	_idlinesNull(16)
 	Return $lineas
 EndFunc
-Func generateEntity($simulation = False)
+Func generateEntity()
 	$lineas = __getArray()
 
-	__add($lineas, "Entity HardScratch_Entity is" & @CRLF & @TAB & "Port(")
+	$rName = ""
+	If $SIMULATION_MODE Then $rName = "_<*Rname>"
+
+	__add($lineas, "Entity HardScratch_Entity"&$rName&" is" & @CRLF & @TAB & "Port(")
 	_idlinesNull(2)
 
 	$filtered = __getArray()
@@ -211,7 +229,7 @@ Func generateEntity($simulation = False)
 		$var = $VARIABLES[$i]
 		if $var[3] = 1 Or $var[3] = 2 Then __add($filtered, $var)
 		;Agregar una salida por cada señal
-		If $simulation Then
+		If $SIMULATION_MODE Then
 			If $var[3] = 3 Then
 				$var[2] = "OUT_"&$var[2]
 				$var[3] = 2
@@ -231,24 +249,41 @@ Func generateEntity($simulation = False)
 		EndIf
 	Next
 
-	__add($lineas, "End HardScratch_Entity;"&@CRLF)
+	__add($lineas, "End HardScratch_Entity"&$rName&";"&@CRLF)
 	_idlinesNull(3)
 
 	Return $lineas
 EndFunc
-Func generateArchitecture($raw, $simulation = False)
+Func generateArchitecture($raw)
+	$rName = ""
+	If $SIMULATION_MODE Then $rName = "_<*Rname>"
+
 	$lines = __getArray()
-	__add($lines,"Architecture HardScratch_Architecture of HardScratch_Entity is")
+	__add($lines,"Architecture HardScratch_Architecture"&$rName&" of HardScratch_Entity"&$rName&" is")
+
 	_idlinesNull(1)
+
 
 	;VARS
 	For $i = 1 To $VARIABLES[0]
 		$var = $VARIABLES[$i]
 		If $var[3] = 3 Or $var[3] = 4 Then
-			__add($lines, @TAB&_variableConstructor($var, $simulation) & ";")
+			__add($lines, @TAB&_variableConstructor($var) & ";")
 			__add($IDLINES, $var[1])
 		EndIf
 	Next
+
+	If $SIMULATION_MODE Then
+		$nSeqs = 0
+		For $i = 1 To $raw[0]
+			$logic = $raw[$i]
+			If $logic[1] = "SEQ" Then
+				__add($lines, @TAB&"Signal EXECUTED_PROCESS_"&$nSeqs&" : STD_LOGIC := '0';")
+				_idlinesNull(1)
+				$nSeqs += 1
+			EndIf
+		Next
+	EndIf
 
 	__add($lines,"Begin")
 	_idlinesNull(1)
@@ -263,7 +298,7 @@ Func generateArchitecture($raw, $simulation = False)
 	Next
 
 	;agregar las asignaciones a las salidas de señales
-	If $simulation Then
+	If $SIMULATION_MODE Then
 		For $i = 1 To $VARIABLES[0]
 			$var = $VARIABLES[$i]
 			If $var[3] = 3 Then
@@ -273,13 +308,13 @@ Func generateArchitecture($raw, $simulation = False)
 		Next
 	EndIf
 
-	__add($lines, "End HardScratch_Architecture;")
+	__add($lines, "End HardScratch_Architecture"&$rName&";")
 	_idlinesNull(2)
 
 	return $lines
 EndFunc
 
-Func _variableConstructor($var, $simulation = false)
+Func _variableConstructor($var)
 	; [0. 6],[1. ID],[2. Nombre],[3. IO],[4. Tipo],[5. Atributos],[6. inicializacion]
 	$mod = ""
 	Switch $var[3]
@@ -312,7 +347,7 @@ Func _variableConstructor($var, $simulation = false)
 
 	$init = _decodeConstructor($var[6], $var[1])
 	;Agregar marcador si es para simulacion
-	If $simulation Then
+	If $SIMULATION_MODE And $var[3] <> 4 Then
 		$init = " <"&$var[2]&">"
 	Else
 		If $init <> "" Then $init = " := "&$init
@@ -328,7 +363,7 @@ Func _decodeConstructor($data, $id)
 	$parts = StringSplit($data,"-")
 	For $i = 1 To $parts[0]
 		$part = $parts[$i]
-		If StringMid($part,1,1) = "L" Then
+		If StringMid($part,1,1) = "L" And StringMid($part,3,1) = ":" Then
 			$type = StringMid($part,2,1)
 			$literal = StringTrimLeft($part,3)
 			If $type = "N" Then
@@ -339,17 +374,21 @@ Func _decodeConstructor($data, $id)
 				$text &= '"'&$literal&'"'
 			EndIf
 			$text&=" "
-		ElseIf StringMid($part,1,2) = "SA" Then
+		ElseIf StringMid($part,1,3) = "SA:" Then
 			$subParts = StringSplit($part,":")
 			$var = getVarByName($subParts[3], $id)
 			_varCheckRead($var, $id)
 			__add($CONSTRUCTOR_USED_VARS,$var[2])
 			$text &= $var[2]&"("&$subParts[2]&") "
-		ElseIf StringMid($part,1,2) = "CK" Then
+		ElseIf StringMid($part,1,3) = "CK:" Then
 			$var = getVarByName(StringTrimLeft($part,3), $id)
 			_varCheckRead($var, $id)
 			__add($CONSTRUCTOR_USED_VARS,$var[2])
-			$text &= "("& $var[2] &"'event and "& $var[2] &"='1' ) "
+			If $SIMULATION_MODE Then	;Porque no hay eventos
+				$text &= $var[2] &"='1' "
+			Else
+				$text &= "("& $var[2] &"'event and "& $var[2] &"='1') "
+			EndIf
 		Else
 			$text &= StringReplace($part,"_","-")&" "
 			;Tiene que reconocer variables y guardarlas en otra pila global
@@ -471,8 +510,11 @@ Func _logicConstructor($logic)
 
 		If $logic[0] < 3 Then Return $lines
 
-		For $i = 3 To $logic[0]-1
-			__add($instructions, _logicConstructor($logic[$i]), True)
+		For $i = 3 To $logic[0]
+ConsoleWrite("SIMMODE: "&$SIMULATION_MODE&@CRLF)
+			$constructed = _logicConstructor($logic[$i])
+			if(Not IsArray($constructed) Or $constructed[0] = 0) Then ContinueLoop
+			__add($instructions, $constructed, True)
 			__add($usedVarsList,$PROCESS_USED_VARS, true)
 			__add($selfIDLINES, $TMP_IDLINES, True)
 		Next
@@ -488,8 +530,24 @@ Func _logicConstructor($logic)
 		Else
 			__addIndentation($lines, "Process")
 		EndIf
+
 		__addIndentation($lines, "Begin")
+
+		If $SIMULATION_MODE Then
+			If $SIM_PROCESS_COUNTER = Null Then $SIM_PROCESS_COUNTER = 0
+			__addIndentation($lines, "If EXECUTED_PROCESS_"&$SIM_PROCESS_COUNTER&" = '0' Then")
+			_idlinesNull(1)
+		EndIf
+
 		__addIndentation($lines, $instructions)
+
+		If $SIMULATION_MODE Then
+			__addIndentation($lines, "EXECUTED_PROCESS_"&$SIM_PROCESS_COUNTER&" <= '1';")
+			__addIndentation($lines, "End If;")
+			$SIM_PROCESS_COUNTER += 1
+			_idlinesNull(2)
+		EndIf
+
 		__addIndentation($lines, "End Process;")
 
 		__add($selfIDLINES, $logic[2])
@@ -523,8 +581,14 @@ Func _logicConstructor($logic)
 
 			$condition = _decodeConstructor($logic[$i], $logic[2])
 			__add($usedVars, $CONSTRUCTOR_USED_VARS, True)
-			$actions = _logicConstructor($logic[$i+1])
-			__add($usedVars, $PROCESS_USED_VARS, True)
+			$actions = __getArray()
+
+			$innerLogic = $logic[$i+1]
+			For $j = 1 To $innerLogic[0]
+				__add($actions, _logicConstructor($innerLogic[$j]), True)
+				__add($usedVars, $PROCESS_USED_VARS, True)
+			Next
+			;_ArrayDisplay($actions)
 
 			__addIndentation($lines, $starter & $condition &" Then")
 			__addIndentation($lines, $actions)
@@ -536,8 +600,11 @@ Func _logicConstructor($logic)
 		Next
 		If $logic[4] <> "-1" Then
 			__addIndentation($lines, "Else")
-			__addIndentation($lines, _logicConstructor($logic[4]))
-			__add($usedVars, $PROCESS_USED_VARS, True)
+			$innerLogic = $logic[4]
+			For $i = 1 To $innerLogic[0]
+				__addIndentation($lines, _logicConstructor($innerLogic[$i]))
+				__add($usedVars, $PROCESS_USED_VARS, True)
+			Next
 
 			__add($selfIDLINES, $logic[2])
 			__add($selfIDLINES, $TMP_IDLINES, True)
@@ -568,15 +635,24 @@ Func _logicConstructor($logic)
 
 			__addIndentation($lines, @TAB&"When "&_decodeConstructor($logic[$i], $logic[2])&" => ")
 			__add($usedVars, $CONSTRUCTOR_USED_VARS, True)
-			__addIndentationX2($lines, _logicConstructor($logic[$i+1]))
-			__add($usedVars, $PROCESS_USED_VARS, True)
+
+			$actions = __getArray()
+			$innerLogic = $logic[$i+1]
+			For $j = 1 To $innerLogic[0]
+				__add($actions, _logicConstructor($innerLogic[$j]), True)
+				__add($usedVars, $PROCESS_USED_VARS, True)
+			Next
+			__addIndentationX2($lines,$actions)
 
 			__add($selfIDLINES, $logic[2])
 			__add($selfIDLINES, $TMP_IDLINES, True)
 		Next
 		__addIndentation($lines, @TAB&"When Others => ")
-		__addIndentationX2($lines, _logicConstructor($logic[5]))
-		__add($usedVars, $PROCESS_USED_VARS, True)
+		$innerLogic = $logic[5]
+			For $i = 1 To $innerLogic[0]
+				__addIndentationX2($lines, _logicConstructor($innerLogic[$i]))
+				__add($usedVars, $PROCESS_USED_VARS, True)
+			Next
 		__addIndentation($lines, "End Case;")
 
 		__add($selfIDLINES, $logic[2])
@@ -593,14 +669,18 @@ Func _logicConstructor($logic)
 		__add($TMP_IDLINES, $selfIDLINES, True)
 	ElseIf $logic[1] = "WFOR" Then
 		;WAITFOR [0. 3],[1. WFOR],[2. ID],[3. Time]
+		If $SIMULATION_MODE Then Return __getArray()
+
 		__addIndentation($lines, "Wait for "&_decodeConstructor($logic[3], $logic[2])&";")
 		$PROCESS_USED_VARS = __getArray()
 		__add($PROCESS_USED_VARS, $CONSTRUCTOR_USED_VARS, True)
 
 		$TMP_IDLINES = __getArray()
-		__add($TMP_IDLINES, $logic[2], True)
+		__add($TMP_IDLINES, $logic[2])
 	ElseIf $logic[1] = "WON" Then
 		;WAITON [0. 4],[1. WON],[2. ID],[3. Var],[4. Edge]
+		If $SIMULATION_MODE Then Return __getArray()
+
 		$var = getVarByName($logic[3], $logic[2])
 		_varCheckRead($var, $logic[2])
 
@@ -615,7 +695,7 @@ Func _logicConstructor($logic)
 		__add($PROCESS_USED_VARS, $var[2])
 
 		$TMP_IDLINES = __getArray()
-		__add($TMP_IDLINES, $logic[2], True)
+		__add($TMP_IDLINES, $logic[2])
 	EndIf
 		;FORNEXT is in progress
 

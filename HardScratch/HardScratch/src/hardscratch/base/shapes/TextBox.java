@@ -137,6 +137,7 @@ public class TextBox extends ElementBase{
     public void setText(String text){
         if(text != null && !text.isEmpty() && !text.isBlank() &&  !text.equals("-1")){
             label.setText(text);
+            label.setColor(color_text);
             empty = false;
         }
     }

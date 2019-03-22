@@ -48,6 +48,13 @@ public class Font {
         return chars[n-32];
     }
     
+    public float getFixedScale(float size){
+        return size/height;
+    }
+    public float getFixedScale(float size, float stretch){
+        return getFixedScale(size/stretch);
+    }
+    
     /*
     public void draw(){
         Texture letter = getCharacter(36);

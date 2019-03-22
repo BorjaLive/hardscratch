@@ -1,7 +1,7 @@
 package hardscratch.elements.piezes.GUIs;
 
 import hardscratch.Controller;
-import hardscratch.Global;
+import static hardscratch.Global.*;
 import hardscratch.backend.*;
 import hardscratch.base.Element;
 import hardscratch.base.shapes.*;
@@ -15,30 +15,30 @@ public class DesignGUI extends Element{
         super(0, 0, -1, true, true, false);
         depth = 1;
         
-        addShape(new Shape_Square(0, 0, Global.COLOR_GUI_2, 1, 4, Global.WINDOW_WIDTH, 70), 0, 0);
-        addImage(new Image(0, 0, 3, Global.TEXTURE_HOUSE, 1, Global.COLOR_GUI_3), Global.WINDOW_WIDTH-80, 0);
-        addImage(new Image(0, 0, 3, Global.TEXTURE_SAVE, 1, Global.COLOR_GUI_3), Global.WINDOW_WIDTH-160, 0);
-        addShape(new Shape_BorderedBox(0, 0, Global.COLOR_GUI_4, Global.COLOR_GUI_5, 1, 3, 200, 52, 5), 36, 10);
-        addShape(new Shape_BorderedBox(0, 0, Global.COLOR_GUI_4, Global.COLOR_GUI_5, 1, 3, 200, 52, 5), 246, 10);
-        addShape(new Shape_BorderedBox(0, 0, Global.COLOR_GUI_4, Global.COLOR_GUI_5, 1, 3, 200, 52, 5), 456, 10);
-        addLabel(new TextLabel(0, 0, 2, 0.42f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "DESIGN", true), 136, 36);
-        addLabel(new TextLabel(0, 0, 2, 0.42f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "IMPLEMENT", true), 346, 36);
-        addLabel(new TextLabel(0, 0, 2, 0.42f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "SIMULATE", true), 556, 36);
+        addShape(new Shape_Square(0, 0, COLOR_GUI_2, 1, 4, WINDOW_WIDTH, 70), 0, 0);
+        addImage(new Image(0, 0, 3, TEXTURE_HOUSE, 1, COLOR_GUI_3), WINDOW_WIDTH-80, 0);
+        addImage(new Image(0, 0, 3, TEXTURE_SAVE, 1, COLOR_GUI_3), WINDOW_WIDTH-160, 0);
+        addShape(new Shape_BorderedBox(0, 0, COLOR_GUI_4, COLOR_GUI_5, 1, 3, 200, 52, 5), 36, 10);
+        addShape(new Shape_BorderedBox(0, 0, COLOR_GUI_4, COLOR_GUI_5, 1, 3, 200, 52, 5), 246, 10);
+        addShape(new Shape_BorderedBox(0, 0, COLOR_GUI_4, COLOR_GUI_5, 1, 3, 200, 52, 5), 456, 10);
+        addLabel(new TextLabel(0, 0, 2, 0.42f, FONT_MONOFONTO, COLOR_WHITE, "DESIGN", true), 136, 36);
+        addLabel(new TextLabel(0, 0, 2, 0.42f, FONT_MONOFONTO, COLOR_WHITE, "IMPLEMENT", true), 346, 36);
+        addLabel(new TextLabel(0, 0, 2, 0.42f, FONT_MONOFONTO, COLOR_WHITE, "SIMULATE", true), 556, 36);
         labels.get(0).setScretch(1.8f);
         labels.get(1).setScretch(1.8f);
         labels.get(2).setScretch(1.8f);
         
-        addBoundingBox(Global.WINDOW_WIDTH-80, Global.WINDOW_WIDTH-10, 0, 70, Global.EVENT_GO_HOMO);
-        addBoundingBox(Global.WINDOW_WIDTH-160, Global.WINDOW_WIDTH-90, 0, 70, Global.EVENT_SAVE);
-        addBoundingBox(36, 236, 10, 62, Global.EVENT_GO_DESIGN);
-        addBoundingBox(246, 446, 10, 62, Global.EVENT_GO_IMPLEMENT);
-        addBoundingBox(456, 656, 10, 62, Global.EVENT_GO_SIMULATE);
+        addBoundingBox(WINDOW_WIDTH-80, WINDOW_WIDTH-10, 0, 70, EVENT_GO_HOMO);
+        addBoundingBox(WINDOW_WIDTH-160, WINDOW_WIDTH-90, 0, 70, EVENT_SAVE);
+        addBoundingBox(36, 236, 10, 62, EVENT_GO_DESIGN);
+        addBoundingBox(246, 446, 10, 62, EVENT_GO_IMPLEMENT);
+        addBoundingBox(456, 656, 10, 62, EVENT_GO_SIMULATE);
         
-        bar = new Shape_Square(400, 70, Global.COLOR_GUI_2, 1, 4, 20, Global.WINDOW_HEIGHT-70);
-        toggle = new Image(390,70+((Global.WINDOW_HEIGHT-150)/2), 2, Global.TEXTURE_FINDERSLIDER, 1, Global.COLOR_WHITE);
-        addBoundingBox(390, 430, 70+((Global.WINDOW_HEIGHT-150)/2), 150+((Global.WINDOW_HEIGHT-150)/2), Global.EVENT_FINDER_TOGGLE);
-        backColor = new Shape_Square(0, 0, Global.COLOR_GUI_1, 1, 5, Global.WINDOW_WIDTH, Global.WINDOW_WIDTH);
-        backColorFinder = new Shape_Square(0, 0, Global.COLOR_GUI_6, 1, 5, 400, Global.WINDOW_WIDTH);
+        bar = new Shape_Square(400, 70, COLOR_GUI_2, 1, 4, 20, WINDOW_HEIGHT-70);
+        toggle = new Image(390,70+((WINDOW_HEIGHT-150)/2), 2, TEXTURE_FINDERSLIDER, 1, COLOR_WHITE);
+        addBoundingBox(390, 430, 70+((WINDOW_HEIGHT-150)/2), 150+((WINDOW_HEIGHT-150)/2), EVENT_FINDER_TOGGLE);
+        backColor = new Shape_Square(0, 0, COLOR_GUI_1, 1, 5, WINDOW_WIDTH, WINDOW_WIDTH);
+        backColorFinder = new Shape_Square(0, 0, COLOR_GUI_6, 1, 5, 400, WINDOW_WIDTH);
     }
 
     @Override
@@ -81,32 +81,34 @@ public class DesignGUI extends Element{
 
     @Override
     public void action(int action) {
+        depth = 1;
         switch(action){
-            case Global.EVENT_DRAW_BACKGROUND:
+            case EVENT_DRAW_BACKGROUND:
                 backColor.draw();
             break;
-            case Global.EVENT_DRAW_FLOD:
+            case EVENT_DRAW_FLOD:
                 backColorFinder.draw();
                 bar.draw();
                 toggle.draw();
             break;
-            case Global.EVENT_GO_HOMO:
+            case EVENT_GO_HOMO:
+                Controller.changeRoom(ROOM_MENU);
             break;
-            case Global.EVENT_SAVE:
+            case EVENT_SAVE:
                 BUCKLE.save();
             break;
-            case Global.EVENT_GO_DESIGN:
+            case EVENT_GO_DESIGN:
             break;
-            case Global.EVENT_GO_IMPLEMENT:
-                Controller.changeRoom(Global.ROOM_IMPLEMENT);
+            case EVENT_GO_IMPLEMENT:
+                Controller.changeRoom(ROOM_IMPLEMENT);
             break;
-            case Global.EVENT_GO_SIMULATE:
-                Controller.changeRoom(Global.ROOM_SIMULATE);
+            case EVENT_GO_SIMULATE:
+                Controller.changeRoom(ROOM_SIMULATE);
             break;
-            case Global.EVENT_FINDER_TOGGLE:
+            case EVENT_FINDER_TOGGLE:
                 Controller.finderToggle();
             break;
-            case Global.EVENT_TOOGLE_TOGGLE:
+            case EVENT_TOOGLE_TOGGLE:
                 toggle.setInvertW();
             break;
         }
@@ -115,7 +117,7 @@ public class DesignGUI extends Element{
     @Override
     public void updateEvent(int event, int data1, int data2, String data3) {
         switch(event){
-            case Global.EVENT_FINDER_MOVE:
+            case EVENT_FINDER_MOVE:
                 bar.move(data1, 0);
                 toggle.move(data1, 0);
                 boundingBoxMove(5, data1, 0);

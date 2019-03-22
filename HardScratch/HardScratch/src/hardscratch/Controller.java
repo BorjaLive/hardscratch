@@ -10,10 +10,10 @@ import hardscratch.elements.piezes.Design.Declarator;
 import hardscratch.elements.piezes.Implementation.Implementer;
 import hardscratch.elements.piezes.Simulation.*;
 import hardscratch.inputs.*;
+import static hardscratch.Global.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import static org.lwjgl.glfw.GLFW.*;
-import org.lwjgl.glfw.GLFWKeyCallback;
 
 public class Controller {
     
@@ -22,6 +22,10 @@ public class Controller {
     private static int focus, Rfocus, lastFocus, currentRoom;
     private static boolean focus_volatile, Rfocus_volatile;
     private static long idCounter = 0;
+    private static int deleteAll;
+    
+    private static int errorI, errorState;
+    private static int loadingWait;
     
     private static int finder;
     private static ArrayList<Summoner>
@@ -46,7 +50,6 @@ public class Controller {
     private static int slidingFinder, finderPos, slidingCurrent;
     private static int[] slidingPos;
     
-    private static GLFWKeyCallback keyCallback;
     private static int layerOnly = -1;
     
     //Variables y logia
@@ -57,10 +60,11 @@ public class Controller {
         vars = new ArrayList<>();
         Controller.window = window;
         focus = -1; Rfocus = -1; lastFocus= -1;
+        deleteAll = 0;
         
-        Global.load();
+        load();
         Mouse.Init(window);
-        glfwSetKeyCallback(window, keyCallback = new Keyboard());
+        glfwSetKeyCallback(window, new Keyboard());
         
         //Movement
         movingElement = null;
@@ -73,50 +77,50 @@ public class Controller {
         
         //Create summonersPack
         finderInit();
+        errorTerminate(); //Por inicializar las cosas un poco
+        loadingWait = 0;
+        
+        changeRoom(ROOM_MENU);
         
         
-        Global.openProyect("test");
-        changeRoom(Global.ROOM_DESIGN);
-        
-        
-        
-        glfwShowWindow(window); 
+        glfwShowWindow(window);
     }
     
     private static void finderInit(){
         BasicElements = new ArrayList<>();
-        finderADD(BasicElements, 1f, Global.SUMMON_DECLARATRON);
-        finderADD(BasicElements, 1f, Global.SUMMON_INICIALIZER);
-        finderADD(BasicElements, 1f, Global.SUMMON_EXTRAVAR);
-        finderADD(BasicElements, 1f, Global.SUMMON_CONVERTER);
-        finderADD(BasicElements, 1f, Global.SUMMON_ASIGNATOR);
-        finderADD(BasicElements, 1f, Global.SUMMON_SETIF);
-        finderADD(BasicElements, 1f, Global.SUMMON_SETSWITCH);
-        finderADD(BasicElements, 1f, Global.SUMMON_SEQUENTIAL);
-        finderADD(BasicElements, 1f, Global.SUMMON_ASIGNATOR_SEQ);
-        finderADD(BasicElements, 1f, Global.SUMMON_IFTHEN);
-        finderADD(BasicElements, 1f, Global.SUMMON_SWITCHCASE);
-        finderADD(BasicElements, 1f, Global.SUMMON_WAITFOR);
-        finderADD(BasicElements, 1f, Global.SUMMON_WAITON);
-        finderADD(BasicElements, 1f, Global.SUMMON_FORNEXT);
+        finderADD(BasicElements, 1f, SUMMON_DECLARATRON);
+        finderADD(BasicElements, 1f, SUMMON_INICIALIZER);
+        finderADD(BasicElements, 1f, SUMMON_EXTRAVAR);
+        finderADD(BasicElements, 1f, SUMMON_CONVERTER);
+        finderADD(BasicElements, 1f, SUMMON_ASIGNATOR);
+        finderADD(BasicElements, 1f, SUMMON_SETIF);
+        finderADD(BasicElements, 1f, SUMMON_SETSWITCH);
+        finderADD(BasicElements, 1f, SUMMON_SEQUENTIAL);
+        finderADD(BasicElements, 1f, SUMMON_ASIGNATOR_SEQ);
+        finderADD(BasicElements, 1f, SUMMON_IFTHEN);
+        finderADD(BasicElements, 1f, SUMMON_SWITCHCASE);
+        finderADD(BasicElements, 1f, SUMMON_WAITFOR);
+        finderADD(BasicElements, 1f, SUMMON_WAITON);
+        finderADD(BasicElements, 1f, SUMMON_FORNEXT);
         
         InOutElements = new ArrayList<>();
-        finderADD(InOutElements, 1f, Global.SUMMON_TIP_IN);
-        finderADD(InOutElements, 1f, Global.SUMMON_TIP_OUT);
-        finderADD(InOutElements, 1f, Global.SUMMON_TIP_SIGNAL);
-        finderADD(InOutElements, 1f, Global.SUMMON_TIP_CONST);
+        finderADD(InOutElements, 1f, SUMMON_TIP_IN);
+        finderADD(InOutElements, 1f, SUMMON_TIP_OUT);
+        finderADD(InOutElements, 1f, SUMMON_TIP_SIGNAL);
+        finderADD(InOutElements, 1f, SUMMON_TIP_CONST);
         
         VarTypeElements = new ArrayList<>();
-        finderADD(VarTypeElements, 1f, Global.SUMMON_TIP_INT);
-        finderADD(VarTypeElements, 1f, Global.SUMMON_TIP_BIT);
-        finderADD(VarTypeElements, 1f, Global.SUMMON_TIP_ARRAY);
+        finderADD(VarTypeElements, 1f, SUMMON_TIP_INT);
+        finderADD(VarTypeElements, 1f, SUMMON_TIP_BIT);
+        finderADD(VarTypeElements, 1f, SUMMON_TIP_ARRAY);
         
         cLiteralElements = new ArrayList<>();
-        finderADD(cLiteralElements, 1f, Global.SUMMON_CONSTRUCTOR_OPEN);
-        finderADD(cLiteralElements, 1f, Global.SUMMON_CONSTRUCTOR_CLOSE);
-        finderADD(cLiteralElements, 1f, Global.SUMMON_CONSTRUCTOR_LITERAL_N);
-        finderADD(cLiteralElements, 1f, Global.SUMMON_CONSTRUCTOR_LITERAL_B);
-        finderADD(cLiteralElements, 1f, Global.SUMMON_CONSTRUCTOR_LITERAL_A);
+        finderADD(cLiteralElements, 1f, SUMMON_CONSTRUCTOR_OPEN);
+        finderADD(cLiteralElements, 1f, SUMMON_CONSTRUCTOR_CLOSE);
+        finderADD(cLiteralElements, 1f, SUMMON_CONSTRUCTOR_LOGIC_NOT);
+        finderADD(cLiteralElements, 1f, SUMMON_CONSTRUCTOR_LITERAL_N);
+        finderADD(cLiteralElements, 1f, SUMMON_CONSTRUCTOR_LITERAL_B);
+        finderADD(cLiteralElements, 1f, SUMMON_CONSTRUCTOR_LITERAL_A);
         
         cLiteralVarElements = new ArrayList<>();
         finderADD(cLiteralVarElements, cLiteralElements);
@@ -125,28 +129,28 @@ public class Controller {
         cVarElements = new ArrayList<>();
         
         cOperatorsElements = new ArrayList<>();
-        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_OPEN);
-        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_CLOSE);
-        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_ARITH_ADD);
-        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_ARITH_SUB);
-        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_ARITH_TIM);
-        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_ARITH_TAK);
-        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_CONCAT);
-        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_LOGIC_AND);
-        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_LOGIC_OR);
-        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_LOGIC_XOR);
-        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_LOGIC_NAND);
-        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_LOGIC_NOR);
-        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_LOGIC_XNOR);
-        finderADD(cOperatorsElements, 1f, Global.SUMMON_CONSTRUCTOR_LOGIC_NOT);
+        finderADD(cOperatorsElements, 1f, SUMMON_CONSTRUCTOR_OPEN);
+        finderADD(cOperatorsElements, 1f, SUMMON_CONSTRUCTOR_CLOSE);
+        finderADD(cOperatorsElements, 1f, SUMMON_CONSTRUCTOR_ARITH_ADD);
+        finderADD(cOperatorsElements, 1f, SUMMON_CONSTRUCTOR_ARITH_SUB);
+        finderADD(cOperatorsElements, 1f, SUMMON_CONSTRUCTOR_ARITH_TIM);
+        finderADD(cOperatorsElements, 1f, SUMMON_CONSTRUCTOR_ARITH_TAK);
+        finderADD(cOperatorsElements, 1f, SUMMON_CONSTRUCTOR_CONCAT);
+        finderADD(cOperatorsElements, 1f, SUMMON_CONSTRUCTOR_LOGIC_AND);
+        finderADD(cOperatorsElements, 1f, SUMMON_CONSTRUCTOR_LOGIC_OR);
+        finderADD(cOperatorsElements, 1f, SUMMON_CONSTRUCTOR_LOGIC_XOR);
+        finderADD(cOperatorsElements, 1f, SUMMON_CONSTRUCTOR_LOGIC_NAND);
+        finderADD(cOperatorsElements, 1f, SUMMON_CONSTRUCTOR_LOGIC_NOR);
+        finderADD(cOperatorsElements, 1f, SUMMON_CONSTRUCTOR_LOGIC_XNOR);
+        finderADD(cOperatorsElements, 1f, SUMMON_CONSTRUCTOR_LOGIC_NOT);
         
         cOperatorsPlusElements = new ArrayList<>();
-        finderADD(cOperatorsPlusElements, 1f, Global.SUMMON_CONSTRUCTOR_EQUALITY);
+        finderADD(cOperatorsPlusElements, 1f, SUMMON_CONSTRUCTOR_EQUALITY);
         finderADD(cOperatorsPlusElements, cOperatorsElements);
         
         EdgeType = new ArrayList<>();
-        finderADD(EdgeType, 1f, Global.SUMMON_TIP_RISSING);
-        finderADD(EdgeType, 1f, Global.SUMMON_TIP_LOWERING);
+        finderADD(EdgeType, 1f, SUMMON_TIP_RISSING);
+        finderADD(EdgeType, 1f, SUMMON_TIP_LOWERING);
         
         cVarOutsElements = new ArrayList<>();
         cVarInsElements = new ArrayList<>();
@@ -166,13 +170,15 @@ public class Controller {
             finderADD(list, s.getScale(), s.getItem());
     }
     private static void finderADD(ArrayList<Summoner> list, float scale, Variable var){
-        finderADD(list, scale, Global.SUMMON_VAR);
+        finderADD(list, scale, SUMMON_VAR);
         list.get(list.size()-1).setVar(var);
-        if(var.type == Global.TIP_VAR_ARRAY){
-            finderADD(list, scale, Global.SUMMON_VAR_SUBARRAY);
+        if(var.type == TIP_VAR_ARRAY){
+            finderADD(list, scale, SUMMON_VAR_SUBARRAY);
             list.get(list.size()-1).setVar(var);
-        }else if(var.type == Global.TIP_VAR_BIT){
-            finderADD(list, scale, Global.SUMMON_VAR_CLOCK);
+        }else if(var.type == TIP_VAR_BIT && (var.name.equals("CK") ||
+                                                    var.name.equals("CLK") ||
+                                                    var.name.equals("CLOCK"))){
+            finderADD(list, scale, SUMMON_VAR_CLOCK);
             list.get(list.size()-1).setVar(var);
         }
     }
@@ -185,6 +191,18 @@ public class Controller {
         Mouse.read();
         
         
+        
+        //Limpiar el tablero
+        if(currentRoom == ROOM_DESIGN){
+            if(Keyboard.getDown(GLFW_KEY_DELETE)){
+                deleteAll++;
+                if(deleteAll == 60){
+                    elements.clear();
+                    elements.add(new DesignGUI());
+                }
+            }else if(deleteAll > 0)
+                deleteAll = 0;
+        }
         
         //Click en summoners
         if(Mouse.getX() < finderPos && Mouse.getY() > 70 )
@@ -200,11 +218,15 @@ public class Controller {
             }
         
         //Scrool de elementos summoneables
-        float scroll = Mouse.getScroll()*Global.MOUSE_SCROLL_SEPED;
-        if(!selectedFinder.isEmpty() && Math.abs(scroll) > 0.000001 && selectedFinder.get(0).getY() + scroll < Global.LAYOUT_TOP+30 &&
-            selectedFinder.get(selectedFinder.size()-1).getY() + scroll > Global.WINDOW_HEIGHT-200)
+        float scroll = Mouse.getScroll()*MOUSE_SCROLL_SEPED;
+        if(!selectedFinder.isEmpty() && Math.abs(scroll) > 0.000001 && selectedFinder.get(0).getY() + scroll < LAYOUT_TOP+30 &&
+            selectedFinder.get(selectedFinder.size()-1).getY() + scroll > WINDOW_HEIGHT-200)
             for(Summoner s: selectedFinder)
                 s.move(0, (int) scroll);
+        if(currentRoom == ROOM_OPEN)
+            elements.get(0).updateEvent(EVENT_SCROLL, (int) scroll, 0, "");
+        if(currentRoom == ROOM_SETTINGS && Mouse.getLeftRelease())
+            elements.get(0).action(107);
         
         //Seleccionar elementos
         //for (int i = 0; i < elements.size(); i++) {
@@ -228,19 +250,19 @@ public class Controller {
         }
         
         //Rutina de dibujado
-        elements.get(0).action(Global.EVENT_DRAW_BACKGROUND);
+        elements.get(0).action(EVENT_DRAW_BACKGROUND);
         for(int dl = 6; dl >= 0; dl--)
-            if(!Global.DEBUG_MODE || layerOnly == -1 || layerOnly == dl)
+            if(!DEBUG_MODE || layerOnly == -1 || layerOnly == dl)
             for(int i = 0; i < elements.size(); i++){
                 if(dl == 2){
-                    if(slidingFinder != -1){
-                        elements.get(0).action(Global.EVENT_DRAW_FLOD);
+                    if(slidingFinder != -1){    //Esto falla cuando el proyecto es nuevo TODO: harreglarlo
+                        elements.get(0).action(EVENT_DRAW_FLOD);
                         selectedFinder.forEach((summoner) -> {
                             summoner.draw();
                         });
                     }
                 }
-                if(elements.get(i).getDepth() == dl && elements.get(i).getDrawable() && inScreen(elements.get(i)))
+                if(elements.get(i).getDepth() == dl && elements.get(i).getDrawable())// && inScreen(elements.get(i))
                     elements.get(i).draw();
             }
         
@@ -267,7 +289,7 @@ public class Controller {
                     move = slidingPos[slidingCurrent];
                     slidingCurrent++;
                 }
-                elements.get(0).updateEvent(Global.EVENT_FINDER_MOVE,move-finderPos,0,"");
+                elements.get(0).updateEvent(EVENT_FINDER_MOVE,move-finderPos,0,"");
                 for(Summoner s:selectedFinder)
                     s.move(move-finderPos, 0);
                 finderPos = move;
@@ -277,10 +299,10 @@ public class Controller {
         
         //Debug toggle
         if(Keyboard.getClick(GLFW_KEY_P))
-            Global.DEBUG_MODE = true;
+            DEBUG_MODE = true;
         else if(Keyboard.getClick(GLFW_KEY_O))
-            Global.DEBUG_MODE = false;
-        if(Global.DEBUG_MODE){
+            DEBUG_MODE = false;
+        if(DEBUG_MODE){
             if(Keyboard.getClick(GLFW_KEY_1 )) layerOnly = 0;
             if(Keyboard.getClick(GLFW_KEY_2 )) layerOnly = 1;
             if(Keyboard.getClick(GLFW_KEY_3 )) layerOnly = 2;
@@ -302,37 +324,70 @@ public class Controller {
         }
         
         //Arrastrar todo el tablero
-        if(Mouse.getRightDown()){
-            for(Element e:elements)
-                if(e.getDepth() != 1 && e.getDragable() && !e.connectedWith(Global.PORT_FEMALE))
-                    e.move(Mouse.getMoveX(), Mouse.getMoveY());
+        if(Mouse.getRightDown())
+            dragBoard(Mouse.getMoveX(), Mouse.getMoveY());
+        
+        
+        //Cosas de la simulacion
+        if(currentRoom == ROOM_SIMULATE){
+            SimulateGUI s = (SimulateGUI) elements.get(0);
+            int todo = s.hasTodo();
+            if(todo != 0)
+                simulationChange();
+        }
+        
+        //Actuar respecto al error
+        if(errorI != -1){
+            if(currentRoom != ROOM_DESIGN)
+                errorTerminate();
+            else{
+                if(errorState == 40){
+                    errorState = 0;
+                    elements.get(errorI).effectGlow();
+                }else if(errorState == 20)
+                    elements.get(errorI).effectGlow();
+
+                errorState++;
+            }
+        }
+        
+        //Periodo de espera
+        if(loadingWait > 0){
+            WaitCourtain.drawFrame();
+            if(loadingWait == 5)
+                ElementsHolesCorrectTipPos();
+            loadingWait--;
         }
     }
     private static boolean selectRoutine(int i){
-        boolean doneSomething = false;
+        boolean colide = false;
         
         Element element = elements.get(i);
-        if(Mouse.getLeftClick()){
-            if((focus == -1 || !focus_volatile) && element.getDragable() && element.colide(Mouse.getX(), Mouse.getY())){
+        if(Mouse.getLeftClick() && (Mouse.getY() > 70 || i == 0)){//Esto es un apano muy malo
+            colide = element.colide(Mouse.getX(), Mouse.getY());
+            if((focus == -1 || !focus_volatile) && element.getDragable() && colide){
                 if(focus != -1)
                     elements.get(focus).focus_end();
                 focus = i;
                 focus_volatile = elements.get(focus).focus_init();
-                
-                doneSomething = true;
             }else if(focus == i && !focus_volatile){
                 elements.get(focus).focus_end();
                 resumeFocus();
             }
         }
         //System.out.println("SELECTED: "+focus+" VOlATILE: "+focus_volatile);
-        return doneSomething;
+        return colide;
+    }
+    private static void dragBoard(int moveX, int moveY) {
+        for(Element e:elements)
+            if(e.getDepth() != 1 && e.getDragable() && !e.connectedWith(PORT_FEMALE))
+                e.move(moveX, moveY);
+                
     }
     
-    
     private static boolean inScreen(Element object){
-        return !(object.getX() < -Global.DRAWING_RADIUS_LIMIT || object.getX() > Global.WINDOW_WIDTH+Global.DRAWING_RADIUS_LIMIT ||
-                object.getY() < -Global.DRAWING_RADIUS_LIMIT || object.getY() > Global.WINDOW_HEIGHT+Global.DRAWING_RADIUS_LIMIT);
+        return !(object.getX() < -DRAWING_RADIUS_LIMIT || object.getX() > WINDOW_WIDTH+DRAWING_RADIUS_LIMIT ||
+                object.getY() < -DRAWING_RADIUS_LIMIT || object.getY() > WINDOW_HEIGHT+DRAWING_RADIUS_LIMIT);
     }
     private static void unLink(int n){
         Element e = null;
@@ -356,11 +411,8 @@ public class Controller {
         }
         movingCounter = 0;
     }
-    private static float functionQR(float x){
-        return Global.FUNCTION_QR_A + (Global.FUNCTION_QR_B*x) + (Global.FUNCTION_QR_C*x*x);
-    }
     private static float functionSM(float x){
-        return Global.FUNCTION_SM_A + (Global.FUNCTION_SM_B*x) + (Global.FUNCTION_SM_C*x*x);
+        return FUNCTION_SM_A + (FUNCTION_SM_B*x) + (FUNCTION_SM_C*x*x);
     }
     
     
@@ -390,7 +442,7 @@ public class Controller {
                     for(Element e:elements){
                         Port[] Ports2 = e.getPorts();
                         for(Port p2: Ports2){
-                            docking(elements.get(focus), e, p1, p2, Global.QUICK_MOVE);
+                            docking(elements.get(focus), e, p1, p2, QUICK_MOVE);
                         }
                     }
                 }
@@ -405,7 +457,7 @@ public class Controller {
         p1.dock(e2, p2);
         p2.dock(e1, p1);
         
-        if(p1.getGender() == Global.PORT_MALE)
+        if(p1.getGender() == PORT_MALE)
             dockingAlign(e1,p1, auto);
         else
             dockingAlign(e2,p2, auto);
@@ -436,25 +488,25 @@ public class Controller {
     public static void setFinder(int type){
         
         //System.out.println(Thread.currentThread().getStackTrace()[2].getMethodName());
-        if((currentRoom != Global.ROOM_DESIGN && currentRoom != Global.ROOM_IMPLEMENT) || type == -1){
+        if((currentRoom != ROOM_DESIGN && currentRoom != ROOM_IMPLEMENT) || type == -1){
             selectedFinder = new ArrayList<>();
         }
-        if(elements.size() > 1 && currentRoom == Global.ROOM_DESIGN)
+        if(elements.size() > 1 && currentRoom == ROOM_DESIGN)
             loadVars();
         finder = type;
         
         switch(finder){
             case 1:                                     selectedFinder = BasicElements; break;
-            case Global.HOLE_VAR_INOUT:                 selectedFinder = InOutElements; break;
-            case Global.HOLE_VAR_TYPE:                  selectedFinder = VarTypeElements; break;
-            //case Global.CONSTRUCTOR_LITERAL_CONST:      selectedFinder = cLiteralElements; break;
-            case Global.CONSTRUCTOR_LITERAL_VARS:       selectedFinder = cLiteralVarElements; break;
-            case Global.CONSTRUCTOR_OPERATORS:          selectedFinder = cOperatorsElements; break;
-            case Global.CONSTRUCTOR_OPERATORS_PLUS:     selectedFinder = cOperatorsPlusElements; break;
-            case Global.HOLE_EDGE:                      selectedFinder = EdgeType; break;
-            case Global.HOLE_VAR:                       selectedFinder = cVarElements; break;
-            case Global.HOLE_VAR_IN:                    selectedFinder = cVarInsElements; break;
-            case Global.HOLE_VAR_OUT:                   selectedFinder = cVarOutsElements; break;
+            case HOLE_VAR_INOUT:                 selectedFinder = InOutElements; break;
+            case HOLE_VAR_TYPE:                  selectedFinder = VarTypeElements; break;
+            //case CONSTRUCTOR_LITERAL_CONST:      selectedFinder = cLiteralElements; break;
+            case CONSTRUCTOR_LITERAL_VARS:       selectedFinder = cLiteralVarElements; break;
+            case CONSTRUCTOR_OPERATORS:          selectedFinder = cOperatorsElements; break;
+            case CONSTRUCTOR_OPERATORS_PLUS:     selectedFinder = cOperatorsPlusElements; break;
+            case HOLE_EDGE:                      selectedFinder = EdgeType; break;
+            case HOLE_VAR:                       selectedFinder = cVarElements; break;
+            case HOLE_VAR_IN:                    selectedFinder = cVarInsElements; break;
+            case HOLE_VAR_OUT:                   selectedFinder = cVarOutsElements; break;
         }
         
         for(Summoner s: selectedFinder)
@@ -504,33 +556,43 @@ public class Controller {
     
     public static void changeRoom(int room){
         BUCKLE.save();
+        
+        elements.clear();//Limpiarlo todo
+        slidingFinder = -1;
+        finderPos = 0;
+        setFinder(-1);
+        
         switch(room){
-            case Global.ROOM_MENU: break;
-            case Global.ROOM_CREATE: break;
-            case Global.ROOM_OPEN: break;
-            case Global.ROOM_SETTINGS: break;
-            case Global.ROOM_DESIGN:
-                elements.clear();
+            case ROOM_MENU:
+                elements.add(new MenuGUI());
+            break;
+            case ROOM_CREATE:
+                elements.add(new CreateGUI());
+            break;
+            case ROOM_OPEN:
+                elements.add(new OpenGUI());
+            break;
+            case ROOM_SETTINGS:
+                elements.add(new SettingsGUI());
+            break;
+            case ROOM_DESIGN:
                 elements.add(new DesignGUI());
                 slidingFinder = 0;
                 finderPos = 400;
                 setFinder(1);
+                loadingWait = 45;
             break;
-            case Global.ROOM_IMPLEMENT:
-                elements.clear();
+            case ROOM_IMPLEMENT:
                 elements.add(new ImplementGUI());
                 slidingFinder = 0;
                 finderPos = 400;
-                setFinder(Global.HOLE_VAR);
+                setFinder(HOLE_VAR);
                 implementImplementElements();
             break;
-            case Global.ROOM_SIMULATE:
-                elements.clear();
+            case ROOM_SIMULATE:
                 slidingFinder = -1;
                 elements.add(new SimulateGUI());
-                elements.get(elements.size()-1).action(Global.EVENT_CREATE_SPARTAN);
-                finderPos = 0;
-                setFinder(-1);
+                elements.get(elements.size()-1).action(EVENT_CREATE_SPARTAN);
             break;
         }
         currentRoom = room;
@@ -544,7 +606,8 @@ public class Controller {
             slidingFinder = 2;
             slidingCurrent = 0;
         }
-        elements.get(0).action(Global.EVENT_TOOGLE_TOGGLE);
+        if(!elements.isEmpty())
+            elements.get(0).action(EVENT_TOOGLE_TOGGLE);
     }
     
     public static void putOnTop(long id){
@@ -560,14 +623,14 @@ public class Controller {
 
     private static void implementImplementElements(){
         for(int i = 0; i < 8; i++)
-            elements.add(new Implementer(500, 95+(125*i), Global.IMPLEMENTER_LED, i+1));
+            elements.add(new Implementer(500, 95+(125*i), IMPLEMENTER_LED, i+1));
         for(int i = 0; i < 4; i++)
-            elements.add(new Implementer(965, 95+(125*i), Global.IMPLEMENTER_SWITCH, i+1));
+            elements.add(new Implementer(965, 95+(125*i), IMPLEMENTER_SWITCH, i+1));
         for(int i = 0; i < 4; i++)
-            elements.add(new Implementer(965, 95+(125*(i+4)), Global.IMPLEMENTER_BUTTON, i+1));
+            elements.add(new Implementer(965, 95+(125*(i+4)), IMPLEMENTER_BUTTON, i+1));
         for(int i = 0; i < 2; i++)
-            elements.add(new Implementer(1430, 95+(125*i), Global.IMPLEMENTER_BCD, i+1));
-        elements.add(new Implementer(1430, 95+(125*3), Global.IMPLEMENTER_CLOCK, 1));
+            elements.add(new Implementer(1430, 95+(125*i), IMPLEMENTER_BCD, i+1));
+        elements.add(new Implementer(1430, 95+(125*3), IMPLEMENTER_CLOCK, 1));
         
     }
     
@@ -586,11 +649,11 @@ public class Controller {
                         vars.addAll(tmp);
                         finderADD(cVarElements, 1f, tmp);
                         finderADD(cLiteralVarElements, 1f, tmp);
-                        finderADD(cLiteralElements, 1f, tmp);
+                        //finderADD(cLiteralElements, 1f, tmp);
                         for(Variable v:tmp)
-                            if(v.inout == Global.TIP_VAR_OUT)
+                            if(v.inout == TIP_VAR_OUT)
                                 finderADD(cVarOutsElements, 1f, v);
-                            else if(v.inout == Global.TIP_VAR_IN)
+                            else if(v.inout == TIP_VAR_IN)
                                 finderADD(cVarInsElements, 1f, v);
                     }
                 }
@@ -678,5 +741,40 @@ public class Controller {
                 }
             }
         }
+    }
+
+    public static void setError(int errorCode, int id){
+        //Ir a Design
+        if(currentRoom != ROOM_DESIGN)
+            changeRoom(ROOM_DESIGN);
+        
+        //Buscar que no exista ya un notifier
+        for(int i = 0; i < elements.size(); i++){
+            if(elements.get(i).getClass() == Notifier.class){
+                elements.remove(i);
+                break;
+            }
+        }
+        
+        //Crearlo
+        addToBoard(new Notifier(errorCode));
+        
+        //Mover el tablero para centrar el error
+        Element e = getElementByID(id);
+        if(e != null)
+            dragBoard(450-e.getX(), 250-e.getY());
+        errorI = elements.indexOf(e);
+        errorState = 0;
+        
+    }
+    public static void errorTerminate(){
+        if(errorI < elements.size()) elements.get(errorI).effectClear();
+        errorI = -1;
+        errorState = 0;
+    }
+    
+    public static void ElementsHolesCorrectTipPos(){
+        for(Element e:elements)
+                e.HolesCorrectTipPos();
     }
 }

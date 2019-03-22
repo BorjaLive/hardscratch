@@ -26,6 +26,21 @@ EndFunc
 
 Func ___readFile($file)
 	return StringReplace(StringReplace(FileRead($file),@CR,""),@LF,"")
+	#cs
+	$i = 1;Corregir posibles errores en el archivo
+	While $i < StringLen($text)
+		$c1 = stringMid($text,$i,1)
+		$c2 = stringMid($text,$i+1,1)
+		If $c1 = "]" And $c2 <> "|" Then
+			$text = StringMid($text,1,$i) &"|"& StringMid($text,$i+1)
+			$i+=2
+		Else
+			$i+=1
+		EndIf
+	WEnd
+	;ConsoleWrite($text)
+	return $text
+	#ce
 EndFunc
 Func ___divide($text)
 	If StringInStr($text,"|") = 0 Then Return $text
