@@ -18,3 +18,5 @@ Una vez descargado y descomprimido, ejecuta el archivo HardScratch.exe. La prime
 La inuitiva interfaz de usuario te guiará por desde el proceso de diseño hasta la elaboración final de código ejecutable.
 
 [Manual en español]: https://github.com/BorjaLive/hardscratch/blob/master/Manual.pdf
+
+[Blog del proyecto]: https://hardscratchb0ve.blogspot.com/
