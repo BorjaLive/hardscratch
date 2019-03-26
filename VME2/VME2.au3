@@ -7,7 +7,7 @@
 Const $ERROR[] = ["BOKEY", "CANNOT_INICIALIZE_INOUT", "CONST_MUST_BE_INICIALIZED", "OUT_VAR_CANNOT_BE_READEN", "CONST_VAR_CANNOT_BE_ASIGNED", _
 "CONVERSION_NOT_ALLOWED", "IN_VAR_CANNOT_BE_ASIGNED", "SETIF_IS_USELESS", "SETSWITCH_IS_USELESS", "ELSE_VALUE_NEEDED", "SWITCH_NEEDS_DEFAULT_CASE", _
 "VARIABLE_DOES_NOT_EXIST", "ILEGAL_USE_OF_OPERATOR_ADD", "ILEGAL_USE_OF_OPERATOR_SUB", "ILEGAL_USE_OF_OPERATOR_TIM", "ILEGAL_USE_OF_OPERATOR_TAK", _
-"ILEGAL_USE_OF_OPERATOR_CONCATENATE", "BAD_INICIALIZATION", "CANT_CHANGE_LENGTH_OF_BITARRAY"]
+"ILEGAL_USE_OF_OPERATOR_CONCATENATE", "BAD_INICIALIZATION", "CANT_CHANGE_LENGTH_OF_BITARRAY","PROYECT_IS_EMPTY"]
 Const 	$ERROR_BOKEY = 0, _
 		$ERROR_CANNOT_INICIALIZE_INOUT = 1, _
 		$ERROR_CONST_MUST_BE_INICIALIZED = 2, _
@@ -26,7 +26,8 @@ Const 	$ERROR_BOKEY = 0, _
 		$ERROR_ILEGAL_USE_OF_OPERATOR_TAK = 15, _
 		$ERROR_ILEGAL_USE_OF_OPERATOR_CONCATENATE = 16, _
 		$ERROR_BAD_INICIALIZATION = 17, _
-		$ERROR_CANT_CHANGE_LENGTH_OF_BITARRAY = 18
+		$ERROR_CANT_CHANGE_LENGTH_OF_BITARRAY = 18, _
+		$ERROR_PROYECT_IS_EMPTY = 19
 
 Global $PROCESS_USED_VARS = Null, $CONSTRUCTOR_USED_VARS= Null, $VARIABLES = Null, $IDLINES = Null, $TMP_IDLINES = Null
 Global $SIMULATION_MODE = Null, $SIM_PROCESS_COUNTER = Null
@@ -39,6 +40,7 @@ Func compile($file, $output, $simulation = False)	;Simylation True: Crear salida
 
 	$raw = __BUMLAY_load($file)
 	;_ArrayDisplay($raw)
+	If Not IsArray($raw) or $raw[0] = 0 Then __Error($ERROR_PROYECT_IS_EMPTY, -1)
 
 	$VARIABLES = loadVars($raw)
 	$IDLINES = __getArray()
@@ -360,7 +362,7 @@ Func _decodeConstructor($data, $id)
 	$text = ""
 	$CONSTRUCTOR_USED_VARS = __getArray()
 
-	$parts = StringSplit($data,"-")
+	$parts = StringSplit($data,"@")
 	For $i = 1 To $parts[0]
 		$part = $parts[$i]
 		If StringMid($part,1,1) = "L" And StringMid($part,3,1) = ":" Then
@@ -511,7 +513,6 @@ Func _logicConstructor($logic)
 		If $logic[0] < 3 Then Return $lines
 
 		For $i = 3 To $logic[0]
-ConsoleWrite("SIMMODE: "&$SIMULATION_MODE&@CRLF)
 			$constructed = _logicConstructor($logic[$i])
 			if(Not IsArray($constructed) Or $constructed[0] = 0) Then ContinueLoop
 			__add($instructions, $constructed, True)

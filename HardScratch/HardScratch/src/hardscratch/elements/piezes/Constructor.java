@@ -250,7 +250,7 @@ public class Constructor extends ElementBase{
         //TODO: Hacerlo
         
         Hole h;
-        String[] list = text.replace("\n", "").replace("\r", "").split(Pattern.quote("-"));
+        String[] list = text.replace("\n", "").replace("\r", "").split(Pattern.quote("@"));
         Variable var;
         for(String data:list){
             h = holes.get(holes.size()-1);
@@ -341,10 +341,20 @@ public class Constructor extends ElementBase{
         
         for(Hole h:holes){
             if(h.isAsigned()){
+                String text;
                 switch(h.getTipType()){
-                    case Global.TIP_CONSTRUCTOR_LITERAL_N: data.add("LN:"+h.getTip().getBox(0).getText());break;
-                    case Global.TIP_CONSTRUCTOR_LITERAL_B: data.add("LB:"+h.getTip().getBox(0).getText());break;
-                    case Global.TIP_CONSTRUCTOR_LITERAL_A: data.add("LA:"+h.getTip().getBox(0).getText());break;
+                    case Global.TIP_CONSTRUCTOR_LITERAL_N:
+                        text = h.getTip().getBox(0).getText();
+                        data.add("LN:"+(text.isEmpty()?"-1":text));
+                        break;
+                    case Global.TIP_CONSTRUCTOR_LITERAL_B:
+                        text = h.getTip().getBox(0).getText();
+                        data.add("LB:"+(text.isEmpty()?"-1":text));
+                        break;
+                    case Global.TIP_CONSTRUCTOR_LITERAL_A:
+                        text = h.getTip().getBox(0).getText();
+                        data.add("LA:"+(text.isEmpty()?"-1":text));
+                        break;
                     case Global.TIP_CONSTRUCTOR_EQUALITY: data.add("=");break;
                     case Global.TIP_CONSTRUCTOR_CONCAT: data.add("&");break;
                     case Global.TIP_CONSTRUCTOR_CLOSE: data.add(")");break;
@@ -362,9 +372,9 @@ public class Constructor extends ElementBase{
                     case Global.TIP_CONSTRUCTOR_LOGIC_NOT: data.add("NOT");break;
                     case Global.TIP_VAR: data.add(h.getTip().getVar().name);break;
                     case Global.TIP_VAR_SUBARRAY:
-                        String sub = h.getTip().getBox(0).getText();
-                        if(sub.isEmpty()) sub = "100";
-                        data.add("SA:"+sub+":"+h.getTip().getVar().name);
+                        text = h.getTip().getBox(0).getText();
+                        if(text.isEmpty()) text = "100";
+                        data.add("SA:"+text+":"+h.getTip().getVar().name);
                     break;
                     case Global.TIP_VAR_CLOCK:
                         data.add("CK:"+h.getTip().getVar().name);
@@ -374,7 +384,7 @@ public class Constructor extends ElementBase{
         }
         
         if(data.isEmpty()) return "-1";
-        return Global.concatenate(data, "-");
+        return Global.concatenate(data, "@");
     }
     
     public void tipCorrectPos(){

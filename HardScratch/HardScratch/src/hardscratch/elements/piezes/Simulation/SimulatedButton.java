@@ -1,7 +1,7 @@
 package hardscratch.elements.piezes.Simulation;
 
 import hardscratch.Controller;
-import hardscratch.Global;
+import static hardscratch.Global.*;
 import hardscratch.base.shapes.Shape_BorderedBox;
 
 
@@ -12,24 +12,28 @@ public class SimulatedButton extends Simulated{
     
     public SimulatedButton(int x, int y, int unit, String name) {
         super(x, y, unit, name);
-        state = Global.SIM_BUTTON_OFF;
+        state = SIM_BUTTON_OFF;
+        setMute(true);
         
-        shape = new Shape_BorderedBox(0, 0, Global.COLOR_CIRCUIT_DKGRAY, Global.COLOR_CIRCUIT_DKBROWN, 1, 3, unit, unit, 8);
+        shape = new Shape_BorderedBox(0, 0, COLOR_CIRCUIT_DKGRAY, COLOR_CIRCUIT_DKBROWN, 1, 3, unit, unit, 8);
         addShape(shape, 0, 0);
         addBoundingBox(0, unit,  0, unit, -1);
     }
 
     @Override
     protected void select_init(long ID) {
-        shape.changeBackColor(Global.COLOR_CIRCUIT_BROWN);
-        state = Global.SIM_BUTTON_ON;
+        shape.changeBackColor(COLOR_CIRCUIT_BROWN);
+        state = SIM_BUTTON_ON;
+        SOUND_BUTTON_UP.play();
+                    
         action(1);
     }
 
     @Override
     protected void select_end() {
-        shape.changeBackColor(Global.COLOR_CIRCUIT_DKGRAY);
-        state = Global.SIM_BUTTON_OFF;
+        shape.changeBackColor(COLOR_CIRCUIT_DKGRAY);
+        state = SIM_BUTTON_OFF;
+        SOUND_BUTTON_DOWN.play();
         action(1);
     }
 
@@ -40,7 +44,7 @@ public class SimulatedButton extends Simulated{
 
     @Override
     public String getValue() {
-        return state == Global.SIM_BUTTON_ON?"ON":"OFF";
+        return state == SIM_BUTTON_ON?"ON":"OFF";
     }
 
     @Override

@@ -1,7 +1,7 @@
 package hardscratch.elements.piezes.GUIs;
 
 import hardscratch.Controller;
-import hardscratch.Global;
+import static hardscratch.Global.*;
 import hardscratch.backend.BUCKLE;
 import hardscratch.base.Element;
 import hardscratch.base.shapes.Shape_Square;
@@ -14,10 +14,10 @@ public class ImplementGUI extends Element{
         super(0, 0, -1, true, true, false);
         depth = 1;
         
-        Global.addGUIframe(this);
-        bar = new Shape_Square(400, 70, Global.COLOR_GUI_2, 1, 4, 20, Global.WINDOW_HEIGHT-70);
-        backColor = new Shape_Square(0, 0, Global.COLOR_GUI_1, 1, 5, Global.WINDOW_WIDTH, Global.WINDOW_WIDTH);
-        backColorFinder = new Shape_Square(0, 0, Global.COLOR_GUI_6, 1, 5, 400, Global.WINDOW_WIDTH);
+        addGUIframe(this);
+        bar = new Shape_Square(400, 70, COLOR_GUI_2, 1, 4, 20, WINDOW_HEIGHT-70);
+        backColor = new Shape_Square(0, 0, COLOR_GUI_1, 1, 5, WINDOW_WIDTH, WINDOW_WIDTH);
+        backColorFinder = new Shape_Square(0, 0, COLOR_GUI_6, 1, 5, 400, WINDOW_WIDTH);
     }
 
     @Override
@@ -61,27 +61,28 @@ public class ImplementGUI extends Element{
     @Override
     public void action(int action) {
         switch(action){
-            case Global.EVENT_DRAW_BACKGROUND:
+            case EVENT_DRAW_BACKGROUND:
                 backColor.draw();
             break;
-            case Global.EVENT_DRAW_FLOD:
+            case EVENT_DRAW_FLOD:
                 backColorFinder.draw();
                 bar.draw();
             break;
-            case Global.EVENT_GO_HOMO:
+            case EVENT_GO_HOMO:
+                Controller.changeRoom(ROOM_MENU);
             break;
-            case Global.EVENT_SAVE:
+            case EVENT_SAVE:
                 BUCKLE.save();
             break;
-            case Global.EVENT_GO_DESIGN:
-                Controller.changeRoom(Global.ROOM_DESIGN);
+            case EVENT_GO_DESIGN:
+                Controller.changeRoom(ROOM_DESIGN);
             break;
-            case Global.EVENT_GO_IMPLEMENT:
+            case EVENT_GO_IMPLEMENT:
             break;
-            case Global.EVENT_GO_SIMULATE:
-                Controller.changeRoom(Global.ROOM_SIMULATE);
+            case EVENT_GO_SIMULATE:
+                Controller.changeRoom(ROOM_SIMULATE);
             break;
-            case Global.EVENT_FINDER_TOGGLE:
+            case EVENT_FINDER_TOGGLE:
                 //No toggle para este finder
             break;
         }

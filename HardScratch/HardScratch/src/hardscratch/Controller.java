@@ -25,7 +25,9 @@ public class Controller {
     private static int deleteAll;
     
     private static int errorI, errorState;
-    private static int loadingWait;
+    private static String openOnNext;
+    private static int openOnNextCounter;
+    private static int buckleStage, buckleLine, buckleMax;
     
     private static int finder;
     private static ArrayList<Summoner>
@@ -49,6 +51,7 @@ public class Controller {
     private static int movingCounter;
     private static int slidingFinder, finderPos, slidingCurrent;
     private static int[] slidingPos;
+    private static boolean easterTrue;
     
     private static int layerOnly = -1;
     
@@ -69,6 +72,12 @@ public class Controller {
         //Movement
         movingElement = null;
         
+        
+        //Bucle load
+        buckleStage = -1;
+        buckleLine = -1;
+        easterTrue = false;
+        
         //Calcular posiciones del finder
         slidingPos = new int[30];
         for(int i = 0; i < 30; i++)
@@ -78,7 +87,6 @@ public class Controller {
         //Create summonersPack
         finderInit();
         errorTerminate(); //Por inicializar las cosas un poco
-        loadingWait = 0;
         
         changeRoom(ROOM_MENU);
         
@@ -203,6 +211,59 @@ public class Controller {
             }else if(deleteAll > 0)
                 deleteAll = 0;
         }
+        //Rutina open Next
+        if(openOnNext != null){
+            WaitCourtain.drawFrame();
+            if(openOnNextCounter == 5){
+                openProyect(openOnNext);
+                changeRoom(ROOM_DESIGN);
+                openOnNext = null;
+                openOnNextCounter = 0;
+            }else
+                openOnNextCounter++;
+        }
+        
+        //Rutina de BUCKLE load
+        if(buckleStage != 0){
+            //System.out.println("LOADING "+buckleStage+"  "+buckleLine);
+            
+            try {
+                BUCKLE.partLoadDesign(buckleStage, buckleLine);
+            } catch (Exception e) {
+                System.err.println("BUCKLE ERROR IN STAGE "+buckleStage+"  "+buckleLine);
+                e.printStackTrace();
+                
+                buckleStage = 0;
+                elements.clear();
+                elements.add(new DesignGUI());
+                setError(ERROR_PROBLEM_LOADING_PROYECT, -1);
+                return;
+            }
+            
+            
+            if(buckleStage == 3 || buckleStage == 5){
+                buckleStage++;
+            }else{
+                buckleLine++;
+                if(buckleLine == buckleMax){
+                    buckleLine = 0;
+                    buckleStage++;
+                }
+            }
+            if(buckleStage == 6){
+                buckleStage = 0;
+                ElementsHolesCorrectTipPos();
+                //System.out.println("BUCLE FINISH");
+            }
+            
+            WaitCourtain.drawFrame();
+            return;
+        }
+        
+        //EASTER
+        if(currentRoom == ROOM_MENU && Keyboard.getClick(GLFW_KEY_F2))
+            changeRoom(ROOM_EASTER);
+        if(easterTrue) elements.get(0).action(EVENT_TURN_ON);
         
         //Click en summoners
         if(Mouse.getX() < finderPos && Mouse.getY() > 70 )
@@ -214,6 +275,7 @@ public class Controller {
                     focus = elements.size()-1;
                     focus_volatile = true;
                     elements.get(focus).focus_force_drag();
+                    SOUND_SWITCH_UP.play();
                 }
             }
         
@@ -235,7 +297,7 @@ public class Controller {
                 selectRoutine(i);
                 
         //Rutina de seleccionados
-        if(focus != -1){
+        if(focus != -1 && elements.size() > focus){
             if(Mouse.getLeftDown()){
                 if(!elements.get(focus).loop(Mouse.getMoveX(), Mouse.getMoveY())){
                     elements.get(focus).focus_end();
@@ -349,14 +411,6 @@ public class Controller {
 
                 errorState++;
             }
-        }
-        
-        //Periodo de espera
-        if(loadingWait > 0){
-            WaitCourtain.drawFrame();
-            if(loadingWait == 5)
-                ElementsHolesCorrectTipPos();
-            loadingWait--;
         }
     }
     private static boolean selectRoutine(int i){
@@ -555,6 +609,8 @@ public class Controller {
     }
     
     public static void changeRoom(int room){
+        SOUND_KEY_PRESS.play();
+        
         BUCKLE.save();
         
         elements.clear();//Limpiarlo todo
@@ -580,7 +636,6 @@ public class Controller {
                 slidingFinder = 0;
                 finderPos = 400;
                 setFinder(1);
-                loadingWait = 45;
             break;
             case ROOM_IMPLEMENT:
                 elements.add(new ImplementGUI());
@@ -594,6 +649,8 @@ public class Controller {
                 elements.add(new SimulateGUI());
                 elements.get(elements.size()-1).action(EVENT_CREATE_SPARTAN);
             break;
+            case ROOM_EASTER:
+                elements.add(new EasterGUI());
         }
         currentRoom = room;
         BUCKLE.load();
@@ -732,6 +789,8 @@ public class Controller {
         }
     }
     public static void simulationSet(String[][] data){
+        if(currentRoom != ROOM_SIMULATE) return;
+        
         for(String[] dat:data){
             for(int i = 1; i < elements.size(); i++){
                 Simulated s = (Simulated) elements.get(i);
@@ -768,7 +827,7 @@ public class Controller {
         
     }
     public static void errorTerminate(){
-        if(errorI < elements.size()) elements.get(errorI).effectClear();
+        if(errorI >= 0 && errorI < elements.size()) elements.get(errorI).effectClear();
         errorI = -1;
         errorState = 0;
     }
@@ -776,5 +835,20 @@ public class Controller {
     public static void ElementsHolesCorrectTipPos(){
         for(Element e:elements)
                 e.HolesCorrectTipPos();
+    }
+
+    public static void setOpenOnNext(String proyect) {
+        openOnNext = proyect;
+        openOnNextCounter = 0;
+    }
+
+    public static void initBUCKLEload(int length) {
+        buckleMax = length;
+        buckleLine = 0;
+        buckleStage = 1;
+    }
+
+    public static void setEasterCheck(boolean b) {
+        easterTrue = b;
     }
 }

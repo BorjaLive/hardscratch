@@ -8,7 +8,7 @@ public class HardScratch {
 
     public void run(){
         System.out.println("LWJGL " + Version.getVersion());
-        System.out.println("HARDSCRATCH v1.0.3A");
+        System.out.println("HARDSCRATCH v1.0.4B");
         Global.sayLinesOfCode();
 
         Display mainWindow = new Display();

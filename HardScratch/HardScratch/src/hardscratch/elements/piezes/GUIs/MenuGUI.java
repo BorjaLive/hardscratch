@@ -54,6 +54,7 @@ public class MenuGUI extends Element{
             break;
             case EVENT_GO_HELP:
                 if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                    SOUND_KEY_PRESS.play();
                     try {   //Poner la documentacion en esa URL
                         Desktop.getDesktop().browse(new URI("https://github.com/BorjaLive/hardscratch"));
                     } catch (URISyntaxException | IOException ex) {

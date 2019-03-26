@@ -1,7 +1,7 @@
 package hardscratch.elements.piezes.Simulation;
 
 import hardscratch.Controller;
-import hardscratch.Global;
+import static hardscratch.Global.*;
 import hardscratch.base.shapes.Shape_BorderedBox;
 
 public class SimulatedClock extends Simulated{
@@ -11,22 +11,26 @@ public class SimulatedClock extends Simulated{
     
     public SimulatedClock(int x, int y, int unit, String name) {
         super(x, y, unit, name);
-        state = Global.SIM_LED_ON;
+        state = SIM_LED_OFF;
         
-        shape = new Shape_BorderedBox(0, 0, Global.COLOR_CIRCUIT_BROWN, Global.COLOR_CIRCUIT_DKBROWN, 1, 3, (int) (unit*1.5f), (int) unit, 8);
+        shape = new Shape_BorderedBox(0, 0, COLOR_CIRCUIT_BROWN, COLOR_CIRCUIT_BROWN, 1, 3, (int) (unit*1.5f), (int) unit, 8);
         addShape(shape,0, 0);
+        addBoundingBox(0, (int) (unit*1.5f),  0, (int) (unit*1.5f), EVENT_TOGGLE);
     }
 
     @Override
     public void action(int action) {
         switch(action){
-            case Global.EVENT_TURN_ON:
-                state = Global.SIM_LED_ON;
-                shape.changeBackColor(Global.COLOR_CIRCUIT_BROWN);
-            break;
-            case Global.EVENT_TURN_OFF:
-                state = Global.SIM_LED_OFF;
-                shape.changeBackColor(Global.COLOR_CIRCUIT_DKBROWN);
+            case EVENT_TOGGLE:
+                SOUND_KEY_PRESS.play();
+                if(state == SIM_LED_ON){
+                    state = SIM_LED_OFF;
+                    shape.changeBackColor(COLOR_CIRCUIT_BROWN);
+                }else{
+                    state = SIM_LED_ON;
+                    shape.changeBackColor(COLOR_CIRCUIT_DKBROWN);
+                }
+                
             break;
         }
         Controller.simulationChange();
@@ -34,14 +38,11 @@ public class SimulatedClock extends Simulated{
 
     @Override
     public String getValue() {
-        return state == Global.SIM_LED_ON?"ON":"OFF";
+        return state == SIM_LED_ON?"ON":"OFF";
     }
 
     @Override
     public void setValue(String value) {
-        if(value.equals("ON"))
-            action(Global.EVENT_TURN_ON);
-        else
-            action(Global.EVENT_TURN_OFF);
+        action(EVENT_TOGGLE);
     }
 }

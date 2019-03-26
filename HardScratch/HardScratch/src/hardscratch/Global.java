@@ -59,8 +59,7 @@ public class Global {
     
     public static Texture  TEXTURE_ARROW_1, TEXTURE_ARROW_2, TEXTURE_FINDERSLIDER, TEXTURE_HOUSE, TEXTURE_SAVE, TEXTURE_BORELICIOUS, TEXTURE_CLOSE_CROSS, TEXTURE_LOGO, TEXTURE_SETTINGS, TEXTURE_TRASHCAN;
     public static Texture[] TEXTURE_BCD;
-    public static final String SOUND_TEST = RESOURCES+"sound/test.wav";
-    public static final String SOUND_TEST2 = RESOURCES+"sound/pipe.wav";
+    public static Sound SOUND_SWITCH_UP, SOUND_SWITCH_DOWN, SOUND_BUTTON_UP, SOUND_BUTTON_DOWN, SOUND_KEY_PRESS;
     public static Font FONT_MONOFONTO, FONT_LCD;
     
     public static final String TASKBAR_ICON = RESOURCES+"img/icon_light.png";
@@ -134,7 +133,8 @@ public class Global {
             ROOM_MENU = 4,
             ROOM_CREATE = 5,
             ROOM_OPEN = 6,
-            ROOM_SETTINGS = 7
+            ROOM_SETTINGS = 7,
+            ROOM_EASTER = 8
             ;
     public static final int
             HOLE_VAR_INOUT = 2,
@@ -273,7 +273,8 @@ public class Global {
             EVENT_SIMULATION_STEP = 20,
             EVENT_GO_HELP = 21,
             EVENT_SCROLL = 22,
-            EVENT_DELETE = 23
+            EVENT_DELETE = 23,
+            EVENT_TOGGLE = 24
             ;
     public static final int
             IMPLEMENTER_LED = 1,
@@ -311,14 +312,17 @@ public class Global {
             ERROR_ILEGAL_USE_OF_OPERATOR_TAK = 15,
             ERROR_ILEGAL_USE_OF_OPERATOR_CONCATENATE = 16,
             ERROR_BAD_INICIALIZATION = 17,
-            ERROR_CANT_CHANGE_LENGTH_OF_BITARRAY = 18
+            ERROR_CANT_CHANGE_LENGTH_OF_BITARRAY = 18,
+            ERROR_PROYECT_IS_EMPTY = 19,
+            ERROR_PROBLEM_LOADING_PROYECT = 20
             ;
     public static final String[] ERROR_NAME = new String[]{"BOKEY", "Input And Output variables\ncan not be initialized.",
     "Constants must\nbe initialized.","Output var\ncannot be read.","Constants cannot\nbe assigned.","Illegal conversion.",
     "Input vars cannot\nbe assigned.","SetIf structure\nis empty.","SetSwitch structure\nis empty.","Set Switch requires\nelse instruction.",
     "Switch needs\ndefault case.","Variable does\nnot exist.","Illegal use of addition operator.","Illegal use of subtraction operator.",
     "Illegal use of\nproduct operator.","Illegal use of\ndivision operator.","Illegal use of\nconcatenate operator.",
-    "Illegal inicialization.","Length of bit array\ncannot be modified."};
+    "Illegal inicialization.","Length of bit array\ncannot be modified.","Cant compile an\nempty proyect",
+    "Unespected problem\nloading proyect."};
     
     public static float distance(int x1, int y1, int x2, int y2){
         return (float) Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
@@ -433,6 +437,12 @@ public class Global {
             COLOR_NOOK = new float[]                    {253/255f,151/255f, 31/255f};
         }
         
+        SOUND_SWITCH_UP = new Sound(RESOURCES+"sound/switchUp.wav");
+        SOUND_SWITCH_DOWN = new Sound(RESOURCES+"sound/switchDown.wav");
+        SOUND_BUTTON_UP = new Sound(RESOURCES+"sound/ButtonUp.wav");
+        SOUND_BUTTON_DOWN = new Sound(RESOURCES+"sound/ButtonDown.wav");
+        SOUND_KEY_PRESS = new Sound(RESOURCES+"sound/ButtonDown.wav");
+        SOUND_KEY_PRESS = new Sound(RESOURCES+"sound/ButtonDown.wav");
         
         WaitCourtain.load(RESOURCES+"img/loading/", 25, COLOR_GUI_1);
     }

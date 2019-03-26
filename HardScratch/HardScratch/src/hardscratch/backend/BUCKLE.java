@@ -168,6 +168,8 @@ public class BUCKLE {
     
     private static String tmp;
     
+    private static String[] lines, data;
+    
     public static void save(){
         switch(Controller.getRoom()){
             case Global.ROOM_DESIGN: saveDesign();BUMLAY.save();break;
@@ -415,14 +417,18 @@ public class BUCKLE {
             File file = new File(Global.getProyectFolder()+"/board.b0ve");
             if(!file.exists()) return;
             
-            String[] lines = Files.readString(Paths.get(Global.getProyectFolder()+"/board.b0ve")).replace("\n", "").replace("\r", "").split(Pattern.quote("{}"));
-            String[] data;
-                       
-            //Pre pasada: Comprobar que nadie toque mi espagueti
+            lines = Files.readString(Paths.get(Global.getProyectFolder()+"/board.b0ve")).replace("\n", "").replace("\r", "").split(Pattern.quote("{}"));
             
-            //Primera pasada: Crear los objetos y verificar la integridad
-            for (String line : lines) {
-                data = line.split(Pattern.quote("|"));
+            Controller.initBUCKLEload(lines.length);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void partLoadDesign(int stage, int nLine){
+        switch(stage){
+            case 1://Pre pasada: Comprobar que nadie toque mi espagueti
+                   //Primera pasada: Crear los objetos y verificar la integridad
+                data = lines[nLine].split(Pattern.quote("|"));
                 //Ejecutar linea por linea
                 if(data[0].equals("DEC")){  if(data.length != 9){ somebodyTouchedMySpagget(); return;}
                     Controller.addToBoard(new Declarator(Integer.parseInt(data[2]), Integer.parseInt(data[3]),
@@ -466,43 +472,38 @@ public class BUCKLE {
                 }else if(data[0].equals("FORNEXT")){
                     //Work in progress
                 }
-            }
-            
-            
-            //Segunda pasada: Asignar variables y docking de puertos
-            for (String line : lines) {
-                data = line.split(Pattern.quote("|"));
+                break;
+            case 2://Segunda pasada: Asignar variables y docking de puertos
+                data = lines[nLine].split(Pattern.quote("|"));
                 //Ejecutar linea por linea
                 if(data[0].equals("DEC")){
                     Controller.autoDock(data[1], data[7], 0, 0);
                     Controller.autoDock(data[1], data[8], 1, 0);
                 }else if(data[0].equals("INITER")){
                     Controller.autoDock(data[1], data[5], 0, 1);
-                    
+
                 }else if(data[0].equals("EXTRAVAR")){
                     Controller.autoDock(data[1], data[5], 0, 0);
                     Controller.autoDock(data[1], data[6], 1, 0);
                     Controller.autoDock(data[1], data[7], 2, 0);
-                    
+
                 }else if(data[0].equals("SEQ")){
                     Controller.autoDock(data[1], data[4], 0, 0);
-                    
+
                 }else if(data[0].equals("SASIG") || data[0].equals("IFTHEN") || data[0].equals("SWITCH") ||
                          data[0].equals("WFOR") || data[0].equals("WON") || data[0].equals("FORNEXT")){
                     Controller.autoDock(data[1], data[5], 1, 0);
                 }
-                
+
                 if(data[0].equals("IFTHEN")){
                 }else if(data[0].equals("SWITCH")){
                 }
-            }
-            
-            //Detectar variables
-            Controller.loadVars();
-            
-            //Tercera pasada: Agregar Tips de variables y constructores
-            for (String line : lines) {
-                data = line.split(Pattern.quote("|"));
+                break;
+            case 3://Detectar variables
+                Controller.loadVars();
+                break;
+            case 4://Tercera pasada: Agregar Tips de variables y constructores
+                data = lines[nLine].split(Pattern.quote("|"));
                 //Ejecutar linea por linea
                 if(data[0].equals("DEC")){
                     
@@ -573,31 +574,30 @@ public class BUCKLE {
                     Controller.getElementByID(data[1]).getHole(1).forceAsign(data[6]);
                     Controller.getElementByID(data[1]).getHole(0).forceAsign(data[7]);
                 }
-            }
-            
-            //TODO: Eliminar todos los dockings anteriores, este se lleva la palma. Pero no lo hagas, algo podria romperse.
-            ArrayList<Element> elements = Controller.getBoardAll();
-            Port[] ports1, ports2;
-            boolean changes;
-            do{
-                changes = false;
-                for(Element e1:elements){
-                    for(Element e2:elements){
-                        ports1 = e1.getPorts();
-                        ports2 = e2.getPorts();
-                        for(Port p1:ports1)
-                            for(Port p2:ports2)
-                                if(Controller.docking(e1, e2, p1, p2, true))
-                                    changes = true;
+                break;
+            case 5:
+                ArrayList<Element> elements = Controller.getBoardAll();
+                Port[] ports1, ports2;
+                boolean changes;
+                do{
+                    changes = false;
+                    for(Element e1:elements){
+                        for(Element e2:elements){
+                            ports1 = e1.getPorts();
+                            ports2 = e2.getPorts();
+                            for(Port p1:ports1)
+                                for(Port p2:ports2)
+                                    if(Controller.docking(e1, e2, p1, p2, true))
+                                        changes = true;
+                        }
                     }
-                }
-            }while(changes);
-            
-            //Todo cargado
-        } catch (IOException e) {
-            e.printStackTrace();
+                }while(changes);
+                
+                Controller.ElementsHolesCorrectTipPos();
+                break;//TODO: Eliminar todos los dockings anteriores, este se lleva la palma. Pero no lo hagas, algo podria romperse.
         }
     }
+    
     public static void loadImplement(){
         try {
             String[] lines = Files.readString(Paths.get(Global.getProyectFolder()+"/implement.b0ve")).replace("\n", "").replace("\r", "").split(Pattern.quote("{}"));

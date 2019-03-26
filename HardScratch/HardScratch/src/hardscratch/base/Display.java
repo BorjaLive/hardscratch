@@ -24,9 +24,17 @@ public class Display {
         
         CONF.load();
         preload();
+        
+        GLFWVidMode videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        
         FULLSCREEN = CONF.get(CONF.WINDOW)==2;
-        WINDOW_WIDTH  = RESOLUTION_LIST[CONF.get(CONF.RESOLUTION)].width;
-        WINDOW_HEIGHT = RESOLUTION_LIST[CONF.get(CONF.RESOLUTION)].height;
+        if(FULLSCREEN){
+            WINDOW_WIDTH  = videoMode.width();
+            WINDOW_HEIGHT = videoMode.height();
+        }else{
+            WINDOW_WIDTH  = RESOLUTION_LIST[CONF.get(CONF.RESOLUTION)].width;
+            WINDOW_HEIGHT = RESOLUTION_LIST[CONF.get(CONF.RESOLUTION)].height;
+        }
         
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
@@ -39,7 +47,6 @@ public class Display {
         glfwSetWindowIcon(window, Texture.lwjglIsStupid(TASKBAR_ICON));
 
         glfwMakeContextCurrent(window);
-        GLFWVidMode videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         glfwSetWindowPos(window, (videoMode.width() - WINDOW_WIDTH) / 2, (videoMode.height() - WINDOW_HEIGHT) / 2);
         GL.createCapabilities();
         glEnable(GL_TEXTURE_2D);

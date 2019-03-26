@@ -35,6 +35,7 @@ public class Notifier extends Element{
 
     @Override
     protected void drawExtra() {
+        depth = 1;
     }
 
     @Override

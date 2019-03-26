@@ -12,7 +12,7 @@ public class WaitCourtain{
     private static int counter, Nmax;
     
     public static void load(String folder, int Nfiles, float[] bgColor){
-        background = new Shape_Square(0, 70, bgColor, 1, 5, WINDOW_WIDTH, WINDOW_HEIGHT-70);
+        background = new Shape_Square(0, 0, bgColor, 1, 5, WINDOW_WIDTH, WINDOW_HEIGHT);
         Nmax = Nfiles;
         
         int size = (int) (WINDOW_HEIGHT*0.6f);
@@ -25,9 +25,9 @@ public class WaitCourtain{
     
     public static void drawFrame(){
         background.draw();
-        images[counter].draw();
+        images[counter/2].draw();
         counter++;
-        if(counter == Nmax)
+        if(counter == Nmax*2)
             counter = 0;
     }
     

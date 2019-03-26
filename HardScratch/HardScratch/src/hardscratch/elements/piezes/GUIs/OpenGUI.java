@@ -5,7 +5,6 @@ import hardscratch.base.Element;
 import static hardscratch.Global.*;
 import hardscratch.base.shapes.*;
 import hardscratch.elements.piezes.ProyectSelecter;
-import hardscratch.elements.piezes.WaitCourtain;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
@@ -80,9 +79,7 @@ public class OpenGUI extends Element{
         switch(action){
             case EVENT_GO_DESIGN:
                 if(selectedI != -1){
-                    openProyect(proyects.get(selectedI).getName());
-                    WaitCourtain.drawFrame();
-                    Controller.changeRoom(ROOM_DESIGN);
+                    Controller.setOpenOnNext(proyects.get(selectedI).getName());
                 }
             break;
             case EVENT_GO_HOMO:
@@ -109,6 +106,7 @@ public class OpenGUI extends Element{
             if(p.colide(x, y)){
                 selectedI = proyects.indexOf(p);//Baya tonteria tosca
                 p.select();
+                SOUND_KEY_PRESS.play();
                 return p.getID();
             }
         return -1;

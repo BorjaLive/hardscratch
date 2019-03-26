@@ -12,6 +12,7 @@ public class TextLabel extends ElementBase{
     private float[] color;
     boolean align;
     private float strech;
+    private float alpha;
     
     public TextLabel(int x, int y, int depth, float scale, float[] color, String text, boolean align) {
         this(x, y, depth, scale, Global.FONT_MONOFONTO, color, text, align);
@@ -20,6 +21,7 @@ public class TextLabel extends ElementBase{
     public TextLabel(int x, int y, int depth, float scale, Font font, float[] color, String text, boolean align) {
         super(x, y, -1, depth, scale);
         strech = 1;
+        alpha = 1;
         
         this.font = font;
         this.text = text;
@@ -78,6 +80,9 @@ public class TextLabel extends ElementBase{
     public void setScretch(float s){
         strech = s;
     }
+    public void setAlpha(float a){
+        alpha = a;
+    }
     
     
     @Override
@@ -89,7 +94,7 @@ public class TextLabel extends ElementBase{
                 spacingW = scale*Dot.relativeSizeX(font.getLetterSpace()),
                 spacingH = scale*Dot.relativeSizeX((int) (font.getLinesPace()*strech));
         
-        glColor3f(color[0], color[1], color[2]);
+        glColor4f(color[0], color[1], color[2], alpha);
         
         for(int i = 0; i < letters.length; i++){
             if(letters[i] == '\n'){

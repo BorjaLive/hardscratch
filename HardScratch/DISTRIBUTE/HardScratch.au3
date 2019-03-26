@@ -2,7 +2,7 @@
 #AutoIt3Wrapper_Icon=icon_light.ico
 #AutoIt3Wrapper_Outfile=HardScratch.exe
 #AutoIt3Wrapper_Res_Description=HardScratch Launcher
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.2
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.4
 #AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
 #AutoIt3Wrapper_Res_ProductName=Hard Scratch
 #AutoIt3Wrapper_Res_ProductVersion=0.9
@@ -72,15 +72,27 @@ EndIf
 
 If $DEBUG Then
 	$logFile = "log"&__currentTime()&".txt"
-	FileWrite($logFile, __runWaitGet($java&"\java -Dorg.lwjgl.util.Debug=true -jar HardScratch.jar", False))
+	$logOutput = __runWaitGet($java&"\java -Dorg.lwjgl.util.Debug=true -jar HardScratch.jar", False)
+	FileWrite($logFile, $logOutput)
 	$comments = _askForDescription()
 	If $comments <> "-1" Then
 		FileWrite($logFile, @CRLF&@CRLF&$comments)
 		_uploadLogs()
 	EndIf
-
 Else
-	Run($java&"\java -jar HardScratch.jar", @ScriptDir, @SW_HIDE)
+	$logOutput = __runWaitGet($java&"\java -jar HardScratch.jar", False)
+EndIf
+If StringInStr($logOutput, "A JNI error has occurred", 2) <> 0 Then
+	;Error de version
+	FileDelete($file)
+	;GUI TEMPORAL PARA SUBIER REPORTES
+	$GUI = GUICreate("HardScratch Crash",420,40, -1, -1, BitOr($WS_BORDER,$WS_POPUP), BitOr($WS_EX_TOOLWINDOW,$WS_EX_TOPMOST))
+	GUICtrlSetFont(GUICtrlCreateLabel("Couldn't find Java 11",10,8, 400, 25, $SS_CENTER), 15)
+
+	GUISetState(@SW_SHOW, $GUI)
+	Sleep(2000)
+	GUIDelete($GUI)
+	Run("HardScratch.exe")
 EndIf
 
 

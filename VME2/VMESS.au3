@@ -1,7 +1,7 @@
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Outfile=..\HardScratch\HardScratch\src\res\vmess\vmess.exe
 #AutoIt3Wrapper_Res_Description=VME Simulated Simulation
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.9
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.19
 #AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
 #AutoIt3Wrapper_Res_ProductName=VMESS
 #AutoIt3Wrapper_Res_ProductVersion=0.9
@@ -15,9 +15,9 @@
 
 ;Esto hay que eliminarlo
 ;$cmdLine = __getArray()
-;__add($cmdLine, "sim")
-;__add($cmdLine, "C:\Users\Arlin-T2\AppData\Roaming\HardScratch\FAIL_test")
-;__add($cmdLine, "entradaR:'1'|null")
+;__add($cmdLine, "check")
+;__add($cmdLine, "C:\Users\Arlin-T2\AppData\Roaming/HardScratch/test")
+;__add($cmdLine, "")
 
 $path = StringReplace(__getArgument(2)," ","_")
 $pathSim = $path & "\sim"
@@ -231,7 +231,7 @@ Func _createOut($text)
 		$signals = StringTrimRight($signals, 1)
 	EndIf
 
-	Return "[]"&$outputs&"{}"&$signals
+	Return "[]"&$outputs&"{}"&StringReplace($signals,'"',"'")
 EndFunc
 
 Func __correctComas($text)

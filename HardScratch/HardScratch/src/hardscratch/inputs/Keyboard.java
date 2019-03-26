@@ -17,8 +17,10 @@ public class Keyboard extends GLFWKeyCallback{
     
      @Override
     public void invoke(long window, int key, int scancode, int action, int mods) {
-        keys_click[key] = action == GLFW_PRESS;
-        keys_down[key] = action != GLFW_RELEASE;
+        if(key >= 0 && key < keys_down.length){
+            keys_click[key] = action == GLFW_PRESS;
+            keys_down[key] = action != GLFW_RELEASE;
+        }
     }
     
     public static boolean getClick(int keycode) {//Delete es GLFW_KEY_DELETE

@@ -14,7 +14,7 @@ public abstract class Element extends ElementBase{
     private long focus_item, focus_itemPRE;
     private boolean drag_forced;
     
-    private boolean effectGlow;
+    private boolean effectGlow, mute;
     
     protected ArrayList<Shape> shapes;
     protected ArrayList<Image> images;
@@ -50,6 +50,7 @@ public abstract class Element extends ElementBase{
         focus_item = -1; focus_itemPRE = -1;
         
         effectGlow = false;
+        mute = false;
     }
     
     public final void addShape(Shape shape, int x, int y){
@@ -292,6 +293,9 @@ public abstract class Element extends ElementBase{
                 if(p.getGender() == PORT_MALE && p.isOcupied())
                     p.undock();
             depth = 4;
+            
+            if(!mute)
+               SOUND_SWITCH_UP.play();
             drag_init();
             Controller.putOnTop(ID);
             return true;
@@ -327,6 +331,9 @@ public abstract class Element extends ElementBase{
                     Controller.dockingAlign(this, port, QUICK_MOVE);
             }
             depth = 5;
+            
+            if(!mute)
+                SOUND_SWITCH_DOWN.play();
             drag_end();
         }
         //if(drag_forced && (Mouse.getX() < Global.LAYOUT_LEFT || Mouse.getY() < Global.LAYOUT_TOP))
@@ -457,5 +464,9 @@ public abstract class Element extends ElementBase{
             h.tipCorrectPos();
         for(Constructor c:creators)
             c.tipCorrectPos();
+    }
+    
+    protected void setMute(boolean mute){
+        this.mute = mute;
     }
 }

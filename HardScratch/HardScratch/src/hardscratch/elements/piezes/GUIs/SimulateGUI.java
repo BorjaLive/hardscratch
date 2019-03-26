@@ -8,6 +8,7 @@ import hardscratch.base.shapes.Image;
 import hardscratch.base.shapes.Shape_Square;
 import hardscratch.elements.piezes.Simulation.*;
 import static hardscratch.Global.*;
+import hardscratch.backend.VMESS;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -24,6 +25,7 @@ public class SimulateGUI extends Element{
     private String memory;
     private String[][] implementation;
     private int todo;           //Accion a realizar
+    private String[][] data;
 
     public SimulateGUI() {
         super(0, 0, -1, true, true, false);
@@ -68,23 +70,6 @@ public class SimulateGUI extends Element{
         Controller.addToBoard(new SimulatedClock(X+(12*unit), Y+(3*unit), unit, "CLOCK"));
     }
     
-    private String vmess(String mode, String data){
-        Runtime rt = Runtime.getRuntime();
-        Process proc;
-        String returned = "";
-        
-        try {
-            proc = rt.exec(Global.VMESS_EXE+" "+mode+" "+Global.getProyectFolder()+" "+data.replace("\"", "'"));
-            BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-            String s;
-            while ((s = stdInput.readLine()) != null)
-                returned += s;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        
-        return returned;
-    }
     
     @Override
     public void action(int action) {
@@ -97,6 +82,7 @@ public class SimulateGUI extends Element{
                 //No hay flod
             break;
             case Global.EVENT_GO_HOMO:
+                Controller.changeRoom(ROOM_MENU);
             break;
             case Global.EVENT_SAVE:
                 BUCKLE.save();
@@ -115,7 +101,8 @@ public class SimulateGUI extends Element{
         }
     }
     
-    public void simulationStep(String[][] data){
+    public void simulationStep(String[][] dat){
+        data = dat;
         String [][] original = new String[data.length][data[0].length];
         for(int i = 0; i < data.length; i++){
             original[i][0] = data[i][0];
@@ -166,7 +153,8 @@ public class SimulateGUI extends Element{
                 break;
                 case 2:
                     memory = null;
-                    detectError(vmess("check",""));
+                    //detectError(vmess("check",""));
+                    new VMESS("check","", this).start();
                     todo = 3;
                 break;
                 case 3:
@@ -179,7 +167,8 @@ public class SimulateGUI extends Element{
                 break;
                 case 5:
                     memory = null;
-                    detectError(vmess("init",""));
+                    //detectError(vmess("init",""));
+                    new VMESS("init","", this).start();
                     todo = 6;
                 break;
                 case 6:
@@ -191,21 +180,13 @@ public class SimulateGUI extends Element{
                 break;
                 case 8:
                     String send = getInputs(data)+memory;
-                    String log = vmess("sim",send);
-                    System.out.println("MANDO: "+send+"\nRECIVO: "+log);
+                    //String log = vmess("sim",send);
+                    
+                    new VMESS("sim",send, this).start();
+                    
+                    
             
-                    //Trim log hasta []
-                    if(log.contains("[]")){
-                        log = log.substring(log.indexOf("[]")+2);
-                        if(log.contains("{}")){
-                            String[] parts = log.split(Pattern.quote("{}"));
-                            if(!parts[1].equals("-1"))
-                                memory = parts[1];
-                            if(!parts[0].equals("-1"))
-                                makeChanges(data, parts[0]);
-                        }
-                    }
-                    todo = 9;
+                    todo = 0;//Acaba aqu'i
                 break;
                 case 9:
                     setInputsData(data, "LCD", "SIMULATION\nRUNNING");
@@ -218,6 +199,7 @@ public class SimulateGUI extends Element{
         if(hasChanges(data, original))
             Controller.simulationSet(data);
     }
+    
     private String getInputsData(String[][] data, String identifer){
         for(int i = 0; i < data.length; i++)
             if(data[i][0].equals(identifer)) return data[i][1];
@@ -246,7 +228,7 @@ public class SimulateGUI extends Element{
         }
         return false;
     }
-    private void detectError(String text){
+    public void detectError(String text){
         if(text == null || text.isEmpty()) return;
         if(text.contains("Roaming/HardScratch"))
             throwError(666, -1); //Error inesperado
@@ -265,9 +247,26 @@ public class SimulateGUI extends Element{
         if(code < ERROR_NAME.length){
             Controller.setError(code, id);
         }else{
-            System.err.println("ESTO ES UN ERROR, seguramente inesperado");
+            System.out.println("Este error inesperado es: "+code+" para ID "+id);
         }
        //TODO: Throw Error
+    }
+    public void simResoult(String log){
+        //Trim log hasta []
+        if(log.contains("[]")){
+            log = log.substring(log.indexOf("[]")+2);
+            if(log.contains("{}")){
+                String[] parts = log.split(Pattern.quote("{}"));
+                if(!parts[1].equals("-1"))
+                    memory = parts[1];
+                if(!parts[0].equals("-1"))
+                    makeChanges(data, parts[0]);
+            }
+        }
+        
+        setInputsData(data, "LCD", "SIMULATION\nRUNNING");
+        
+        Controller.simulationSet(data);
     }
     
     public int hasTodo(){
