@@ -11,6 +11,7 @@ import hardscratch.elements.piezes.Implementation.Implementer;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
@@ -615,8 +616,12 @@ public class BUCKLE {
         }
     }
     public static String[][] getImplement(){
+        File file = new File(Global.getProyectFolder()+"/implement.b0ve");
+        if(!file.exists())
+                return new String[0][2];
+        
         try {
-            String[] lines = Files.readString(Paths.get(Global.getProyectFolder()+"/implement.b0ve")).replace("\n", "").replace("\r", "").split(Pattern.quote("{}"));
+            String[] lines = Files.readString(Path.of(file.getPath())).replace("\n", "").replace("\r", "").split(Pattern.quote("{}"));
             String[][] data = new String[lines.length][2];
             String[] parts;
             
@@ -631,7 +636,7 @@ public class BUCKLE {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return new String[0][2];
     }
     
     

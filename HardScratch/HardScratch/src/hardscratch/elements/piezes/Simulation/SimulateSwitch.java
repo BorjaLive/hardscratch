@@ -2,6 +2,8 @@ package hardscratch.elements.piezes.Simulation;
 
 import hardscratch.Controller;
 import static hardscratch.Global.*;
+import hardscratch.base.Sound;
+import hardscratch.base.SoundPlayer;
 import hardscratch.base.shapes.Shape_BorderedBox;
 import hardscratch.base.shapes.Shape_Square;
 
@@ -34,10 +36,10 @@ public class SimulateSwitch extends Simulated{
         if(action == 1){
             if(state == SIM_POWER_ON){
                 state = SIM_POWER_OFF;
-                SOUND_SWITCH_DOWN.play();
+                SoundPlayer.play(SOUND_SWITCH_DOWN);
             }else{
                 state = SIM_POWER_ON;
-                SOUND_SWITCH_UP.play();
+                SoundPlayer.play(SOUND_SWITCH_UP);
             }
         }
         shapes.get(1).move(0, (int) (((unit*1.5)-10)*(state==SIM_POWER_OFF?1:-1)));

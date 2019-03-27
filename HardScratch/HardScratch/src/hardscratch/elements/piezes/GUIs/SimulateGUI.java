@@ -9,11 +9,7 @@ import hardscratch.base.shapes.Shape_Square;
 import hardscratch.elements.piezes.Simulation.*;
 import static hardscratch.Global.*;
 import hardscratch.backend.VMESS;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public class SimulateGUI extends Element{
@@ -67,7 +63,7 @@ public class SimulateGUI extends Element{
         
         Controller.addToBoard(new SimulatedButton((int) X+(unit*18), Y+unit, unit, "RESET"));
         
-        Controller.addToBoard(new SimulatedClock(X+(12*unit), Y+(3*unit), unit, "CLOCK"));
+        Controller.addToBoard(new SimulatedClock(X+(12*unit), Y+(3*unit), unit, "CLOCK1"));
     }
     
     
@@ -103,25 +99,19 @@ public class SimulateGUI extends Element{
     
     public void simulationStep(String[][] dat){
         data = dat;
-        String [][] original = new String[data.length][data[0].length];
-        for(int i = 0; i < data.length; i++){
-            original[i][0] = data[i][0];
-            original[i][1] = data[i][1];
-            //System.out.println(data[i][0]+"  "+data[i][1]);
-        };
         
-        boolean power = getInputsData(data, "POWER").equals("ON");
-        boolean reseting = getInputsData(data, "RESET").equals("ON");
+        boolean power = getInputsData("POWER").equals("ON");
+        boolean reseting = getInputsData("RESET").equals("ON");
         
         if(started && !power){
             //Apagado.
                 started = false;
                 todo = 0;
-                setInputsData(data, "LCD", "");
+                setInputsData("LCD", "");
                 for(int i = 1; i <= 8; i++)
-                    setInputsData(data, "LED"+i, "OFF");
-                setInputsData(data, "BCD1", "10");
-                setInputsData(data, "BCD2", "10");
+                    setInputsData("LED"+i, "OFF");
+                setInputsData("BCD1", "10");
+                setInputsData("BCD2", "10");
         }else if(!started && power){
             //Encendido
             started = true;
@@ -140,7 +130,7 @@ public class SimulateGUI extends Element{
         
         //System.out.println("TODO: "+todo);
         if(started && todo == 0){
-            setInputsData(data, "LCD", "COMPUTING...");
+            setInputsData("LCD", "COMPUTING...");
             //Mouse.setBlock(true);
             todo = 7;
             //System.out.println("CHANGES ARE MADE");
@@ -148,7 +138,7 @@ public class SimulateGUI extends Element{
         }else if(started){
             switch(todo){
                 case 1:     //Inicio de Check
-                    setInputsData(data, "LCD", "BUILDING\nPROGRAM");
+                    setInputsData("LCD", "BUILDING\nPROGRAM");
                     todo = 2;
                 break;
                 case 2:
@@ -158,11 +148,11 @@ public class SimulateGUI extends Element{
                     todo = 3;
                 break;
                 case 3:
-                    setInputsData(data, "LCD", "BUILD\nSUCCESSFUL");
+                    setInputsData("LCD", "BUILD\nSUCCESSFUL");
                     todo = 4;
                 break;
                 case 4:     //Inicio de Init
-                    setInputsData(data, "LCD", "STARTING\nSIMULATION");
+                    setInputsData("LCD", "STARTING\nSIMULATION");
                     todo = 5;
                 break;
                 case 5:
@@ -172,14 +162,14 @@ public class SimulateGUI extends Element{
                     todo = 6;
                 break;
                 case 6:
-                    setInputsData(data, "LCD", "SIMULATION\nSTARTED");
+                    setInputsData("LCD", "SIMULATION\nSTARTED");
                     todo = 8;
                 break;
                 case 7:
                    todo = 8;//Parece que esto no hace nada, pero es la solucion a todos los problemas
                 break;
                 case 8:
-                    String send = getInputs(data)+memory;
+                    String send = getInputs()+memory;
                     //String log = vmess("sim",send);
                     
                     new VMESS("sim",send, this).start();
@@ -189,44 +179,28 @@ public class SimulateGUI extends Element{
                     todo = 0;//Acaba aqu'i
                 break;
                 case 9:
-                    setInputsData(data, "LCD", "SIMULATION\nRUNNING");
+                    setInputsData("LCD", "SIMULATION\nRUNNING");
                     //Mouse.setBlock(false);
                     todo = 0;
                 break;
             }
         }
         
-        if(hasChanges(data, original))
-            Controller.simulationSet(data);
+        Controller.simulationSet(data);
     }
     
-    private String getInputsData(String[][] data, String identifer){
+    private String getInputsData(String identifer){
         for(int i = 0; i < data.length; i++)
             if(data[i][0].equals(identifer)) return data[i][1];
+        System.out.println("NO ENCONTRE: "+identifer);
         return null;
     }
-    private void setInputsData(String[][] data, String identifer, String value){
+    private void setInputsData(String identifer, String value){
         for(int i = 0; i < data.length; i++)
             if(data[i][0].equals(identifer)){
                 data[i][1] = value;
                 return;
             } 
-    }
-    private boolean hasChanges(String[][] data1, String[][] data2){
-        /*
-        System.out.println("START");
-        for(String[] dat:data1)
-            System.out.println(dat[0]+"  "+dat[1]);
-        System.out.println("SECOND");
-        for(String[] dat:data2)
-            System.out.println(dat[0]+"  "+dat[1]);
-        System.out.println("FINALE");
-        */
-        
-        for(String[] dat:data1){
-            if(!getInputsData(data2,dat[0]).equals(dat[1])) return true;
-        }
-        return false;
     }
     public void detectError(String text){
         if(text == null || text.isEmpty()) return;
@@ -264,7 +238,7 @@ public class SimulateGUI extends Element{
             }
         }
         
-        setInputsData(data, "LCD", "SIMULATION\nRUNNING");
+        setInputsData("LCD", "SIMULATION\nRUNNING");
         
         Controller.simulationSet(data);
     }
@@ -308,36 +282,38 @@ public class SimulateGUI extends Element{
                                 value = "OFF";
                         }
                     }
-                    setInputsData(data,conn[0], value);
+                    setInputsData(conn[0], value);
                 }
             }
             
         }
     }
-    private String getInputs(String[][] state){
-        String data = "";
+    private String getInputs(){
+        String test = "";
         ArrayList<String> agregados = new ArrayList<>();
         ArrayList<String[]> arrays = new ArrayList<>();
         
         for(String[] conn:implementation){
+            if(conn == null) continue;
+            
             if(!conn[1].equals("-1") && (conn[0].contains("SWITCH") || conn[0].contains("BUTTON") || conn[0].contains("CLOCK"))){
                 if(conn[1].contains("SA:")){
                     String[] parts = conn[1].split(Pattern.quote(":"));
-                    addPiece(arrays, parts[2], getInputsData(state, conn[0]).equals("ON")?"1":"0", Integer.parseInt(parts[1]));
+                    addPiece(arrays, parts[2], getInputsData(conn[0]).equals("ON")?"1":"0", Integer.parseInt(parts[1]));
                 }else{
                     if(!agregados.contains(conn[1])){
-                        data += conn[1]+":"+(getInputsData(state, conn[0]).equals("ON")?"'1'":"'0'")+"|";
+                        test += conn[1]+":"+(getInputsData(conn[0]).equals("ON")?"'1'":"'0'")+"|";
                         agregados.add(conn[1]);
                     }
                 }
             }
         }
         for(String[] array:arrays){
-            data += array[0]+":\""+array[1]+"\"|";
+            test += array[0]+":\""+array[1]+"\"|";
         }
         
         
-        return data.replace("\"", "'");
+        return test.replace("\"", "'");
     }
     private void addPiece(ArrayList<String[]> arrays, String name, String value, int pos){
         //System.out.println("ME DICEN QUE AGREGE A "+name+" un "+value+" en "+pos);

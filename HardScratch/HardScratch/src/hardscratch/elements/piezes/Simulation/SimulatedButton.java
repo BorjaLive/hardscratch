@@ -2,6 +2,8 @@ package hardscratch.elements.piezes.Simulation;
 
 import hardscratch.Controller;
 import static hardscratch.Global.*;
+import hardscratch.base.Sound;
+import hardscratch.base.SoundPlayer;
 import hardscratch.base.shapes.Shape_BorderedBox;
 
 
@@ -24,7 +26,7 @@ public class SimulatedButton extends Simulated{
     protected void select_init(long ID) {
         shape.changeBackColor(COLOR_CIRCUIT_BROWN);
         state = SIM_BUTTON_ON;
-        SOUND_BUTTON_UP.play();
+        SoundPlayer.play(SOUND_BUTTON_UP);
                     
         action(1);
     }
@@ -33,7 +35,7 @@ public class SimulatedButton extends Simulated{
     protected void select_end() {
         shape.changeBackColor(COLOR_CIRCUIT_DKGRAY);
         state = SIM_BUTTON_OFF;
-        SOUND_BUTTON_DOWN.play();
+        SoundPlayer.play(SOUND_BUTTON_DOWN);
         action(1);
     }
 

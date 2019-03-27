@@ -295,7 +295,7 @@ public abstract class Element extends ElementBase{
             depth = 4;
             
             if(!mute)
-               SOUND_SWITCH_UP.play();
+               SoundPlayer.play(SOUND_SWITCH_UP);
             drag_init();
             Controller.putOnTop(ID);
             return true;
@@ -333,7 +333,7 @@ public abstract class Element extends ElementBase{
             depth = 5;
             
             if(!mute)
-                SOUND_SWITCH_DOWN.play();
+               SoundPlayer.play(SOUND_SWITCH_DOWN);
             drag_end();
         }
         //if(drag_forced && (Mouse.getX() < Global.LAYOUT_LEFT || Mouse.getY() < Global.LAYOUT_TOP))

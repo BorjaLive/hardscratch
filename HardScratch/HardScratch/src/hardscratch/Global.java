@@ -59,7 +59,11 @@ public class Global {
     
     public static Texture  TEXTURE_ARROW_1, TEXTURE_ARROW_2, TEXTURE_FINDERSLIDER, TEXTURE_HOUSE, TEXTURE_SAVE, TEXTURE_BORELICIOUS, TEXTURE_CLOSE_CROSS, TEXTURE_LOGO, TEXTURE_SETTINGS, TEXTURE_TRASHCAN;
     public static Texture[] TEXTURE_BCD;
-    public static Sound SOUND_SWITCH_UP, SOUND_SWITCH_DOWN, SOUND_BUTTON_UP, SOUND_BUTTON_DOWN, SOUND_KEY_PRESS;
+    public static String SOUND_SWITCH_UP = RESOURCES+"sound/switchUp.wav";
+    public static String SOUND_SWITCH_DOWN = RESOURCES+"sound/switchDown.wav";
+    public static String SOUND_BUTTON_UP = RESOURCES+"sound/ButtonUp.wav";
+    public static String SOUND_BUTTON_DOWN = RESOURCES+"sound/ButtonDown.wav";
+    public static String SOUND_KEY_PRESS = RESOURCES+"sound/KeyPress.wav";
     public static Font FONT_MONOFONTO, FONT_LCD;
     
     public static final String TASKBAR_ICON = RESOURCES+"img/icon_light.png";
@@ -436,13 +440,6 @@ public class Global {
             COLOR_OK = new float[]                      { 37/255f,155/255f, 36/255f};
             COLOR_NOOK = new float[]                    {253/255f,151/255f, 31/255f};
         }
-        
-        SOUND_SWITCH_UP = new Sound(RESOURCES+"sound/switchUp.wav");
-        SOUND_SWITCH_DOWN = new Sound(RESOURCES+"sound/switchDown.wav");
-        SOUND_BUTTON_UP = new Sound(RESOURCES+"sound/ButtonUp.wav");
-        SOUND_BUTTON_DOWN = new Sound(RESOURCES+"sound/ButtonDown.wav");
-        SOUND_KEY_PRESS = new Sound(RESOURCES+"sound/ButtonDown.wav");
-        SOUND_KEY_PRESS = new Sound(RESOURCES+"sound/ButtonDown.wav");
         
         WaitCourtain.load(RESOURCES+"img/loading/", 25, COLOR_GUI_1);
     }

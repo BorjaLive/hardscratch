@@ -2,6 +2,8 @@ package hardscratch.elements.piezes.Simulation;
 
 import hardscratch.Controller;
 import static hardscratch.Global.*;
+import hardscratch.base.Sound;
+import hardscratch.base.SoundPlayer;
 import hardscratch.base.shapes.Shape_BorderedBox;
 
 public class SimulatedClock extends Simulated{
@@ -22,7 +24,7 @@ public class SimulatedClock extends Simulated{
     public void action(int action) {
         switch(action){
             case EVENT_TOGGLE:
-                SOUND_KEY_PRESS.play();
+                SoundPlayer.play(SOUND_KEY_PRESS);
                 if(state == SIM_LED_ON){
                     state = SIM_LED_OFF;
                     shape.changeBackColor(COLOR_CIRCUIT_BROWN);

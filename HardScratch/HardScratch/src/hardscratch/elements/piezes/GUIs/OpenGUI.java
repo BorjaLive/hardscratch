@@ -3,6 +3,8 @@ package hardscratch.elements.piezes.GUIs;
 import hardscratch.Controller;
 import hardscratch.base.Element;
 import static hardscratch.Global.*;
+import hardscratch.base.Sound;
+import hardscratch.base.SoundPlayer;
 import hardscratch.base.shapes.*;
 import hardscratch.elements.piezes.ProyectSelecter;
 import java.io.File;
@@ -106,7 +108,7 @@ public class OpenGUI extends Element{
             if(p.colide(x, y)){
                 selectedI = proyects.indexOf(p);//Baya tonteria tosca
                 p.select();
-                SOUND_KEY_PRESS.play();
+                SoundPlayer.play(SOUND_KEY_PRESS);
                 return p.getID();
             }
         return -1;

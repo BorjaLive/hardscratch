@@ -4,6 +4,7 @@ import hardscratch.Controller;
 import static hardscratch.Global.*;
 import hardscratch.base.Element;
 import hardscratch.base.Sound;
+import hardscratch.base.SoundPlayer;
 import hardscratch.base.shapes.Shape_Square;
 import hardscratch.base.shapes.TextLabel;
 import hardscratch.inputs.Keyboard;
@@ -71,8 +72,7 @@ public class EasterGUI  extends Element{
             break;
             case EVENT_TURN_ON: //Ejecutar
                 if(Keyboard.getClick(GLFW_KEY_F1)){
-                    song.stop();
-                    Controller.changeRoom(ROOM_MENU);
+                    action(EVENT_GO_HOMO);
                 }
                 if(counter >= words.length) return;
                 
@@ -99,6 +99,7 @@ public class EasterGUI  extends Element{
                 
             break;
             case EVENT_GO_HOMO:
+                SoundPlayer.stop(song);
                 Controller.setEasterCheck(false);
                 Controller.changeRoom(ROOM_MENU);
             break;
@@ -122,8 +123,7 @@ public class EasterGUI  extends Element{
         counter = 0;
         
         Controller.setEasterCheck(true);
-        song = new Sound(audioFile);
-        song.play();
+        song = SoundPlayer.play(audioFile);
         StarterTime = System.currentTimeMillis();
     }
     

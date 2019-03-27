@@ -19,6 +19,7 @@ public class HardScratch {
         }
 
         mainWindow.terminate();
+        SoundPlayer.stop();
     }
     
     public static void main(String[] args) {

@@ -280,7 +280,7 @@ public class Controller {
                     focus = elements.size()-1;
                     focus_volatile = true;
                     elements.get(focus).focus_force_drag();
-                    SOUND_SWITCH_UP.play();
+                    SoundPlayer.play(SOUND_SWITCH_UP);
                 }
             }
         
@@ -614,7 +614,7 @@ public class Controller {
     }
     
     public static void changeRoom(int room){
-        SOUND_KEY_PRESS.play();
+        SoundPlayer.play(SOUND_KEY_PRESS);
         
         BUCKLE.save();
         

@@ -3,6 +3,8 @@ package hardscratch.elements.piezes.GUIs;
 import hardscratch.Controller;
 import hardscratch.base.Element;
 import static hardscratch.Global.*;
+import hardscratch.base.Sound;
+import hardscratch.base.SoundPlayer;
 import hardscratch.base.shapes.Image;
 import hardscratch.base.shapes.*;
 import java.awt.Desktop;
@@ -54,7 +56,7 @@ public class MenuGUI extends Element{
             break;
             case EVENT_GO_HELP:
                 if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                    SOUND_KEY_PRESS.play();
+                    SoundPlayer.play(SOUND_KEY_PRESS);
                     try {   //Poner la documentacion en esa URL
                         Desktop.getDesktop().browse(new URI("https://github.com/BorjaLive/hardscratch"));
                     } catch (URISyntaxException | IOException ex) {
