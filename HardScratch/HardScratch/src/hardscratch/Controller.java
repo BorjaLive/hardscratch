@@ -205,6 +205,11 @@ public class Controller {
             if(Keyboard.getDown(GLFW_KEY_DELETE)){
                 deleteAll++;
                 if(deleteAll == 60){
+                    if(finderPos == slidingPos[0]){ 
+                        for(Summoner s:selectedFinder)
+                            s.move(slidingPos[slidingPos.length-1]-finderPos, 0);
+                        finderPos = slidingPos[slidingPos.length-1];
+                    }
                     elements.clear();
                     elements.add(new DesignGUI());
                 }

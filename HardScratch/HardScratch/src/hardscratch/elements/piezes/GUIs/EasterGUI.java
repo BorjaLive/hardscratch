@@ -1,7 +1,6 @@
 package hardscratch.elements.piezes.GUIs;
 
 import hardscratch.Controller;
-import hardscratch.Global;
 import static hardscratch.Global.*;
 import hardscratch.base.Element;
 import hardscratch.base.Sound;
@@ -12,7 +11,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -25,7 +23,7 @@ public class EasterGUI  extends Element{
     
     private String audioFile = RESOURCES+"sound/easterSong.wav";
     private String wordsFile = RESOURCES+"sound/easter.wav";
-    private String inetSource = "http://hardscratch.rf.gd/easterSong.wav";
+    private String inetSource = "https://www.filehosting.org/file/details/789842/videoplayback.wav";
     private float[] COLOR_BACK = new float[]{255/255f, 98/255f, 64/255f};
     private String[] words;
     private long[] times;
