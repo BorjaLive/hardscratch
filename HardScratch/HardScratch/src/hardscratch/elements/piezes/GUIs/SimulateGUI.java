@@ -192,7 +192,6 @@ public class SimulateGUI extends Element{
     private String getInputsData(String identifer){
         for(int i = 0; i < data.length; i++)
             if(data[i][0].equals(identifer)) return data[i][1];
-        System.out.println("NO ENCONTRE: "+identifer);
         return null;
     }
     private void setInputsData(String identifer, String value){
