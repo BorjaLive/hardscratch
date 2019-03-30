@@ -20,3 +20,10 @@ La inuitiva interfaz de usuario te guiará por desde el proceso de diseño hasta
 Manual en español: https://github.com/BorjaLive/hardscratch/blob/master/Manual.pdf
 
 Blog del proyecto: https://hardscratchb0ve.blogspot.com/
+
+## Clonado
+Compilar HardScratch requiere:
++ Java OpenJDK 11 o superior
++ Librería LWJGL 3.2.1 y sus componentes GLFW, JMALLOC, OPENGL y STB.
++ Autoit 3.1 (Para construir VMESS)
+Se recomienda usar Netbeans 10.
