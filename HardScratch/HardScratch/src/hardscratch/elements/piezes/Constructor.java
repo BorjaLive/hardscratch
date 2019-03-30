@@ -287,6 +287,18 @@ public class Constructor extends ElementBase{
                         if(var != null)
                             tip.setVar(var);
                     break;
+                    case "CV":
+                        var = Controller.getVarByName(parts[1]);
+                        tip = new Tip(h.getX(),h.getY(),Global.TIP_VAR_CONV_ARRAY_TO_INT);
+                        if(var != null)
+                            tip.setVar(var);
+                    break;
+                    case "VC":
+                        var = Controller.getVarByName(parts[1]);
+                        tip = new Tip(h.getX(),h.getY(),Global.TIP_VAR_CONV_INT_TO_ARRAY);
+                        if(var != null)
+                            tip.setVar(var);
+                    break;
                 }
                     
             }else{
@@ -378,6 +390,12 @@ public class Constructor extends ElementBase{
                     break;
                     case Global.TIP_VAR_CLOCK:
                         data.add("CK:"+h.getTip().getVar().name);
+                    break;
+                    case Global.TIP_VAR_CONV_ARRAY_TO_INT:
+                        data.add("CV:"+h.getTip().getVar().name);
+                    break;
+                    case Global.TIP_VAR_CONV_INT_TO_ARRAY:
+                        data.add("VC:"+h.getTip().getVar().name);
                     break;
                 }
             }

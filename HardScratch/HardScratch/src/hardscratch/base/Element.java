@@ -251,6 +251,7 @@ public abstract class Element extends ElementBase{
         if(DEBUG_MODE)
             for (Shape bound : bounds)
                 bound.draw();
+        
     }
     protected abstract void drawExtra();
     
@@ -265,6 +266,7 @@ public abstract class Element extends ElementBase{
         depth = 2;
         Controller.putOnTop(ID);
         drag_init();
+        effectGlow();
     }
     public final boolean focus_init(){
         if(focus_itemPRE != -1){
@@ -297,6 +299,8 @@ public abstract class Element extends ElementBase{
             if(!mute)
                SoundPlayer.play(SOUND_SWITCH_UP);
             drag_init();
+            effectGlow();
+        
             Controller.putOnTop(ID);
             return true;
         }
@@ -335,6 +339,7 @@ public abstract class Element extends ElementBase{
             if(!mute)
                SoundPlayer.play(SOUND_SWITCH_DOWN);
             drag_end();
+            effectGlow();
         }
         //if(drag_forced && (Mouse.getX() < Global.LAYOUT_LEFT || Mouse.getY() < Global.LAYOUT_TOP))
         //    Controller.deleteElement(ID);
@@ -445,7 +450,7 @@ public abstract class Element extends ElementBase{
         if(n < labels.size()) return labels.get(n); else return null;
     }
     
-    public final void effectGlow(){
+    public void effectGlow(){
         if(effectGlow)
             for(Shape s:shapes)
                 s.setColor(colorDeGlow(s.getColor()));

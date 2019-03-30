@@ -173,6 +173,14 @@ public class Tip extends Element{
                 width = 260; height = 44;
                 addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "ERROR", true), (width/2), (height/2));
             break;
+            case Global.TIP_VAR_CONV_ARRAY_TO_INT:
+                width = 350; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "ERROR", true), (width/2), (height/2));
+            break;
+            case Global.TIP_VAR_CONV_INT_TO_ARRAY:
+                width = 350; height = 44;
+                addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "ERROR", true), (width/2), (height/2));
+            break;
         }
         switch(value){
             case Global.TIP_VAR_IN:
@@ -204,6 +212,8 @@ public class Tip extends Element{
             case Global.TIP_CONSTRUCTOR_LOGIC_NOR:
             case Global.TIP_CONSTRUCTOR_LOGIC_XNOR:
             case Global.TIP_CONSTRUCTOR_LOGIC_NOT:
+            case Global.TIP_VAR_CONV_ARRAY_TO_INT:
+            case Global.TIP_VAR_CONV_INT_TO_ARRAY:
             case Global.TIP_VAR_CLOCK:                  compativility = Global.HOLE_CONSTRUCTOR; break;
             case Global.TIP_EDGE_RISING:
             case Global.TIP_EDGE_LOWERING:              compativility = Global.HOLE_EDGE; break;
@@ -224,6 +234,12 @@ public class Tip extends Element{
             break;
             case Global.TIP_VAR_CLOCK:
                 labels.get(0).setText("CLK "+v.name);
+            break;
+            case Global.TIP_VAR_CONV_ARRAY_TO_INT:
+                labels.get(0).setText(v.name+" TO INT");
+            break;
+            case Global.TIP_VAR_CONV_INT_TO_ARRAY:
+                labels.get(0).setText(v.name+" TO ARRAY");
             break;
         }
         
@@ -356,6 +372,12 @@ public class Tip extends Element{
         else
             return null;
     }
+    
+    @Override
+    public void effectGlow(){
+        //Los tips no glow
+    }
+    
     
     /*
     public void correctPositions(){

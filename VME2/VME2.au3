@@ -1,4 +1,7 @@
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
+#AutoIt3Wrapper_Outfile=..\..\src\res\vmess\vmess.exe
+#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
+#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Outfile=..\HardScratch\HardScratch\src\res\vmess\vmess.exe
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 #include "_BUMLAY.au3"
@@ -7,7 +10,7 @@
 Const $ERROR[] = ["BOKEY", "CANNOT_INICIALIZE_INOUT", "CONST_MUST_BE_INICIALIZED", "OUT_VAR_CANNOT_BE_READEN", "CONST_VAR_CANNOT_BE_ASIGNED", _
 "CONVERSION_NOT_ALLOWED", "IN_VAR_CANNOT_BE_ASIGNED", "SETIF_IS_USELESS", "SETSWITCH_IS_USELESS", "ELSE_VALUE_NEEDED", "SWITCH_NEEDS_DEFAULT_CASE", _
 "VARIABLE_DOES_NOT_EXIST", "ILEGAL_USE_OF_OPERATOR_ADD", "ILEGAL_USE_OF_OPERATOR_SUB", "ILEGAL_USE_OF_OPERATOR_TIM", "ILEGAL_USE_OF_OPERATOR_TAK", _
-"ILEGAL_USE_OF_OPERATOR_CONCATENATE", "BAD_INICIALIZATION", "CANT_CHANGE_LENGTH_OF_BITARRAY","PROYECT_IS_EMPTY"]
+"ILEGAL_USE_OF_OPERATOR_CONCATENATE", "BAD_INICIALIZATION", "CANT_CHANGE_LENGTH_OF_BITARRAY","PROYECT_IS_EMPTY", "PROBLEM_LOADING", "BAD_CONDITION", "BAD_EXPRESSION"]
 Const 	$ERROR_BOKEY = 0, _
 		$ERROR_CANNOT_INICIALIZE_INOUT = 1, _
 		$ERROR_CONST_MUST_BE_INICIALIZED = 2, _
@@ -27,7 +30,10 @@ Const 	$ERROR_BOKEY = 0, _
 		$ERROR_ILEGAL_USE_OF_OPERATOR_CONCATENATE = 16, _
 		$ERROR_BAD_INICIALIZATION = 17, _
 		$ERROR_CANT_CHANGE_LENGTH_OF_BITARRAY = 18, _
-		$ERROR_PROYECT_IS_EMPTY = 19
+		$ERROR_PROYECT_IS_EMPTY = 19, _
+		$ERROR_PROBLEM_LOADING = 20, _
+		$ERROR_BAD_CONDITION = 21, _
+		$ERROR_BAD_EXPRESSION = 22
 
 Global $PROCESS_USED_VARS = Null, $CONSTRUCTOR_USED_VARS= Null, $VARIABLES = Null, $IDLINES = Null, $TMP_IDLINES = Null
 Global $SIMULATION_MODE = Null, $SIM_PROCESS_COUNTER = Null
@@ -340,7 +346,7 @@ Func _variableConstructor($var)
 	$type = ""
 	Switch $var[4]
 		Case 1
-			$type = "INTEGER range 255 downto 0"
+			$type = "INTEGER"
 		Case 2
 			$type = "STD_LOGIC"
 		Case 3
@@ -391,6 +397,16 @@ Func _decodeConstructor($data, $id)
 			Else
 				$text &= "("& $var[2] &"'event and "& $var[2] &"='1') "
 			EndIf
+		ElseIf StringMid($part,1,3) = "CV:" Then
+			$var = getVarByName(StringTrimLeft($part,3), $id)
+			_varCheckRead($var, $id)
+			__add($CONSTRUCTOR_USED_VARS,$var[2])
+			$text &= "CONV_INTEGER("&$var[2]&") "
+		ElseIf StringMid($part,1,3) = "VC:" Then
+			$var = getVarByName(StringTrimLeft($part,3), $id)
+			_varCheckRead($var, $id)
+			__add($CONSTRUCTOR_USED_VARS,$var[2])
+			$text &= "CONV_STD_LOGIC_VECTOR("&$var[2]&") "
 		Else
 			$text &= StringReplace($part,"_","-")&" "
 			;Tiene que reconocer variables y guardarlas en otra pila global
@@ -558,7 +574,7 @@ Func _logicConstructor($logic)
 		;SASIG [0. 4],[1. SEQ],[2. ID],[3. VAR],[4. Value]
 		$var = getVarByName($logic[3], $logic[2])
 		$usedVars = __getArray()
-		__add($usedVars, $var[2])
+		;__add($usedVars, $var[2])	;La variable asignada no se agrega porque la lista de sensibilidades es para cosas que cambian, escribirla no hace que quieras leerla.
 
 		_varCheckWrite($var,$logic[2])
 		__addIndentation($lines, $var[2] &" <= "& _decodeConstructor($logic[4], $logic[2]) &";")

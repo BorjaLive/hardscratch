@@ -25,6 +25,7 @@ public class Controller {
     private static int deleteAll;
     
     private static int errorI, errorState;
+    private static long errorID;
     private static String openOnNext;
     private static int openOnNextCounter;
     private static int buckleStage, buckleLine, buckleMax;
@@ -63,6 +64,7 @@ public class Controller {
         vars = new ArrayList<>();
         Controller.window = window;
         focus = -1; Rfocus = -1; lastFocus= -1;
+        errorID = -1;
         deleteAll = 0;
         
         load();
@@ -183,6 +185,13 @@ public class Controller {
         if(var.type == TIP_VAR_ARRAY){
             finderADD(list, scale, SUMMON_VAR_SUBARRAY);
             list.get(list.size()-1).setVar(var);
+            
+            finderADD(list, scale, SUMMON_VAR_CONV_ARRAY_TO_INT);
+            list.get(list.size()-1).setVar(var);
+            
+        }else if(var.type == TIP_VAR_INT){
+            finderADD(list, scale, SUMMON_VAR_CONV_INT_TO_ARRAY);
+            list.get(list.size()-1).setVar(var);
         }else if(var.type == TIP_VAR_BIT && (var.name.equals("CK") ||
                                                     var.name.equals("CLK") ||
                                                     var.name.equals("CLOCK"))){
@@ -259,6 +268,18 @@ public class Controller {
                 buckleStage = 0;
                 ElementsHolesCorrectTipPos();
                 //System.out.println("BUCLE FINISH");
+                
+                
+                if(errorID != -1){
+                    System.err.println("He detectado un error con: "+errorID);
+                    Element errorE = getElementByID(errorID);
+                    if(errorE != null){
+                        dragBoard(450-errorE.getX(), 250-errorE.getY());
+                        errorI = elements.indexOf(errorE);
+                        errorState = 0;
+                    }
+                    errorID = -1;
+                }
             }
             
             WaitCourtain.drawFrame();
@@ -823,12 +844,8 @@ public class Controller {
         //Crearlo
         addToBoard(new Notifier(errorCode));
         
-        //Mover el tablero para centrar el error
-        Element e = getElementByID(id);
-        if(e != null)
-            dragBoard(450-e.getX(), 250-e.getY());
-        errorI = elements.indexOf(e);
-        errorState = 0;
+        //Mover el tablero para centrar el error, pero cuando termine de cargar
+        errorID = id;
         
     }
     public static void errorTerminate(){

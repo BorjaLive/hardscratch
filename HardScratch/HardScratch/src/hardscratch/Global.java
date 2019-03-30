@@ -187,7 +187,9 @@ public class Global {
             TIP_EDGE_LOWERING = 31,
             TIP_VAR = 32,
             TIP_VAR_SUBARRAY = 33,//CLOCK y subindice en BUMLAY
-            TIP_VAR_CLOCK = 34
+            TIP_VAR_CLOCK = 34,
+            TIP_VAR_CONV_ARRAY_TO_INT = 35,
+            TIP_VAR_CONV_INT_TO_ARRAY = 36
             ;
     public static final int
             SUMMON_DECLARATRON = 1,
@@ -237,7 +239,9 @@ public class Global {
             SUMMON_TIP_LOWERING = 46,
             SUMMON_VAR = 47,
             SUMMON_VAR_SUBARRAY = 48,
-            SUMMON_VAR_CLOCK = 49
+            SUMMON_VAR_CLOCK = 49,
+            SUMMON_VAR_CONV_ARRAY_TO_INT = 50,
+            SUMMON_VAR_CONV_INT_TO_ARRAY = 51
             ;
     public static final int
             CREATOR_I = 1,
@@ -321,7 +325,9 @@ public class Global {
             ERROR_BAD_INICIALIZATION = 17,
             ERROR_CANT_CHANGE_LENGTH_OF_BITARRAY = 18,
             ERROR_PROYECT_IS_EMPTY = 19,
-            ERROR_PROBLEM_LOADING_PROYECT = 20
+            ERROR_PROBLEM_LOADING_PROYECT = 20,
+            ERROR_BAD_CONDITION = 21,
+            ERROR_BAD_EXPRESSION = 22
             ;
     public static final String[] ERROR_NAME = new String[]{"BOKEY", "Input And Output variables\ncan not be initialized.",
     "Constants must\nbe initialized.","Output var\ncannot be read.","Constants cannot\nbe assigned.","Illegal conversion.",
@@ -329,7 +335,7 @@ public class Global {
     "Switch needs\ndefault case.","Variable does\nnot exist.","Illegal use of addition operator.","Illegal use of subtraction operator.",
     "Illegal use of\nproduct operator.","Illegal use of\ndivision operator.","Illegal use of\nconcatenate operator.",
     "Illegal inicialization.","Length of bit array\ncannot be modified.","Cant compile an\nempty proyect",
-    "Unespected problem\nloading proyect."};
+    "Unespected problem\nloading proyect.", "Illegal\ncondition", "Illegal\nexpression"};
     
     public static float distance(int x1, int y1, int x2, int y2){
         return (float) Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));

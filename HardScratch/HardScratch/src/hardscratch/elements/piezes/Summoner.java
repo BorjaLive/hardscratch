@@ -92,6 +92,12 @@ public class Summoner extends ElementBase{
             case Global.SUMMON_VAR_CLOCK:
                 name.setText("CLOCK TICK "+v.name);
             break;
+            case Global.SUMMON_VAR_CONV_ARRAY_TO_INT:
+                name.setText("CONV "+v.name+" TO INT");
+            break;
+            case Global.SUMMON_VAR_CONV_INT_TO_ARRAY:
+                name.setText("CONV "+v.name+" TO ARRAY");
+            break;
         }
         switch(v.inout){
             case Global.TIP_VAR_IN:     shape.setPalete(Global.COLOR_VAR_IN); break;
@@ -147,6 +153,8 @@ public class Summoner extends ElementBase{
             case Global.SUMMON_VAR:                     return new Tip(Global.TIP_VAR).setVar(var);
             case Global.SUMMON_VAR_SUBARRAY:            return new Tip(Global.TIP_VAR_SUBARRAY).setVar(var);
             case Global.SUMMON_VAR_CLOCK:               return new Tip(Global.TIP_VAR_CLOCK).setVar(var);
+            case Global.SUMMON_VAR_CONV_ARRAY_TO_INT:               return new Tip(Global.TIP_VAR_CONV_ARRAY_TO_INT).setVar(var);
+            case Global.SUMMON_VAR_CONV_INT_TO_ARRAY:               return new Tip(Global.TIP_VAR_CONV_INT_TO_ARRAY).setVar(var);
             case Global.SUMMON_DECLARATRON:             return new Declarator();
             case Global.SUMMON_INICIALIZER:             return new Inicializer();
             case Global.SUMMON_EXTRAVAR:                return new ExtraVar();

@@ -128,22 +128,23 @@ public class BUMLAY {
                 //Buscar conversiones
                 if(!e.isComplete()) break;
                 
-                addCONV(e.getID(),e.getHole(0).getTip().getVar().name, e.getHole(1).getTip().getVar().name);
+                addCONV(e.getID(),e.getHole(0).isAsigned()?e.getHole(0).getTip().getVar().name:"-1", e.getHole(1).getTip().getVar().name);
             }else if(e.getClass() == Asignator.class){
                 //Buscar asignaciones
                 if(!e.isComplete()) break;
                 
-                addASIG(e.getID(),e.getHole(0).getTip().getVar().name, creator2String(e.getCreator(0)));
+                addASIG(e.getID(),e.getHole(0).isAsigned()?e.getHole(0).getTip().getVar().name:"-1", creator2String(e.getCreator(0)));
             }else if(e.getClass() == SetIf.class){
                 //Buscar SETIFs
                 SetIf s = (SetIf) e;
                 
-                addASETIF(s.getID(),s.getHole(0).getTip().getVar().name,creator2String(s.getExpresions()),creator2String(s.getValues()));
+                addASETIF(s.getID(),s.getHole(0).isAsigned()?s.getHole(0).getTip().getVar().name:"-1",creator2String(s.getExpresions()),creator2String(s.getValues()));
             }else if(e.getClass() == SetSwitch.class){
                 //Buscar SETSWITCHs
                 SetSwitch s = (SetSwitch) e;
                 
-                addASETSWITCH(s.getID(),s.getHole(0).getTip().getVar().name,s.getHole(1).getTip().getVar().name,
+                addASETSWITCH(s.getID(),s.getHole(0).isAsigned()?s.getHole(0).getTip().getVar().name:"-1",
+                              s.getHole(1).isAsigned()?s.getHole(1).getTip().getVar().name:"-1",
                               creator2String(s.getExpresions()),creator2String(s.getValues()));
             }else if(e.getClass() == Sequential.class){
                 //Buscar secuenciales

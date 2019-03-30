@@ -1,4 +1,48 @@
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
+#AutoIt3Wrapper_Outfile=..\..\src\res\vmess\vmess.exe
+#AutoIt3Wrapper_Res_Description=VME Simulated Simulation
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.20
+#AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
+#AutoIt3Wrapper_Res_ProductName=VMESS
+#AutoIt3Wrapper_Res_ProductVersion=0.9
+#AutoIt3Wrapper_Res_CompanyName=Liveployers
+#AutoIt3Wrapper_Res_LegalCopyright=B0vE
+#AutoIt3Wrapper_Res_LegalTradeMarks=Borja Live
+#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
+#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
+#AutoIt3Wrapper_Outfile=..\..\src\res\vmess\vmess.exe
+#AutoIt3Wrapper_Res_Description=VME Simulated Simulation
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.20
+#AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
+#AutoIt3Wrapper_Res_ProductName=VMESS
+#AutoIt3Wrapper_Res_ProductVersion=0.9
+#AutoIt3Wrapper_Res_CompanyName=Liveployers
+#AutoIt3Wrapper_Res_LegalCopyright=B0vE
+#AutoIt3Wrapper_Res_LegalTradeMarks=Borja Live
+#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
+#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
+#AutoIt3Wrapper_Outfile=..\..\src\res\vmess\vmess.exe
+#AutoIt3Wrapper_Res_Description=VME Simulated Simulation
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.20
+#AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
+#AutoIt3Wrapper_Res_ProductName=VMESS
+#AutoIt3Wrapper_Res_ProductVersion=0.9
+#AutoIt3Wrapper_Res_CompanyName=Liveployers
+#AutoIt3Wrapper_Res_LegalCopyright=B0vE
+#AutoIt3Wrapper_Res_LegalTradeMarks=Borja Live
+#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
+#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
+#AutoIt3Wrapper_Outfile=..\..\src\res\vmess\vmess.exe
+#AutoIt3Wrapper_Res_Description=VME Simulated Simulation
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.20
+#AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
+#AutoIt3Wrapper_Res_ProductName=VMESS
+#AutoIt3Wrapper_Res_ProductVersion=0.9
+#AutoIt3Wrapper_Res_CompanyName=Liveployers
+#AutoIt3Wrapper_Res_LegalCopyright=B0vE
+#AutoIt3Wrapper_Res_LegalTradeMarks=Borja Live
+#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
+#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Outfile=..\HardScratch\HardScratch\src\res\vmess\vmess.exe
 #AutoIt3Wrapper_Res_Description=VME Simulated Simulation
 #AutoIt3Wrapper_Res_Fileversion=1.0.0.19
@@ -16,8 +60,8 @@
 ;Esto hay que eliminarlo
 ;$cmdLine = __getArray()
 ;__add($cmdLine, "check")
-;__add($cmdLine, "C:\Users\Arlin-T2\AppData\Roaming/HardScratch/test")
-;__add($cmdLine, "")
+;__add($cmdLine, "C:\Users\Margaret\AppData\Roaming/HardScratch/Sistema_simple")
+;__add($cmdLine, "entradaS:'0'|contador:'0000'|null")
 
 $path = StringReplace(__getArgument(2)," ","_")
 $pathSim = $path & "\sim"
@@ -59,7 +103,7 @@ Func _detectError($text)
 EndFunc
 Func __checkLog($line, $log)
 	$code = 0
-	ConsoleWrite($log&"  "&$line&"  ---> ")
+	ConsoleWriteError($log&"  "&$line&"  ERROR RECOGNIZED AS ---> ")
 
 	If StringInStr($log, "operator") <> 0 And StringInStr($log, "is overloaded") <> 0 Then
 		;Error de operador mal usado
@@ -76,14 +120,17 @@ Func __checkLog($line, $log)
 			Case "&"
 				$code = $ERROR_ILEGAL_USE_OF_OPERATOR_CONCATENATE
 		EndSwitch
-	ElseIf StringInStr($log, "can't match") <> 0 Then
+	ElseIf StringInStr($log, "can't match character literal") <> 0 Then
 		;Error de mala inicializacion
 		$code = $ERROR_BAD_INICIALIZATION
+	ElseIf StringInStr($log, "no function declarations for operator") <> 0 Or StringInStr($log, "unexpected token") Or StringInStr($log, 'missing ";" at end of object declaration') Then
+		$code = $ERROR_BAD_EXPRESSION
+	ElseIf StringInStr($log, "can't match") <> 0 And StringInStr($log, "with type boolean") <> 0 Then
+		$code = $ERROR_BAD_CONDITION
 	;TODO: AQUI HAY QUE AGREGAR UN PORRON DE ERRORES QUE SUELTA GHDL
 	EndIf
 
-
-	ConsoleWrite($ERROR[$code]&@CRLF)
+	ConsoleWriteError($ERROR[$code]&@CRLF)
 	If $code <> 0 Then __Error($code, $IDLINES[$line])
 EndFunc
 Func _detectRuntimeError($text)
@@ -93,6 +140,8 @@ Func _detectRuntimeError($text)
 	$log = StringTrimLeft($line, StringInStr($line,"error:")+6)
 	$log = StringMid($log, 1, StringInStr($log, "at ")-2)
 	$line = StringTrimLeft($line, StringInStr($line,":",2,-1))
+
+	MsgBox(0, "", $text)
 
 	If StringInStr($log, "bound check failure") <> 0 Then __Error($ERROR_CANT_CHANGE_LENGTH_OF_BITARRAY, $IDLINES[$line])
 EndFunc
@@ -152,8 +201,8 @@ Func _modifyModels($path, $text); Init True: No se conocen las señales, hay que
 	FileWrite($fileTest,$Text_fileTest)
 
 	ghdl("--clean", "")
-	ghdl("-a", $file)
-	ghdl("-a", $fileTest)
+	_detectError(ghdl("-a", $file))
+	_detectError(ghdl("-a", $fileTest))
 	Return ghdl("-r","HardScratchSimulation_Entity_"&$randomName, True, True)
 EndFunc
 Func _deleteMarks($text)

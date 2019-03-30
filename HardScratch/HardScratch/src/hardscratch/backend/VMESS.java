@@ -12,14 +12,16 @@ public class VMESS extends Thread{
     private String command;
     private int callBack;
     private SimulateGUI element;
+    private int todo;
     
-    public VMESS(String mode, String data, SimulateGUI e){
+    public VMESS(String mode, String data, SimulateGUI e, int todo){
         command = VMESS_EXE+" "+mode+" "+getProyectFolder()+" "+data.replace("\"", "'");
         if(mode.equals("check") || mode.equals("init"))
             callBack = 1;
         else
             callBack = 2;
         element = e;
+        this.todo = todo;
     }
     
     @Override
@@ -56,6 +58,6 @@ public class VMESS extends Thread{
         else if(callBack == 2);
             element.simResoult(returned);
             
-        
+        element.setTodo(todo);
     }
 }

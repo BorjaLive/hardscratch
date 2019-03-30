@@ -144,8 +144,8 @@ public class SimulateGUI extends Element{
                 case 2:
                     memory = null;
                     //detectError(vmess("check",""));
-                    new VMESS("check","", this).start();
-                    todo = 3;
+                    new VMESS("check","", this, 3).start();
+                    todo = 0;
                 break;
                 case 3:
                     setInputsData("LCD", "BUILD\nSUCCESSFUL");
@@ -158,8 +158,8 @@ public class SimulateGUI extends Element{
                 case 5:
                     memory = null;
                     //detectError(vmess("init",""));
-                    new VMESS("init","", this).start();
-                    todo = 6;
+                    new VMESS("init","", this, 6).start();
+                    todo = 0;
                 break;
                 case 6:
                     setInputsData("LCD", "SIMULATION\nSTARTED");
@@ -172,13 +172,13 @@ public class SimulateGUI extends Element{
                     String send = getInputs()+memory;
                     //String log = vmess("sim",send);
                     
-                    new VMESS("sim",send, this).start();
+                    new VMESS("sim",send, this, 0).start();
                     
                     
             
                     todo = 0;//Acaba aqu'i
                 break;
-                case 9:
+                case 9: //Este no se usa
                     setInputsData("LCD", "SIMULATION\nRUNNING");
                     //Mouse.setBlock(false);
                     todo = 0;
@@ -225,6 +225,11 @@ public class SimulateGUI extends Element{
        //TODO: Throw Error
     }
     public void simResoult(String log){
+        if(log.contains("ERROR")){
+            detectError(log);
+            return;
+        }
+        
         //Trim log hasta []
         if(log.contains("[]")){
             log = log.substring(log.indexOf("[]")+2);
@@ -244,6 +249,9 @@ public class SimulateGUI extends Element{
     
     public int hasTodo(){
         return todo;
+    }
+    public void setTodo(int t){
+        todo = t;
     }
     private void makeChanges(String[][] data, String output){
         String[] outputs = output.split(Pattern.quote("|"));
