@@ -4,17 +4,33 @@ package hardscratch.backend;
 import hardscratch.elements.piezes.Design.*;
 import hardscratch.Controller;
 import hardscratch.Global;
+import static hardscratch.Global.EVENT_RELOAD;
 import hardscratch.base.*;
 import hardscratch.elements.piezes.Constructor;
 import hardscratch.elements.piezes.Hole;
 import hardscratch.elements.piezes.Implementation.Implementer;
+import java.awt.FileDialog;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
+import java.util.zip.ZipOutputStream;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 
 public class BUCKLE {
@@ -642,5 +658,92 @@ public class BUCKLE {
     
     private static void somebodyTouchedMySpagget(){
         System.err.println("\n\nSOMEBODY TOUCHED MY SPAGGET\n\n");
+    }
+    
+    
+    
+    
+    public static void packProyect(String folder, String name){
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new java.io.File(System.getProperty("user.home") + "/Desktop"));
+        chooser.setDialogTitle("Select a directory to export the proyect.");
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        
+        new Thread(){
+            @Override
+            public void run(){
+                if(chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION){
+                    try {
+                        String folderName = name.replace(" ", "_");
+                        
+                        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(Paths.get(chooser.getSelectedFile()+"\\"+name+".hspp").toFile()));
+                        
+                        File board = new File(folder+"\\board.b0ve");
+                        File implement = new File(folder+"\\implement.b0ve");
+                        
+                        zos.putNextEntry(new ZipEntry(folderName+"\\board.b0ve"));
+                        Files.copy(Path.of(board.getPath()), zos);
+                        zos.closeEntry();
+                        zos.putNextEntry(new ZipEntry(folderName+"\\implement.b0ve"));
+                        Files.copy(Path.of(implement.getPath()), zos);
+                        zos.closeEntry();
+                        
+                        zos.close();
+                                
+                    } catch (FileNotFoundException ex) {
+                        Logger.getLogger(BUCKLE.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        Logger.getLogger(BUCKLE.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }.start();
+    }
+    
+    public static void unPackProyect(Element callback){
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new java.io.File(System.getProperty("user.home") + "/Desktop"));
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("HS packed proyect", "hspp", "zip");
+        chooser.setFileFilter(filter);
+        
+        new Thread(){
+            @Override
+            public void run(){
+                if(chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION){
+                    try {
+                        System.out.println("Import from: " + chooser.getSelectedFile());
+                        String prouectsFolder = System.getenv("APPDATA")+"/HardScratch";
+                        byte[] buffer = new byte[1024];
+                        
+                        ZipInputStream zis = new ZipInputStream(new FileInputStream(chooser.getSelectedFile()));
+                        
+                        ZipEntry zipEntry = zis.getNextEntry();
+                        while (zipEntry != null) {
+                            File newFile = new File(prouectsFolder, zipEntry.getName());
+                            
+                            File folder = new File(newFile.getParent());
+                            if(!folder.exists())
+                                folder.mkdir();
+                            
+                            FileOutputStream fos = new FileOutputStream(newFile);
+                            int len;
+                            while ((len = zis.read(buffer)) > 0)
+                                fos.write(buffer, 0, len);
+                            fos.close();
+                            zipEntry = zis.getNextEntry();
+                        }
+                        zis.closeEntry();
+                        zis.close();
+                        
+                        callback.action(EVENT_RELOAD);
+                    } catch (FileNotFoundException ex) {
+                        Logger.getLogger(BUCKLE.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        Logger.getLogger(BUCKLE.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }.start();
     }
 }

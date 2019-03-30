@@ -3,6 +3,7 @@ package hardscratch.elements.piezes.GUIs;
 import hardscratch.Controller;
 import hardscratch.base.Element;
 import static hardscratch.Global.*;
+import hardscratch.backend.BUCKLE;
 import hardscratch.base.Sound;
 import hardscratch.base.SoundPlayer;
 import hardscratch.base.shapes.*;
@@ -16,7 +17,7 @@ public class OpenGUI extends Element{
     private Shape[] cover;
     private Shape back, border, button;
     private TextLabel buttonText;
-    private Image logo, trashcan, menu;
+    private Image logo, trashcan, importt, exportt, menu;
     private ArrayList<ProyectSelecter> proyects;
     private int selectedI;
 
@@ -63,14 +64,22 @@ public class OpenGUI extends Element{
         buttonText = new TextLabel(WINDOW_WIDTH/2, (int) (-WINDOW_HEIGHT*0.22)+(heightButton/2)+WINDOW_HEIGHT, 3, scale12H, FONT_MONOFONTO, COLOR_GUI_5, "OPEN", true);
         buttonText.setScretch(1.5f);
         
-        float scaleImage = heightButton/350f;
+        float scaleImage = heightButton/350f, scaleIEimage = heightButton/(256f+25f);
         trashcan = new Image((int) (((WINDOW_WIDTH-widthButton)/2)-(scaleImage*350f)), (int) (-WINDOW_HEIGHT*0.22)+WINDOW_HEIGHT, 3, TEXTURE_TRASHCAN, scaleImage, COLOR_GUI_5);
+        importt = new Image((int) (((WINDOW_WIDTH-widthButton)/2)+widthButton+10), (int) (-WINDOW_HEIGHT*0.22)+WINDOW_HEIGHT, 3, TEXTURE_IMPORT, scaleIEimage, COLOR_GUI_5);
+        exportt = new Image((int) (((WINDOW_WIDTH-widthButton)/2)+widthButton+10), (int) (-WINDOW_HEIGHT*0.22)+(heightButton/2)+WINDOW_HEIGHT, 3, TEXTURE_EXPORT, scaleIEimage, COLOR_GUI_5);
         float scaleMenu = (WINDOW_HEIGHT*0.10f)/70f;
         menu = new Image((int) (WINDOW_WIDTH-paddingBorder-(scaleMenu*75f)), (int) (WINDOW_HEIGHT-paddingBorder-(scaleMenu*70f)), 3, TEXTURE_HOUSE, scaleMenu, COLOR_WHITE);
         
         addBoundingBox((WINDOW_WIDTH-widthButton)/2, (WINDOW_WIDTH+widthButton)/2, (int) (-WINDOW_HEIGHT*0.22)+WINDOW_HEIGHT, (int) (-WINDOW_HEIGHT*0.22)+WINDOW_HEIGHT+heightButton, EVENT_GO_DESIGN);
         addBoundingBox((int) (((WINDOW_WIDTH-widthButton)/2)-(scaleImage*350f)), (int) (((WINDOW_WIDTH-widthButton)/2)-(scaleImage*49f))
                 , (int) (-WINDOW_HEIGHT*0.22)+WINDOW_HEIGHT, (int) (-WINDOW_HEIGHT*0.22)+WINDOW_HEIGHT+heightButton, EVENT_DELETE);
+        
+        addBoundingBox((int) (((WINDOW_WIDTH-widthButton)/2)+widthButton+10), (int) (((WINDOW_WIDTH-widthButton)/2)+widthButton+10+(scaleIEimage*150))
+                , (int) (-WINDOW_HEIGHT*0.22)+WINDOW_HEIGHT, (int) (-WINDOW_HEIGHT*0.22)+WINDOW_HEIGHT+(heightButton/2), EVENT_IMPORT);
+        addBoundingBox((int) (((WINDOW_WIDTH-widthButton)/2)+widthButton+10), (int) (((WINDOW_WIDTH-widthButton)/2)+widthButton+10+(scaleIEimage*150))
+                , (int) (-WINDOW_HEIGHT*0.22)+WINDOW_HEIGHT+(heightButton/2), (int) (-WINDOW_HEIGHT*0.22)+WINDOW_HEIGHT+heightButton, EVENT_EXPORT);
+        
         addBoundingBox((int) (WINDOW_WIDTH-paddingBorder-(scaleMenu*75f)), (int) (WINDOW_WIDTH-paddingBorder-(scaleMenu*5f)),
                 (int) (WINDOW_HEIGHT-paddingBorder-(scaleMenu*75f)), WINDOW_HEIGHT-paddingBorder, EVENT_GO_HOMO);
     }
@@ -84,14 +93,26 @@ public class OpenGUI extends Element{
                     Controller.setOpenOnNext(proyects.get(selectedI).getName());
                 }
             break;
+            case EVENT_EXPORT:
+                if(selectedI != -1){
+                    openProyect(proyects.get(selectedI).getName());
+                    BUCKLE.packProyect(getProyectFolder(), proyects.get(selectedI).getName());
+                }
+            break;
+            case EVENT_IMPORT:
+                BUCKLE.unPackProyect(this);
+            break;
             case EVENT_GO_HOMO:
                 Controller.changeRoom(ROOM_MENU);
             break;
             case EVENT_DELETE:
                 if(selectedI != -1){
                     deleteProyect(proyects.get(selectedI).getName());
-                    Controller.changeRoom(ROOM_OPEN);
+                    action(EVENT_RELOAD);
                 }
+            break;
+            case EVENT_RELOAD:
+                Controller.changeRoom(ROOM_OPEN);
             break;
         }
     }
@@ -128,6 +149,8 @@ public class OpenGUI extends Element{
         button.draw();
         buttonText.draw();
         trashcan.draw();
+        importt.draw();
+        exportt.draw();
         menu.draw();
     }
     @Override

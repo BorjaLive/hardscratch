@@ -57,7 +57,7 @@ public class Global {
     public static final float FUNCTION_SM_B = 1.8f;
     public static final float FUNCTION_SM_C = -0.8f;
     
-    public static Texture  TEXTURE_ARROW_1, TEXTURE_ARROW_2, TEXTURE_FINDERSLIDER, TEXTURE_HOUSE, TEXTURE_SAVE, TEXTURE_BORELICIOUS, TEXTURE_CLOSE_CROSS, TEXTURE_LOGO, TEXTURE_SETTINGS, TEXTURE_TRASHCAN;
+    public static Texture  TEXTURE_ARROW_1, TEXTURE_ARROW_2, TEXTURE_FINDERSLIDER, TEXTURE_HOUSE, TEXTURE_SAVE, TEXTURE_BORELICIOUS, TEXTURE_CLOSE_CROSS, TEXTURE_LOGO, TEXTURE_SETTINGS, TEXTURE_TRASHCAN, TEXTURE_IMPORT, TEXTURE_EXPORT;
     public static Texture[] TEXTURE_BCD;
     public static String SOUND_SWITCH_UP = RESOURCES+"sound/switchUp.wav";
     public static String SOUND_SWITCH_DOWN = RESOURCES+"sound/switchDown.wav";
@@ -278,7 +278,10 @@ public class Global {
             EVENT_GO_HELP = 21,
             EVENT_SCROLL = 22,
             EVENT_DELETE = 23,
-            EVENT_TOGGLE = 24
+            EVENT_TOGGLE = 24,
+            EVENT_EXPORT = 25,
+            EVENT_IMPORT = 26,
+            EVENT_RELOAD = 27
             ;
     public static final int
             IMPLEMENTER_LED = 1,
@@ -403,6 +406,8 @@ public class Global {
         TEXTURE_CLOSE_CROSS = new Texture(RESOURCES+"img/cross.png");
         TEXTURE_SETTINGS = new Texture(RESOURCES+"img/Setings.png");
         TEXTURE_TRASHCAN = new Texture(RESOURCES+"img/trashcan.png");
+        TEXTURE_IMPORT = new Texture(RESOURCES+"img/import.png");
+        TEXTURE_EXPORT = new Texture(RESOURCES+"img/export.png");
         //FONT_TEST = new Font("src/res/fonts/test.png",32,32,16,16);
         FONT_MONOFONTO = new Font(RESOURCES+"fonts/monofonto.png",64,64,48,64+5);//Sumarle +5 al ultimo 64
         FONT_LCD = new Font(RESOURCES+"fonts/lcd.png",64,64,42,64+8);
