@@ -8,7 +8,7 @@ HardScratch viene a facilitar y hacer más accesible el modelado de hardware. No
 ## Instrucciones de uso
 HardScratch requiere una instalación de Java Rountime Enviroment 11 o superior.
 
-Puedes descargar la versión de prueba más reciente desde el siguiente servidor ftp://casabore.ddns.net/
+Puedes descargar la una versión estable desde las releases de github, o compilar la última versión disponible desde el código fuente.
 
 Es recomendable elegir la versión que contiene el JRE 11, puesto que asegura un funcionamiento correcto.
 
@@ -26,4 +26,5 @@ Compilar HardScratch requiere:
 + Java OpenJDK 11 o superior
 + Librería LWJGL 3.2.1 y sus componentes GLFW, JMALLOC, OPENGL y STB.
 + Autoit 3.1 (Para construir VMESS)
+
 Se recomienda usar Netbeans 10.
