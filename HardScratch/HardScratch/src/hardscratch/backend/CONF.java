@@ -25,7 +25,7 @@ public class CONF {
         File file = new File(System.getenv("APPDATA")+"/HardScratch/conf.B0vE");
         if(file.exists()){
             try {
-                String[] lines = Files.readString(Paths.get(file.getPath())).replace("\n", "").replace("\r", "").split(Pattern.quote("|"));
+                String[] lines = (new String(Files.readAllBytes(Paths.get(file.getPath())))).replace("\n", "").replace("\r", "").split(Pattern.quote("|"));
                 DATA = new int[lines.length];
                 for(int i = 0; i < lines.length; i++)
                     DATA[i] = Integer.parseInt(lines[i]);
@@ -58,7 +58,7 @@ public class CONF {
         
         String data = concatenate(DATA, "|");
         try {
-            Files.write(Path.of(file.getPath()), data.getBytes());
+            Files.write(Paths.get(file.getPath()), data.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
         }

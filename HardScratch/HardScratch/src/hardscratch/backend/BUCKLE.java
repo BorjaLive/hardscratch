@@ -9,23 +9,17 @@ import hardscratch.base.*;
 import hardscratch.elements.piezes.Constructor;
 import hardscratch.elements.piezes.Hole;
 import hardscratch.elements.piezes.Implementation.Implementer;
-import java.awt.FileDialog;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
-import java.util.zip.ZipOutputStream;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -434,7 +428,7 @@ public class BUCKLE {
             File file = new File(Global.getProyectFolder()+"/board.b0ve");
             if(!file.exists()) return;
             
-            lines = Files.readString(Paths.get(Global.getProyectFolder()+"/board.b0ve")).replace("\n", "").replace("\r", "").split(Pattern.quote("{}"));
+            lines = (new String(Files.readAllBytes(Paths.get(Global.getProyectFolder()+"/board.b0ve")))).replace("\n", "").replace("\r", "").split(Pattern.quote("{}"));
             
             Controller.initBUCKLEload(lines.length);
         } catch (IOException e) {
@@ -617,7 +611,7 @@ public class BUCKLE {
     
     public static void loadImplement(){
         try {
-            String[] lines = Files.readString(Paths.get(Global.getProyectFolder()+"/implement.b0ve")).replace("\n", "").replace("\r", "").split(Pattern.quote("{}"));
+            String[] lines = (new String(Files.readAllBytes(Paths.get(Global.getProyectFolder()+"/implement.b0ve")))).replace("\n", "").replace("\r", "").split(Pattern.quote("{}"));
             String[] data;
             
             for(String line:lines){
@@ -637,7 +631,7 @@ public class BUCKLE {
                 return new String[0][2];
         
         try {
-            String[] lines = Files.readString(Path.of(file.getPath())).replace("\n", "").replace("\r", "").split(Pattern.quote("{}"));
+            String[] lines = (new String(Files.readAllBytes(Paths.get(file.getPath())))).replace("\n", "").replace("\r", "").split(Pattern.quote("{}"));
             String[][] data = new String[lines.length][2];
             String[] parts;
             
@@ -683,10 +677,10 @@ public class BUCKLE {
                         File implement = new File(folder+"\\implement.b0ve");
                         
                         zos.putNextEntry(new ZipEntry(folderName+"\\board.b0ve"));
-                        Files.copy(Path.of(board.getPath()), zos);
+                        Files.copy(Paths.get(board.getPath()), zos);
                         zos.closeEntry();
                         zos.putNextEntry(new ZipEntry(folderName+"\\implement.b0ve"));
-                        Files.copy(Path.of(implement.getPath()), zos);
+                        Files.copy(Paths.get(implement.getPath()), zos);
                         zos.closeEntry();
                         
                         zos.close();
