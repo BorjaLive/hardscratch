@@ -21,6 +21,9 @@ Manual en español: https://github.com/BorjaLive/hardscratch/blob/master/Manual.
 
 Blog del proyecto: https://hardscratchb0ve.blogspot.com/
 
+### Usuario de GNU Linux
+No todas las caracteristicas han sido portadas la versión para linux. La simulación se encuentra desactivada por no poder integrar directamente sus componentes.
+
 ## Clonado
 Compilar HardScratch requiere:
 + Java OpenJDK 11 o superior
