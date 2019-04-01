@@ -4,7 +4,6 @@ import hardscratch.Controller;
 import hardscratch.base.Element;
 import static hardscratch.Global.*;
 import hardscratch.backend.BUCKLE;
-import hardscratch.base.Sound;
 import hardscratch.base.SoundPlayer;
 import hardscratch.base.shapes.*;
 import hardscratch.elements.piezes.ProyectSelecter;
@@ -176,6 +175,7 @@ public class OpenGUI extends Element{
     public void updateEvent(int event, int data1, int data2, String data3) {
         switch(event){
             case EVENT_SCROLL:
+                if(proyects.isEmpty()) break;
                 //data 1 es la cantidad
                 if(data1 > 0){
                     //Bajar: El primero no debe bajar de x POS

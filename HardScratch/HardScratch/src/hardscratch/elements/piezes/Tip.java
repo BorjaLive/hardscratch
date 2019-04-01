@@ -174,11 +174,11 @@ public class Tip extends Element{
                 addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "ERROR", true), (width/2), (height/2));
             break;
             case Global.TIP_VAR_CONV_ARRAY_TO_INT:
-                width = 350; height = 44;
+                width = 370; height = 44;
                 addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "ERROR", true), (width/2), (height/2));
             break;
             case Global.TIP_VAR_CONV_INT_TO_ARRAY:
-                width = 350; height = 44;
+                width = 370; height = 44;
                 addLabel(new TextLabel(0, 0, 3, 0.5f, Global.FONT_MONOFONTO, Global.COLOR_WHITE, "ERROR", true), (width/2), (height/2));
             break;
         }

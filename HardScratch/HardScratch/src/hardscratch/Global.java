@@ -35,7 +35,7 @@ public class Global {
     
     public static boolean DEBUG_MODE = false;
     public static int DRAWING_RADIUS_LIMIT = 500;   //Algun dia habra que quitar esto
-    public static String VERSION_NAME = "v1.0 OpenWound BETA";
+    public static String VERSION_NAME = "v1.0 OpenWound";
     
     public static final float[][] SHAPE_SQUARE = new float[][] {
         new float[] { 0, 0,},
