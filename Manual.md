@@ -25,6 +25,31 @@ A demás de los módulos en Autoit, el código en Java se apoya en la librería 
 
 Este proyecto ha sido realizado por Borja López, alias B0vE, para el concurso universitario de software libre ([CUSL](https://concursosoftwarelibre.org)) 2019.
 
+### Porte para GNU Linux
+HardScratch no se olvida de los usuarios de kernel libre.
+En este caso no hay launcher, el programa debe abrir se mediante el siguiente comando en la carpeta dónde se descomprima.
+```
+java -jar HardScratch.jar
+```
+Dado que la simulación está mayormente escrita en Autoit, no es posible portar esta característica directamente. Es por esto que en OpenWound no habrá simulación en Linux.
+Sin embargo, dado que Autoit tiene buena integración con Wine y GHDL es multiplataforma, no se descarta reincorporar la simulación en una futura versión.
+
+### Confirmaciones de compatibilidad
+Commbinaciones de OS y Java sobre las que el programa fue probado.
+> #### Windows 7
+>> + ##### OpenJDK 11
+>> + ##### OracleJDK 11
+>> + ##### OracleJDK 12
+>> + ##### OracleJRE 1.8
+> #### Windows 8 y 8.1
+>> Se busca confirmación
+> #### Windows 10
+>> Se busca confirmación
+> #### Ubuntu 18
+>> + ##### OpenJDK 1.8
+> #### Debian 9
+>> + ##### OpenJDK 1.8
+
 
 ## Notas de la v1.0.x
 Este manual de usuario está escrito para la versión v1.0 BETA y LTS, por tanto, puede ser incompatible con funciones futuras del lenguaje.
