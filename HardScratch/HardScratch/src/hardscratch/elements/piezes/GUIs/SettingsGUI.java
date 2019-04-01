@@ -4,7 +4,6 @@ import hardscratch.Controller;
 import hardscratch.base.Element;
 import static hardscratch.Global.*;
 import hardscratch.backend.CONF;
-import hardscratch.base.shapes.Image;
 import hardscratch.base.shapes.*;
 
 public class SettingsGUI extends Element{

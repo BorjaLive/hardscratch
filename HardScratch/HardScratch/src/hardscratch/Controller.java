@@ -635,6 +635,12 @@ public class Controller {
     }
     
     public static void changeRoom(int room){
+        if(room == ROOM_SIMULATE){
+            setError(ERROR_SIMULATION_IN_LINUX, -1);
+            return;
+        }
+        
+        
         SoundPlayer.play(SOUND_KEY_PRESS);
         
         BUCKLE.save();
@@ -671,9 +677,9 @@ public class Controller {
                 implementImplementElements();
             break;
             case ROOM_SIMULATE:
-                slidingFinder = -1;
-                elements.add(new SimulateGUI());
-                elements.get(elements.size()-1).action(EVENT_CREATE_SPARTAN);
+                //slidingFinder = -1;
+                //elements.add(new SimulateGUI());
+                ///elements.get(elements.size()-1).action(EVENT_CREATE_SPARTAN);
             break;
             case ROOM_EASTER:
                 elements.add(new EasterGUI());

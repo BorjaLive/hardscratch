@@ -7,10 +7,13 @@ import hardscratch.base.shapes.*;
 import hardscratch.elements.piezes.WaitCourtain;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 
@@ -327,7 +330,8 @@ public class Global {
             ERROR_PROYECT_IS_EMPTY = 19,
             ERROR_PROBLEM_LOADING_PROYECT = 20,
             ERROR_BAD_CONDITION = 21,
-            ERROR_BAD_EXPRESSION = 22
+            ERROR_BAD_EXPRESSION = 22,
+            ERROR_SIMULATION_IN_LINUX = 23
             ;
     public static final String[] ERROR_NAME = new String[]{"BOKEY", "Input And Output variables\ncan not be initialized.",
     "Constants must\nbe initialized.","Output var\ncannot be read.","Constants cannot\nbe assigned.","Illegal conversion.",
@@ -335,7 +339,7 @@ public class Global {
     "Switch needs\ndefault case.","Variable does\nnot exist.","Illegal use of addition operator.","Illegal use of subtraction operator.",
     "Illegal use of\nproduct operator.","Illegal use of\ndivision operator.","Illegal use of\nconcatenate operator.",
     "Illegal inicialization.","Length of bit array\ncannot be modified.","Cant compile an\nempty proyect",
-    "Unespected problem\nloading proyect.", "Illegal\ncondition", "Illegal\nexpression"};
+    "Unespected problem\nloading proyect.", "Illegal\ncondition", "Illegal\nexpression", "Simulation in linux\nis not supported"};
     
     public static float distance(int x1, int y1, int x2, int y2){
         return (float) Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));
@@ -416,11 +420,6 @@ public class Global {
         TEXTURE_EXPORT = new Texture(RESOURCES+"img/export.png");
         //FONT_TEST = new Font("src/res/fonts/test.png",32,32,16,16);
         FONT_MONOFONTO = new Font(RESOURCES+"fonts/monofonto.png",64,64,48,64+5);//Sumarle +5 al ultimo 64
-        FONT_LCD = new Font(RESOURCES+"fonts/lcd.png",64,64,42,64+8);
-        TEXTURE_BCD = new Texture[11];
-        TEXTURE_BORELICIOUS = new Texture(RESOURCES+"img/borelicious.png");
-        for(int i = 0; i < 11; i++)
-            TEXTURE_BCD[i] = new Texture(RESOURCES+"img/bcd"+i+".jpg");
         
         if(CONF.get(CONF.THEME) == 1){
             //LIGHT THEME
@@ -619,10 +618,24 @@ public class Global {
     
     public static void planedRestart(){
         try {
-            Runtime.getRuntime().exec(Global.LAUNCHER_EXE);
+            final String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+            final File currentJar = new File(HardScratch.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+
+            
+            if(!currentJar.getName().endsWith(".jar"))
+                return;
+            
+            
+            final ArrayList<String> command = new ArrayList<>();
+            command.add(javaBin);
+            command.add("-jar");
+            command.add(currentJar.getPath());
+            
+            final ProcessBuilder builder = new ProcessBuilder(command);
+            builder.start();
             System.exit(0);
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (URISyntaxException | IOException ex) {
+            Logger.getLogger(Global.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
