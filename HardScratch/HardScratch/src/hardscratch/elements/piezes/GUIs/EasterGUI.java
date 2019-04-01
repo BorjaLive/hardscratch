@@ -108,7 +108,7 @@ public class EasterGUI  extends Element{
 
     private void load(){
         try {
-            String[] lines = Files.readString(Paths.get(wordsFile)).split(Pattern.quote("\r\n"));
+            String[] lines = (new String(Files.readAllBytes(Paths.get(wordsFile)))).split(Pattern.quote("\r\n"));
             words = new String[lines.length];
             times = new long[lines.length*2];
             for(int i = 0; i < lines.length; i++){
