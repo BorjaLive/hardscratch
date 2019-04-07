@@ -1,10 +1,10 @@
 v 4
-file / "C:\Users\Margaret\AppData\Roaming/HardScratch/Adivinador\sim\sim.vhdl" "30a9b65f23da8af532af39b69b8f236ef701b81b" "20190407111228.484":
-  entity hardscratch_entity_tdqh1d at 11( 473) + 0 on 545;
-  architecture hardscratch_architecture_tdqh1d of hardscratch_entity_tdqh1d at 29( 970) + 0 on 546;
-file / "C:\Users\Margaret\AppData\Roaming/HardScratch/Adivinador\sim\simTest.vhdl" "4e35c7a69cd70250761be7f88aa39e5a9091f65a" "20190407111228.523":
-  entity hardscratchsimulation_entity_tdqh1d at 11( 515) + 0 on 547;
-  architecture hardscratchsimulation_architecture_tdqh1d of hardscratchsimulation_entity_tdqh1d at 20( 720) + 0 on 548;
-file / "C:\Users\Margaret\AppData\Roaming/HardScratch/Adivinador\code.vhdl" "1495b4f326d3eedea7549fbf1271ff8eaea570e2" "20190407111151.649":
-  entity hardscratch_entity at 11( 473) + 0 on 467;
-  architecture hardscratch_architecture of hardscratch_entity at 27( 825) + 0 on 468;
+file / "C:\Users\Margaret\AppData\Roaming/HardScratch/Adivinador\code.vhdl" "8a6fe661c41d1b4dc2b5934cc32ea7391e0df513" "20190407122520.311":
+  entity hardscratch_entity at 11( 473) + 0 on 549;
+  architecture hardscratch_architecture of hardscratch_entity at 27( 825) + 0 on 550;
+file / "C:\Users\Margaret\AppData\Roaming/HardScratch/Adivinador\sim\simTest.vhdl" "1353719ed2d6c3ca4abd6ef69bf3417f465257ab" "20190407122527.577":
+  entity hardscratchsimulation_entity_b70n0i at 11( 515) + 0 on 577;
+  architecture hardscratchsimulation_architecture_b70n0i of hardscratchsimulation_entity_b70n0i at 20( 720) + 0 on 578;
+file / "C:\Users\Margaret\AppData\Roaming/HardScratch/Adivinador\sim\sim.vhdl" "a56c825dbfe97a011e36318d8947fc946ed9323f" "20190407122527.542":
+  entity hardscratch_entity_b70n0i at 11( 473) + 0 on 575;
+  architecture hardscratch_architecture_b70n0i of hardscratch_entity_b70n0i at 29( 970) + 0 on 576;
