@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 public class SimulateGUI extends Element{
     
     private Shape_Square backColor, backBoard;
+    private Image boreliciousLogo;
     private final int X, Y, width, height, unit;
     
     private boolean started, reset;
@@ -40,7 +41,7 @@ public class SimulateGUI extends Element{
         implementation = BUCKLE.getImplement();
         
         backBoard = new Shape_Square(X, Y, Global.COLOR_CIRCUIT_GREEN, 1, 5, width, height);
-        addImage(new Image(0, 0, 2, Global.TEXTURE_BORELICIOUS, (5*unit)/254f, Global.COLOR_WHITE), Y+unit*15, X+(int) (unit*2.5f));
+        boreliciousLogo = new Image(Y+unit*15, X+(int) (unit*2.5f), 2, Global.TEXTURE_BORELICIOUS, (5*unit)/254f, Global.COLOR_WHITE);
     }
     
     private void createElectronics(){
@@ -73,6 +74,7 @@ public class SimulateGUI extends Element{
             case Global.EVENT_DRAW_BACKGROUND:
                 backColor.draw();
                 backBoard.draw();
+                boreliciousLogo.draw();
             break;
             case Global.EVENT_DRAW_FLOD:
                 //No hay flod

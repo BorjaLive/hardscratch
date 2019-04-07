@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 /*
     BUMLAY ENCODING RULES
@@ -265,6 +266,7 @@ public class BUMLAY {
             }
             
             list.add(genSWITCHCASE(e.getID(),switchcase));
+            //System.out.println("COSA: "+Arrays.toString(list.toArray()));
         }else if(e.getClass() == WaitFor.class){
             if(!e.isComplete()) return list;
             list.add(genWAITFOR(e.getID(),creator2String(e.getCreator(0))));

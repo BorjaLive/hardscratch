@@ -1,57 +1,5 @@
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
-#AutoIt3Wrapper_Outfile=..\..\src\res\vmess\vmess.exe
-#AutoIt3Wrapper_Res_Description=VME Simulated Simulation
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.20
-#AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
-#AutoIt3Wrapper_Res_ProductName=VMESS
-#AutoIt3Wrapper_Res_ProductVersion=0.9
-#AutoIt3Wrapper_Res_CompanyName=Liveployers
-#AutoIt3Wrapper_Res_LegalCopyright=B0vE
-#AutoIt3Wrapper_Res_LegalTradeMarks=Borja Live
-#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
-#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
-#AutoIt3Wrapper_Outfile=..\..\src\res\vmess\vmess.exe
-#AutoIt3Wrapper_Res_Description=VME Simulated Simulation
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.20
-#AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
-#AutoIt3Wrapper_Res_ProductName=VMESS
-#AutoIt3Wrapper_Res_ProductVersion=0.9
-#AutoIt3Wrapper_Res_CompanyName=Liveployers
-#AutoIt3Wrapper_Res_LegalCopyright=B0vE
-#AutoIt3Wrapper_Res_LegalTradeMarks=Borja Live
-#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
-#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
-#AutoIt3Wrapper_Outfile=..\..\src\res\vmess\vmess.exe
-#AutoIt3Wrapper_Res_Description=VME Simulated Simulation
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.20
-#AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
-#AutoIt3Wrapper_Res_ProductName=VMESS
-#AutoIt3Wrapper_Res_ProductVersion=0.9
-#AutoIt3Wrapper_Res_CompanyName=Liveployers
-#AutoIt3Wrapper_Res_LegalCopyright=B0vE
-#AutoIt3Wrapper_Res_LegalTradeMarks=Borja Live
-#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
-#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
-#AutoIt3Wrapper_Outfile=..\..\src\res\vmess\vmess.exe
-#AutoIt3Wrapper_Res_Description=VME Simulated Simulation
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.20
-#AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
-#AutoIt3Wrapper_Res_ProductName=VMESS
-#AutoIt3Wrapper_Res_ProductVersion=0.9
-#AutoIt3Wrapper_Res_CompanyName=Liveployers
-#AutoIt3Wrapper_Res_LegalCopyright=B0vE
-#AutoIt3Wrapper_Res_LegalTradeMarks=Borja Live
-#EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
-#Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Outfile=..\HardScratch\HardScratch\src\res\vmess\vmess.exe
-#AutoIt3Wrapper_Res_Description=VME Simulated Simulation
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.19
-#AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
-#AutoIt3Wrapper_Res_ProductName=VMESS
-#AutoIt3Wrapper_Res_ProductVersion=0.9
-#AutoIt3Wrapper_Res_CompanyName=Liveployers
-#AutoIt3Wrapper_Res_LegalCopyright=B0vE
-#AutoIt3Wrapper_Res_LegalTradeMarks=Borja Live
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 #include "_RunWaitGet.au3"
 #include "VME2.au3"
@@ -59,9 +7,9 @@
 
 ;Esto hay que eliminarlo
 ;$cmdLine = __getArray()
-;__add($cmdLine, "check")
-;__add($cmdLine, "C:\Users\Margaret\AppData\Roaming/HardScratch/Sistema_simple")
-;__add($cmdLine, "entradaS:'0'|contador:'0000'|null")
+;__add($cmdLine, "sim")
+;__add($cmdLine, "C:\Users\Margaret\AppData\Roaming/HardScratch/Adivinador")
+;__add($cmdLine, "empezar:'0'|CK:'0'|entrada:'0000'|null")
 
 $path = StringReplace(__getArgument(2)," ","_")
 $pathSim = $path & "\sim"
@@ -125,8 +73,14 @@ Func __checkLog($line, $log)
 		$code = $ERROR_BAD_INICIALIZATION
 	ElseIf StringInStr($log, "no function declarations for operator") <> 0 Or StringInStr($log, "unexpected token") Or StringInStr($log, 'missing ";" at end of object declaration') Then
 		$code = $ERROR_BAD_EXPRESSION
-	ElseIf StringInStr($log, "can't match") <> 0 And StringInStr($log, "with type boolean") <> 0 Then
-		$code = $ERROR_BAD_CONDITION
+	ElseIf StringInStr($log, "can't match") <> 0 Then
+		If StringInStr($log, "with type boolean") <> 0 Then
+			$code = $ERROR_BAD_CONDITION
+		Else
+			$code = $ERROR_INCOMPATIBLE_TYPES
+		EndIf
+	ElseIf StringInStr($log, "wait statement not allowed") <> 0 Then
+		$code = $ERROR_WAIT_NOT_ALLOWED
 	;TODO: AQUI HAY QUE AGREGAR UN PORRON DE ERRORES QUE SUELTA GHDL
 	EndIf
 

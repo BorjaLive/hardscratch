@@ -326,8 +326,10 @@ public class Global {
             ERROR_CANT_CHANGE_LENGTH_OF_BITARRAY = 18,
             ERROR_PROYECT_IS_EMPTY = 19,
             ERROR_PROBLEM_LOADING_PROYECT = 20,
-            ERROR_BAD_CONDITION = 21,
-            ERROR_BAD_EXPRESSION = 22
+            ERROR_INCOMPATIBLE_TYPES= 21,
+            ERROR_BAD_EXPRESSION = 22,
+            ERROR_WAIT_NOT_ALLOWED = 23,
+            ERROR_BAD_CONDITION = 24
             ;
     public static final String[] ERROR_NAME = new String[]{"BOKEY", "Input And Output variables\ncan not be initialized.",
     "Constants must\nbe initialized.","Output var\ncannot be read.","Constants cannot\nbe assigned.","Illegal conversion.",
@@ -335,7 +337,8 @@ public class Global {
     "Switch needs\ndefault case.","Variable does\nnot exist.","Illegal use of addition operator.","Illegal use of subtraction operator.",
     "Illegal use of\nproduct operator.","Illegal use of\ndivision operator.","Illegal use of\nconcatenate operator.",
     "Illegal inicialization.","Length of bit array\ncannot be modified.","Cant compile an\nempty proyect",
-    "Unespected problem\nloading proyect.", "Illegal\ncondition", "Illegal\nexpression"};
+    "Unespected problem\nloading proyect.", "Incompatible\ntypes", "Illegal\nexpression", "Wait statement\nnot allowed",
+    "Illegal\ncondition"};
     
     public static float distance(int x1, int y1, int x2, int y2){
         return (float) Math.sqrt(Math.pow(x2-x1,2)+Math.pow(y2-y1,2));

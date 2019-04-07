@@ -291,6 +291,15 @@ public class Controller {
             changeRoom(ROOM_EASTER);
         if(easterTrue) elements.get(0).action(EVENT_TURN_ON);
         
+        //Calbiar reloj con una tecla
+        if(currentRoom == ROOM_SIMULATE){
+            if(Keyboard.getClick(GLFW_KEY_T)){
+                for(Element e:elements)
+                    if(e.getClass() == SimulatedClock.class)
+                        e.action(EVENT_TOGGLE);
+            }
+        }
+        
         //Click en summoners
         if(Mouse.getX() < finderPos && Mouse.getY() > 70 )
             for(Summoner summoner : selectedFinder){

@@ -25,6 +25,7 @@ Func __add(Byref $array, $element, $isList = False, $XOR = False)
 
 	If $isList Then
 		; Is a list of elements
+		If Not IsArray($element) Then Return
 		For $i = 1 To $element[0]
 			__add($array,$element[$i])
 		Next

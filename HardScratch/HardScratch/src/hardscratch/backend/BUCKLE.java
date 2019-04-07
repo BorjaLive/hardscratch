@@ -540,7 +540,8 @@ public class BUCKLE {
                     
                     e.getHole(0).forceAsign(data[4]);
                     for(int i = 5; i < data.length; i++)
-                        e.getCreator(i-5).forceSet(data[i]);
+                        if(e.getCreator(i-5) != null)
+                            e.getCreator(i-5).forceSet(data[i]);
                     
                 }else if(data[0].equals("SETSWITCH")){
                     Element e = Controller.getElementByID(data[1]);
@@ -550,7 +551,8 @@ public class BUCKLE {
                     
                     e.getHole(0).forceAsign(data[4]);
                     for(int i = 6; i < data.length; i++)
-                        e.getCreator(i-6).forceSet(data[i]);
+                        if(e.getCreator(i-6) != null)
+                            e.getCreator(i-6).forceSet(data[i]);
                     
                     
                 }else if(data[0].equals("SASIG")){
@@ -566,7 +568,7 @@ public class BUCKLE {
                         data8+i:ID dock SEQ-P       Integer or -1
                     */
                     for(int i = 5; i < data.length; i+=2){
-                        if(i != 5)
+                        if(i != 5 && e.getCreator((i-5)/2) != null)
                             e.getCreator((i-5)/2).forceSet(data[i]);
                         
                         Controller.autoDock(data[1], data[i+1], (i-1)/2, 0);
@@ -578,8 +580,8 @@ public class BUCKLE {
                     
                     Controller.getElementByID(data[1]).getHole(0).forceAsign(data[6]);
                     for(int i = 6; i < data.length; i+=2){
-                        if(i != 6)
-                            e.getCreator((i-6)/2).forceSet(data[i]);
+                        if(i != 6 && e.getCreator((i-6)/2) != null)
+                                e.getCreator((i-6)/2).forceSet(data[i]);
                         
                         Controller.autoDock(data[1], data[i+1], (i-2)/2, 0);
                     }

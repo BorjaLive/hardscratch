@@ -10,7 +10,8 @@
 Const $ERROR[] = ["BOKEY", "CANNOT_INICIALIZE_INOUT", "CONST_MUST_BE_INICIALIZED", "OUT_VAR_CANNOT_BE_READEN", "CONST_VAR_CANNOT_BE_ASIGNED", _
 "CONVERSION_NOT_ALLOWED", "IN_VAR_CANNOT_BE_ASIGNED", "SETIF_IS_USELESS", "SETSWITCH_IS_USELESS", "ELSE_VALUE_NEEDED", "SWITCH_NEEDS_DEFAULT_CASE", _
 "VARIABLE_DOES_NOT_EXIST", "ILEGAL_USE_OF_OPERATOR_ADD", "ILEGAL_USE_OF_OPERATOR_SUB", "ILEGAL_USE_OF_OPERATOR_TIM", "ILEGAL_USE_OF_OPERATOR_TAK", _
-"ILEGAL_USE_OF_OPERATOR_CONCATENATE", "BAD_INICIALIZATION", "CANT_CHANGE_LENGTH_OF_BITARRAY","PROYECT_IS_EMPTY", "PROBLEM_LOADING", "BAD_CONDITION", "BAD_EXPRESSION"]
+"ILEGAL_USE_OF_OPERATOR_CONCATENATE", "BAD_INICIALIZATION", "CANT_CHANGE_LENGTH_OF_BITARRAY","PROYECT_IS_EMPTY", "PROBLEM_LOADING", "INCOMPATIBLE_TYPES", "BAD_EXPRESSION", _
+"WAIT_NOT_ALLOWED", "BAD_CONDITION"]
 Const 	$ERROR_BOKEY = 0, _
 		$ERROR_CANNOT_INICIALIZE_INOUT = 1, _
 		$ERROR_CONST_MUST_BE_INICIALIZED = 2, _
@@ -32,8 +33,10 @@ Const 	$ERROR_BOKEY = 0, _
 		$ERROR_CANT_CHANGE_LENGTH_OF_BITARRAY = 18, _
 		$ERROR_PROYECT_IS_EMPTY = 19, _
 		$ERROR_PROBLEM_LOADING = 20, _
-		$ERROR_BAD_CONDITION = 21, _
-		$ERROR_BAD_EXPRESSION = 22
+		$ERROR_INCOMPATIBLE_TYPES = 21, _
+		$ERROR_BAD_EXPRESSION = 22, _
+		$ERROR_WAIT_NOT_ALLOWED = 23, _
+		$ERROR_BAD_CONDITION = 24
 
 Global $PROCESS_USED_VARS = Null, $CONSTRUCTOR_USED_VARS= Null, $VARIABLES = Null, $IDLINES = Null, $TMP_IDLINES = Null
 Global $SIMULATION_MODE = Null, $SIM_PROCESS_COUNTER = Null
@@ -55,7 +58,6 @@ Func compile($file, $output, $simulation = False)	;Simylation True: Crear salida
 	__add($lines, generateHeader(), True)
 	__add($lines, generateEntity(), True)
 	__add($lines, generateArchitecture($raw), True)
-
 
 	;_ArrayDisplay($lines)
 	__write($lines, $output)
@@ -459,6 +461,7 @@ Func _logicConstructor($logic)
 		__add($TMP_IDLINES, $logic[2])
 	ElseIf $logic[1] = "SETIF" Then
 		;SETIF [0. 3+2n],[1. SETIF],[2. ID],[3. VAR],[4 + 2n. Condition],[5 + 2n. Value]
+
 		$TMP_IDLINES = __getArray()
 		$var = getVarByName($logic[3], $logic[2])
 
@@ -511,7 +514,7 @@ Func _logicConstructor($logic)
 			EndIf
 		Next
 
-		__addIndentation($lines, $indentation& _decodeConstructor($logic[6], $logic[2]) &";")
+		__addIndentation($lines, $indentation& _decodeConstructor($logic[6], $logic[2]) &" When others;")
 
 		__add($TMP_IDLINES, $logic[2])
 		__add($TMP_IDLINES, $logic[2])

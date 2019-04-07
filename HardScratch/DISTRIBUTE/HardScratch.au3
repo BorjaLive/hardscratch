@@ -2,7 +2,7 @@
 #AutoIt3Wrapper_Icon=icon_light.ico
 #AutoIt3Wrapper_Outfile=HardScratch.exe
 #AutoIt3Wrapper_Res_Description=HardScratch Launcher
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.6
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.7
 #AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
 #AutoIt3Wrapper_Res_ProductName=Hard Scratch
 #AutoIt3Wrapper_Res_ProductVersion=0.9
