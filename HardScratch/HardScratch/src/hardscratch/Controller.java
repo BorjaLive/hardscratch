@@ -25,7 +25,8 @@ public class Controller {
     private static int deleteAll;
     
     private static int errorI, errorState;
-    private static long errorID;
+    private static long errorID, futureErrorID;
+    private static int futureErrorCode;
     private static String openOnNext;
     private static int openOnNextCounter;
     private static int buckleStage, buckleLine, buckleMax;
@@ -66,6 +67,8 @@ public class Controller {
         focus = -1; Rfocus = -1; lastFocus= -1;
         errorID = -1;
         deleteAll = 0;
+        futureErrorCode = -1;
+        futureErrorID = -1;
         
         load();
         Mouse.Init(window);
@@ -265,6 +268,12 @@ public class Controller {
                 }
             }
             if(buckleStage == 6){
+                if(futureErrorCode != -1){
+                    pushError(futureErrorCode, futureErrorID);
+                    futureErrorCode = -1;
+                    futureErrorID = -1;
+                }
+                
                 buckleStage = 0;
                 ElementsHolesCorrectTipPos();
                 //System.out.println("BUCLE FINISH");
@@ -837,11 +846,16 @@ public class Controller {
         }
     }
 
-    public static void setError(int errorCode, int id){
+    public static void setError(int errorCode, long id){
         //Ir a Design
         if(currentRoom != ROOM_DESIGN)
             changeRoom(ROOM_DESIGN);
         
+        futureErrorCode = errorCode;
+        futureErrorID = id;
+        
+    }
+    public static void pushError(int errorCode, long id){
         //Buscar que no exista ya un notifier
         for(int i = 0; i < elements.size(); i++){
             if(elements.get(i).getClass() == Notifier.class){
@@ -855,7 +869,6 @@ public class Controller {
         
         //Mover el tablero para centrar el error, pero cuando termine de cargar
         errorID = id;
-        
     }
     public static void errorTerminate(){
         if(errorI >= 0 && errorI < elements.size()) elements.get(errorI).effectClear();

@@ -210,14 +210,14 @@ public class SimulateGUI extends Element{
         String[] parts = text.split(Pattern.quote(":"));
         if(parts.length != 3 || !parts[0].equals("ERROR")) return;
         try{
-            throwError(Integer.valueOf(parts[1]),Integer.valueOf(parts[2]));
+            throwError(Integer.valueOf(parts[1]),Long.valueOf(parts[2]));
         }catch(NumberFormatException ex){
             ex.printStackTrace();
             System.out.println("ERROR INESPERADO: "+parts[1]);
             throwError(666, -1);//Error inesperado
         }
     }
-    private void throwError(int code, int id){
+    private void throwError(int code, long id){
         if(code == 0 && id == 0) return; //BOKEY
         if(code < ERROR_NAME.length){
             Controller.setError(code, id);
